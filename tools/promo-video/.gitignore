@@ -1,0 +1,9 @@
+node_modules
+dist
+out
+.DS_Store
+.env
+
+# Drawn by scripts/render.sh (the app's views, the wallpaper, the sounds): never edited by hand.
+public/app
+public/gen

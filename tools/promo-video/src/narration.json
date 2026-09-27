@@ -1,0 +1,35 @@
+{
+  "voice": "Charon",
+  "model": "gemini-2.5-pro-tts",
+  "style": "Read this line of a short product video in English, in a warm, upbeat and confident voice, at a lively, brisk pace, without adding any words:",
+  "lines": [
+    {
+      "id": "intro",
+      "text": "Meet SimplyBar, a free system monitor for your Mac's menu bar."
+    },
+    {
+      "id": "settings",
+      "text": "Open the settings and switch on the modules you want."
+    },
+    {
+      "id": "click",
+      "text": "Click any item to see the details."
+    },
+    {
+      "id": "live",
+      "text": "Everything updates in real time."
+    },
+    {
+      "id": "widgets",
+      "text": "To add widgets, right-click the desktop and choose Edit Widgets."
+    },
+    {
+      "id": "drag",
+      "text": "Drag them in: CPU, memory, network, SSD and storage."
+    },
+    {
+      "id": "outro",
+      "text": "SimplyBar. Free and open source, on the Mac App Store."
+    }
+  ]
+}
