@@ -6,7 +6,7 @@ struct DemoNames: Decodable {
     var gpu: String
     var keyboard: String
     var mouse: String
-    var headphones: String
+    var earbuds: String
     var system: String
     var photos: String
     var backup: String
@@ -47,7 +47,7 @@ struct DemoData {
             BluetoothDevice(name: names.keyboard, levels: [.init(part: .main, percent: 78)]),
             BluetoothDevice(name: names.mouse, levels: [.init(part: .main, percent: 16)]),
             // Earbuds report each side and the case, which shows how the popup lays out several levels.
-            BluetoothDevice(name: names.headphones, levels: [
+            BluetoothDevice(name: names.earbuds, levels: [
                 .init(part: .left, percent: 90), .init(part: .right, percent: 85), .init(part: .caseBattery, percent: 62),
             ]),
         ]

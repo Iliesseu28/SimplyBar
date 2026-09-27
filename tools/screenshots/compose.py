@@ -30,7 +30,7 @@ APPSTORE_SIZE = (2880, 1800)
 TITLE_WIDTH = APPSTORE_SIZE[0] - 320  # widest title line, in pixels
 # Long dashes are refused in every text of the set (written as code points so this file holds none).
 FORBIDDEN_DASHES = {chr(0x2014): "em dash", chr(0x2013): "en dash", chr(0x2015): "horizontal bar"}
-DEMO_KEYS = ["gpu", "keyboard", "mouse", "headphones", "system", "photos", "backup", "archive"]
+DEMO_KEYS = ["gpu", "keyboard", "mouse", "earbuds", "system", "photos", "backup", "archive"]
 RTL_LANGUAGES = {"ar", "he", "fa", "ur"}
 # Language of the app (its .lproj and titles.json key) to language of the Mac App Store listing, which names the
 # folder of its screenshots (interne/appstore-metadata/version/1.0/<code>.json). Codes not listed are the same.
