@@ -46,9 +46,10 @@ struct DemoData {
         [
             BluetoothDevice(name: names.keyboard, levels: [.init(part: .main, percent: 78)]),
             BluetoothDevice(name: names.mouse, levels: [.init(part: .main, percent: 16)]),
-            // One level, as over-ear headphones report it. Earbuds would add Left, Right and Case, whose labels
-            // wrap in French in the 300 pt popup.
-            BluetoothDevice(name: names.headphones, levels: [.init(part: .main, percent: 64)]),
+            // Earbuds report each side and the case, which shows how the popup lays out several levels.
+            BluetoothDevice(name: names.headphones, levels: [
+                .init(part: .left, percent: 90), .init(part: .right, percent: 85), .init(part: .caseBattery, percent: 62),
+            ]),
         ]
     }
 

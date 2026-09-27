@@ -1,9 +1,10 @@
 {
   "_readme": [
-    "One entry per language code of the string catalog (en, fr, de, ja, zh-Hans, pt-BR...).",
+    "One entry per language of the app, keyed by its code in the string catalog (.lproj): en, fr, de, es-419, zh-Hans...",
+    "compose.py maps it to the Mac App Store code of the listing (de to de-DE, nb to no, es-419 to es-MX) for the folder name.",
     "titles: the 5 titles of the Mac App Store screenshots 01 to 05, short and factual. No em dash or en dash.",
     "demo: names the app does not translate because they are user data (GPU model, Bluetooth devices, disk names).",
-    "locale (optional): region used for dates and numbers, e.g. ar_AE; by default the language code with _ (pt_BR) or its usual country."
+    "locale (optional): region used for dates and numbers, e.g. ar_AE; by default the usual country of the language."
   ],
   "en": {
     "titles": [
@@ -13,16 +14,151 @@
       "5 desktop widgets",
       "Free, open source, no data collected"
     ],
-    "demo": {
-      "gpu": "Integrated GPU",
-      "keyboard": "Keyboard",
-      "mouse": "Mouse",
-      "headphones": "Headphones",
-      "system": "System",
-      "photos": "Photos",
-      "backup": "Backup",
-      "archive": "Archive"
-    }
+    "demo": {"gpu": "Integrated GPU", "keyboard": "Keyboard", "mouse": "Mouse", "headphones": "Headphones",
+             "system": "System", "photos": "Photos", "backup": "Backup", "archive": "Archive"}
+  },
+  "en-AU": {
+    "titles": [
+      "Your whole Mac at a glance in the menu bar",
+      "A detailed window for every module",
+      "The Storage widget shows every disk",
+      "5 desktop widgets",
+      "Free, open source, no data collected"
+    ],
+    "demo": {"gpu": "Integrated GPU", "keyboard": "Keyboard", "mouse": "Mouse", "headphones": "Headphones",
+             "system": "System", "photos": "Photos", "backup": "Backup", "archive": "Archive"}
+  },
+  "en-CA": {
+    "titles": [
+      "Your whole Mac at a glance in the menu bar",
+      "A detailed window for every module",
+      "The Storage widget shows every disk",
+      "5 desktop widgets",
+      "Free, open source, no data collected"
+    ],
+    "demo": {"gpu": "Integrated GPU", "keyboard": "Keyboard", "mouse": "Mouse", "headphones": "Headphones",
+             "system": "System", "photos": "Photos", "backup": "Backup", "archive": "Archive"}
+  },
+  "en-GB": {
+    "titles": [
+      "Your whole Mac at a glance in the menu bar",
+      "A detailed window for every module",
+      "The Storage widget shows every disk",
+      "5 desktop widgets",
+      "Free, open source, no data collected"
+    ],
+    "demo": {"gpu": "Integrated GPU", "keyboard": "Keyboard", "mouse": "Mouse", "headphones": "Headphones",
+             "system": "System", "photos": "Photos", "backup": "Backup", "archive": "Archive"}
+  },
+  "ar": {
+    "titles": [
+      "جهاز Mac بالكامل في لمحة من شريط القائمة",
+      "نافذة مفصّلة لكل وحدة",
+      "أداة التخزين تعرض كل أقراصك",
+      "5 أدوات لسطح المكتب",
+      "مجاني ومفتوح المصدر، دون جمع أي بيانات"
+    ],
+    "demo": {"gpu": "معالج رسومات مدمج", "keyboard": "لوحة المفاتيح", "mouse": "الماوس", "headphones": "سماعات الرأس",
+             "system": "النظام", "photos": "الصور", "backup": "النسخ الاحتياطي", "archive": "الأرشيف"}
+  },
+  "bn": {
+    "titles": [
+      "মেনু বারেই এক নজরে পুরো Mac",
+      "প্রতিটি মডিউলের জন্য বিস্তারিত উইন্ডো",
+      "স্টোরেজ উইজেট সব ডিস্ক দেখায়",
+      "ডেস্কটপের জন্য ৫টি উইজেট",
+      "বিনামূল্যে, ওপেন সোর্স, কোনো ডেটা সংগ্রহ নয়"
+    ],
+    "demo": {"gpu": "ইন্টিগ্রেটেড GPU", "keyboard": "কীবোর্ড", "mouse": "মাউস", "headphones": "হেডফোন",
+             "system": "সিস্টেম", "photos": "ছবি", "backup": "ব্যাকআপ", "archive": "আর্কাইভ"}
+  },
+  "ca": {
+    "titles": [
+      "Tot el Mac d’un cop d’ull a la barra de menús",
+      "Una finestra detallada per a cada mòdul",
+      "El giny Emmagatzematge mostra tots els discos",
+      "5 ginys per a l’escriptori",
+      "Gratuït, de codi obert, sense recollir dades"
+    ],
+    "demo": {"gpu": "GPU integrada", "keyboard": "Teclat", "mouse": "Ratolí", "headphones": "Auriculars",
+             "system": "Sistema", "photos": "Fotos", "backup": "Còpies", "archive": "Arxiu"}
+  },
+  "cs": {
+    "titles": [
+      "Celý Mac na první pohled v řádku nabídek",
+      "Podrobné okno pro každý modul",
+      "Widget Úložiště ukáže všechny disky",
+      "5 widgetů na plochu",
+      "Zdarma, open source, bez sběru dat"
+    ],
+    "demo": {"gpu": "Integrovaná GPU", "keyboard": "Klávesnice", "mouse": "Myš", "headphones": "Sluchátka",
+             "system": "Systém", "photos": "Fotky", "backup": "Záloha", "archive": "Archiv"}
+  },
+  "da": {
+    "titles": [
+      "Hele din Mac på et øjeblik i menulinjen",
+      "Et detaljeret vindue til hvert modul",
+      "Widgetten Lagring viser alle diske",
+      "5 widgets til skrivebordet",
+      "Gratis, open source, ingen dataindsamling"
+    ],
+    "demo": {"gpu": "Integreret GPU", "keyboard": "Tastatur", "mouse": "Mus", "headphones": "Hovedtelefoner",
+             "system": "System", "photos": "Fotos", "backup": "Backup", "archive": "Arkiv"}
+  },
+  "de": {
+    "titles": [
+      "Dein ganzer Mac auf einen Blick in der Menüleiste",
+      "Ein detailliertes Fenster für jedes Modul",
+      "Das Widget Speicherplatz zeigt alle Laufwerke",
+      "5 Widgets für den Schreibtisch",
+      "Kostenlos, Open Source, keine Datenerfassung"
+    ],
+    "demo": {"gpu": "Integrierte GPU", "keyboard": "Tastatur", "mouse": "Maus", "headphones": "Kopfhörer",
+             "system": "System", "photos": "Fotos", "backup": "Backup", "archive": "Archiv"}
+  },
+  "el": {
+    "titles": [
+      "Όλο το Mac σας με μια ματιά στη γραμμή μενού",
+      "Λεπτομερές παράθυρο για κάθε μονάδα",
+      "Το widget αποθήκευσης δείχνει όλους τους δίσκους",
+      "5 widget για το Γραφείο",
+      "Δωρεάν, ανοιχτού κώδικα, χωρίς συλλογή δεδομένων"
+    ],
+    "demo": {"gpu": "Ενσωματωμένη GPU", "keyboard": "Πληκτρολόγιο", "mouse": "Ποντίκι", "headphones": "Ακουστικά",
+             "system": "Σύστημα", "photos": "Φωτογραφίες", "backup": "Αντίγραφα", "archive": "Αρχείο"}
+  },
+  "es": {
+    "titles": [
+      "Todo tu Mac de un vistazo en la barra de menús",
+      "Una ventana detallada para cada módulo",
+      "El widget Almacenamiento muestra todos los discos",
+      "5 widgets para el escritorio",
+      "Gratis, de código abierto, sin recopilar datos"
+    ],
+    "demo": {"gpu": "GPU integrada", "keyboard": "Teclado", "mouse": "Ratón", "headphones": "Auriculares",
+             "system": "Sistema", "photos": "Fotos", "backup": "Copias", "archive": "Archivo"}
+  },
+  "es-419": {
+    "titles": [
+      "Toda tu Mac de un vistazo en la barra de menús",
+      "Una ventana detallada para cada módulo",
+      "El widget Almacenamiento muestra todos los discos",
+      "5 widgets para el escritorio",
+      "Gratis, de código abierto, sin recopilar datos"
+    ],
+    "demo": {"gpu": "GPU integrada", "keyboard": "Teclado", "mouse": "Mouse", "headphones": "Audífonos",
+             "system": "Sistema", "photos": "Fotos", "backup": "Respaldo", "archive": "Archivo"}
+  },
+  "fi": {
+    "titles": [
+      "Koko Mac yhdellä silmäyksellä valikkorivillä",
+      "Yksityiskohtainen ikkuna jokaiselle moduulille",
+      "Tallennustila-widget näyttää kaikki levyt",
+      "5 widgetiä työpöydälle",
+      "Ilmainen, avoin lähdekoodi, ei tiedonkeruuta"
+    ],
+    "demo": {"gpu": "Integroitu GPU", "keyboard": "Näppäimistö", "mouse": "Hiiri", "headphones": "Kuulokkeet",
+             "system": "Järjestelmä", "photos": "Kuvat", "backup": "Varmuuskopio", "archive": "Arkisto"}
   },
   "fr": {
     "titles": [
@@ -32,15 +168,392 @@
       "5 widgets pour le bureau",
       "Gratuit, open source, aucune donnée collectée"
     ],
-    "demo": {
-      "gpu": "GPU intégré",
-      "keyboard": "Clavier",
-      "mouse": "Souris",
-      "headphones": "Casque",
-      "system": "Système",
-      "photos": "Photos",
-      "backup": "Sauvegarde",
-      "archive": "Archives"
-    }
+    "demo": {"gpu": "GPU intégré", "keyboard": "Clavier", "mouse": "Souris", "headphones": "Casque",
+             "system": "Système", "photos": "Photos", "backup": "Sauvegarde", "archive": "Archives"}
+  },
+  "fr-CA": {
+    "titles": [
+      "Tout votre Mac d’un coup d’œil dans la barre des menus",
+      "Une fenêtre détaillée pour chaque module",
+      "Le widget Stockage affiche tous vos disques",
+      "5 widgets pour le bureau",
+      "Gratuit, code source ouvert, aucune donnée collectée"
+    ],
+    "demo": {"gpu": "GPU intégré", "keyboard": "Clavier", "mouse": "Souris", "headphones": "Casque",
+             "system": "Système", "photos": "Photos", "backup": "Sauvegarde", "archive": "Archives"}
+  },
+  "gu": {
+    "titles": [
+      "મેનૂ બારમાં એક નજરે આખું Mac",
+      "દરેક મોડ્યુલ માટે વિગતવાર વિન્ડો",
+      "સ્ટોરેજ વિજેટ બધી ડિસ્ક બતાવે છે",
+      "ડેસ્કટૉપ માટે 5 વિજેટ",
+      "મફત, ઓપન સોર્સ, કોઈ ડેટા એકત્ર થતો નથી"
+    ],
+    "demo": {"gpu": "ઇન્ટિગ્રેટેડ GPU", "keyboard": "કીબોર્ડ", "mouse": "માઉસ", "headphones": "હેડફોન",
+             "system": "સિસ્ટમ", "photos": "ફોટા", "backup": "બેકઅપ", "archive": "આર્કાઇવ"}
+  },
+  "he": {
+    "titles": [
+      "כל ה-Mac שלך במבט אחד בשורת התפריטים",
+      "חלון מפורט לכל מודול",
+      "וידג׳ט האחסון מציג את כל הדיסקים",
+      "5 וידג׳טים לשולחן העבודה",
+      "חינמי, קוד פתוח, ללא איסוף נתונים"
+    ],
+    "demo": {"gpu": "GPU משולב", "keyboard": "מקלדת", "mouse": "עכבר", "headphones": "אוזניות",
+             "system": "מערכת", "photos": "תמונות", "backup": "גיבוי", "archive": "ארכיון"}
+  },
+  "hi": {
+    "titles": [
+      "मेनू बार में एक नज़र में पूरा Mac",
+      "हर मॉड्यूल के लिए विस्तृत विंडो",
+      "स्टोरेज विजेट सभी डिस्क दिखाता है",
+      "डेस्कटॉप के लिए 5 विजेट",
+      "मुफ़्त, ओपन सोर्स, कोई डेटा इकट्ठा नहीं"
+    ],
+    "demo": {"gpu": "इंटीग्रेटेड GPU", "keyboard": "कीबोर्ड", "mouse": "माउस", "headphones": "हेडफ़ोन",
+             "system": "सिस्टम", "photos": "फ़ोटो", "backup": "बैकअप", "archive": "आर्काइव"}
+  },
+  "hr": {
+    "titles": [
+      "Cijeli Mac na prvi pogled u traci izbornika",
+      "Detaljan prozor za svaki modul",
+      "Widget Pohrana prikazuje sve diskove",
+      "5 widgeta za radnu površinu",
+      "Besplatno, otvoreni kod, bez prikupljanja podataka"
+    ],
+    "demo": {"gpu": "Integrirani GPU", "keyboard": "Tipkovnica", "mouse": "Miš", "headphones": "Slušalice",
+             "system": "Sustav", "photos": "Fotografije", "backup": "Kopije", "archive": "Arhiva"}
+  },
+  "hu": {
+    "titles": [
+      "Az egész Mac egy pillantással a menüsorban",
+      "Részletes ablak minden modulhoz",
+      "A Tárhely widget minden lemezt megjelenít",
+      "5 widget az íróasztalra",
+      "Ingyenes, nyílt forráskódú, nem gyűjt adatot"
+    ],
+    "demo": {"gpu": "Integrált GPU", "keyboard": "Billentyűzet", "mouse": "Egér", "headphones": "Fejhallgató",
+             "system": "Rendszer", "photos": "Fotók", "backup": "Mentés", "archive": "Archívum"}
+  },
+  "id": {
+    "titles": [
+      "Seluruh Mac Anda sekilas di bar menu",
+      "Jendela terperinci untuk setiap modul",
+      "Widget Penyimpanan menampilkan semua disk",
+      "5 widget untuk desktop",
+      "Gratis, sumber terbuka, tanpa pengumpulan data"
+    ],
+    "demo": {"gpu": "GPU Terintegrasi", "keyboard": "Papan Ketik", "mouse": "Mouse", "headphones": "Headphone",
+             "system": "Sistem", "photos": "Foto", "backup": "Cadangan", "archive": "Arsip"}
+  },
+  "it": {
+    "titles": [
+      "Tutto il tuo Mac a colpo d’occhio nella barra dei menu",
+      "Una finestra dettagliata per ogni modulo",
+      "Il widget Spazio mostra tutti i dischi",
+      "5 widget per la scrivania",
+      "Gratis, open source, nessun dato raccolto"
+    ],
+    "demo": {"gpu": "GPU integrata", "keyboard": "Tastiera", "mouse": "Mouse", "headphones": "Cuffie",
+             "system": "Sistema", "photos": "Foto", "backup": "Backup", "archive": "Archivio"}
+  },
+  "ja": {
+    "titles": [
+      "Mac全体をメニューバーでひと目で確認",
+      "モジュールごとの詳細ウインドウ",
+      "ストレージウィジェットですべてのディスクを表示",
+      "デスクトップ用ウィジェットが5種類",
+      "無料、オープンソース、データ収集なし"
+    ],
+    "demo": {"gpu": "内蔵GPU", "keyboard": "キーボード", "mouse": "マウス", "headphones": "ヘッドフォン",
+             "system": "システム", "photos": "写真", "backup": "バックアップ", "archive": "アーカイブ"}
+  },
+  "kn": {
+    "titles": [
+      "ಮೆನು ಬಾರ್‌ನಲ್ಲಿ ಇಡೀ Mac ಒಂದೇ ನೋಟದಲ್ಲಿ",
+      "ಪ್ರತಿ ಮಾಡ್ಯೂಲ್‌ಗೆ ವಿವರವಾದ ವಿಂಡೋ",
+      "ಸಂಗ್ರಹಣೆ ವಿಜೆಟ್ ಎಲ್ಲಾ ಡಿಸ್ಕ್‌ಗಳನ್ನು ತೋರಿಸುತ್ತದೆ",
+      "ಡೆಸ್ಕ್‌ಟಾಪ್‌ಗಾಗಿ 5 ವಿಜೆಟ್‌ಗಳು",
+      "ಉಚಿತ, ಓಪನ್ ಸೋರ್ಸ್, ಯಾವುದೇ ಡೇಟಾ ಸಂಗ್ರಹವಿಲ್ಲ"
+    ],
+    "demo": {"gpu": "ಇಂಟಿಗ್ರೇಟೆಡ್ GPU", "keyboard": "ಕೀಬೋರ್ಡ್", "mouse": "ಮೌಸ್", "headphones": "ಹೆಡ್‌ಫೋನ್",
+             "system": "ಸಿಸ್ಟಂ", "photos": "ಫೋಟೋಗಳು", "backup": "ಬ್ಯಾಕಪ್", "archive": "ಆರ್ಕೈವ್"}
+  },
+  "ko": {
+    "titles": [
+      "메뉴 막대에서 Mac 전체를 한눈에",
+      "모듈별 상세 윈도우",
+      "저장 공간 위젯에 모든 디스크 표시",
+      "데스크탑용 위젯 5종",
+      "무료, 오픈 소스, 데이터 수집 없음"
+    ],
+    "demo": {"gpu": "내장 GPU", "keyboard": "키보드", "mouse": "마우스", "headphones": "헤드폰",
+             "system": "시스템", "photos": "사진", "backup": "백업", "archive": "아카이브"}
+  },
+  "ml": {
+    "titles": [
+      "മെനു ബാറിൽ Mac മുഴുവൻ ഒറ്റനോട്ടത്തിൽ",
+      "ഓരോ മൊഡ്യൂളിനും വിശദമായ വിൻഡോ",
+      "സ്റ്റോറേജ് വിജറ്റ് എല്ലാ ഡിസ്കുകളും കാണിക്കുന്നു",
+      "ഡെസ്ക്ടോപ്പിനായി 5 വിജറ്റുകൾ",
+      "സൗജന്യം, ഓപ്പൺ സോഴ്സ്, ഡാറ്റ ശേഖരിക്കുന്നില്ല"
+    ],
+    "demo": {"gpu": "ഇന്റഗ്രേറ്റഡ് GPU", "keyboard": "കീബോർഡ്", "mouse": "മൗസ്", "headphones": "ഹെഡ്ഫോൺ",
+             "system": "സിസ്റ്റം", "photos": "ഫോട്ടോകൾ", "backup": "ബാക്കപ്പ്", "archive": "ആർക്കൈവ്"}
+  },
+  "mr": {
+    "titles": [
+      "मेनू बारमध्ये संपूर्ण Mac एका नजरेत",
+      "प्रत्येक मॉड्यूलसाठी तपशीलवार विंडो",
+      "स्टोरेज विजेट सर्व डिस्क दाखवते",
+      "डेस्कटॉपसाठी 5 विजेट",
+      "मोफत, ओपन सोर्स, कोणताही डेटा गोळा होत नाही"
+    ],
+    "demo": {"gpu": "इंटिग्रेटेड GPU", "keyboard": "कीबोर्ड", "mouse": "माउस", "headphones": "हेडफोन",
+             "system": "सिस्टम", "photos": "फोटो", "backup": "बॅकअप", "archive": "संग्रह"}
+  },
+  "ms": {
+    "titles": [
+      "Seluruh Mac anda sepintas lalu dalam bar menu",
+      "Tetingkap terperinci untuk setiap modul",
+      "Widget Storan memaparkan semua cakera",
+      "5 widget untuk desktop",
+      "Percuma, sumber terbuka, tiada data dikumpul"
+    ],
+    "demo": {"gpu": "GPU Bersepadu", "keyboard": "Papan Kekunci", "mouse": "Tetikus", "headphones": "Fon Kepala",
+             "system": "Sistem", "photos": "Foto", "backup": "Sandaran", "archive": "Arkib"}
+  },
+  "nb": {
+    "titles": [
+      "Hele Macen din på et øyeblikk i menylinjen",
+      "Et detaljert vindu for hver modul",
+      "Lagring-widgeten viser alle disker",
+      "5 widgeter for skrivebordet",
+      "Gratis, åpen kildekode, ingen datainnsamling"
+    ],
+    "demo": {"gpu": "Integrert GPU", "keyboard": "Tastatur", "mouse": "Mus", "headphones": "Hodetelefoner",
+             "system": "System", "photos": "Bilder", "backup": "Sikkerhetskopi", "archive": "Arkiv"}
+  },
+  "nl": {
+    "titles": [
+      "Je hele Mac in één oogopslag in de menubalk",
+      "Een gedetailleerd venster voor elke module",
+      "De Opslag-widget toont al je schijven",
+      "5 widgets voor het bureaublad",
+      "Gratis, open source, geen gegevensverzameling"
+    ],
+    "demo": {"gpu": "Geïntegreerde GPU", "keyboard": "Toetsenbord", "mouse": "Muis", "headphones": "Koptelefoon",
+             "system": "Systeem", "photos": "Foto’s", "backup": "Reservekopie", "archive": "Archief"}
+  },
+  "or": {
+    "titles": [
+      "ମେନୁ ବାରରେ ପୂରା Mac ଗୋଟିଏ ନଜରରେ",
+      "ପ୍ରତ୍ୟେକ ମଡ୍ୟୁଲ ପାଇଁ ବିସ୍ତୃତ ୱିଣ୍ଡୋ",
+      "ଷ୍ଟୋରେଜ ୱିଜେଟ ସମସ୍ତ ଡିସ୍କ ଦେଖାଏ",
+      "ଡେସ୍କଟପ ପାଇଁ 5ଟି ୱିଜେଟ",
+      "ମାଗଣା, ଓପନ ସୋର୍ସ, କୌଣସି ଡାଟା ସଂଗ୍ରହ ନାହିଁ"
+    ],
+    "demo": {"gpu": "ଇଣ୍ଟିଗ୍ରେଟେଡ GPU", "keyboard": "କୀବୋର୍ଡ", "mouse": "ମାଉସ", "headphones": "ହେଡଫୋନ",
+             "system": "ସିଷ୍ଟମ", "photos": "ଫଟୋ", "backup": "ବ୍ୟାକଅପ", "archive": "ଆର୍କାଇଭ"}
+  },
+  "pa": {
+    "titles": [
+      "ਮੀਨੂ ਬਾਰ ਵਿੱਚ ਪੂਰਾ Mac ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ",
+      "ਹਰ ਮੋਡੀਊਲ ਲਈ ਵਿਸਤ੍ਰਿਤ ਵਿੰਡੋ",
+      "ਸਟੋਰੇਜ ਵਿਜੇਟ ਸਾਰੀਆਂ ਡਿਸਕਾਂ ਦਿਖਾਉਂਦਾ ਹੈ",
+      "ਡੈਸਕਟਾਪ ਲਈ 5 ਵਿਜੇਟ",
+      "ਮੁਫ਼ਤ, ਓਪਨ ਸੋਰਸ, ਕੋਈ ਡਾਟਾ ਇਕੱਠਾ ਨਹੀਂ"
+    ],
+    "demo": {"gpu": "ਇੰਟੀਗ੍ਰੇਟਿਡ GPU", "keyboard": "ਕੀਬੋਰਡ", "mouse": "ਮਾਊਸ", "headphones": "ਹੈੱਡਫ਼ੋਨ",
+             "system": "ਸਿਸਟਮ", "photos": "ਫ਼ੋਟੋ", "backup": "ਬੈਕਅੱਪ", "archive": "ਆਰਕਾਈਵ"}
+  },
+  "pl": {
+    "titles": [
+      "Cały Mac w mgnieniu oka na pasku menu",
+      "Szczegółowe okno dla każdego modułu",
+      "Widżet Pamięć masowa pokazuje wszystkie dyski",
+      "5 widżetów na biurko",
+      "Za darmo, open source, bez zbierania danych"
+    ],
+    "demo": {"gpu": "Zintegrowany GPU", "keyboard": "Klawiatura", "mouse": "Mysz", "headphones": "Słuchawki",
+             "system": "System", "photos": "Zdjęcia", "backup": "Kopie", "archive": "Archiwum"}
+  },
+  "pt-BR": {
+    "titles": [
+      "Seu Mac inteiro num relance na barra de menus",
+      "Uma janela detalhada para cada módulo",
+      "O widget Armazenamento mostra todos os discos",
+      "5 widgets para a Mesa",
+      "Gratuito, código aberto, nenhum dado coletado"
+    ],
+    "demo": {"gpu": "GPU integrada", "keyboard": "Teclado", "mouse": "Mouse", "headphones": "Fones de ouvido",
+             "system": "Sistema", "photos": "Fotos", "backup": "Backup", "archive": "Arquivo"}
+  },
+  "pt-PT": {
+    "titles": [
+      "Todo o seu Mac num relance na barra de menus",
+      "Uma janela detalhada para cada módulo",
+      "O widget Armazenamento mostra todos os discos",
+      "5 widgets para a secretária",
+      "Gratuito, código aberto, sem recolha de dados"
+    ],
+    "demo": {"gpu": "GPU integrada", "keyboard": "Teclado", "mouse": "Rato", "headphones": "Auscultadores",
+             "system": "Sistema", "photos": "Fotografias", "backup": "Cópias", "archive": "Arquivo"}
+  },
+  "ro": {
+    "titles": [
+      "Tot Mac-ul dintr-o privire în bara de meniu",
+      "O fereastră detaliată pentru fiecare modul",
+      "Widgetul Stocare arată toate discurile",
+      "5 widgeturi pentru desktop",
+      "Gratuit, open source, fără colectare de date"
+    ],
+    "demo": {"gpu": "GPU integrat", "keyboard": "Tastatură", "mouse": "Mouse", "headphones": "Căști",
+             "system": "Sistem", "photos": "Poze", "backup": "Backup", "archive": "Arhivă"}
+  },
+  "ru": {
+    "titles": [
+      "Весь Mac как на ладони в строке меню",
+      "Подробное окно для каждого модуля",
+      "Виджет «Хранилище» показывает все диски",
+      "5 виджетов для рабочего стола",
+      "Бесплатно, открытый код, без сбора данных"
+    ],
+    "demo": {"gpu": "Встроенный GPU", "keyboard": "Клавиатура", "mouse": "Мышь", "headphones": "Наушники",
+             "system": "Система", "photos": "Фото", "backup": "Резервные копии", "archive": "Архив"}
+  },
+  "sk": {
+    "titles": [
+      "Celý Mac na prvý pohľad na lište menu",
+      "Podrobné okno pre každý modul",
+      "Widget Úložisko zobrazí všetky disky",
+      "5 widgetov na plochu",
+      "Zadarmo, open source, bez zberu údajov"
+    ],
+    "demo": {"gpu": "Integrovaná GPU", "keyboard": "Klávesnica", "mouse": "Myš", "headphones": "Slúchadlá",
+             "system": "Systém", "photos": "Fotky", "backup": "Záloha", "archive": "Archív"}
+  },
+  "sl": {
+    "titles": [
+      "Ves Mac na prvi pogled v menijski vrstici",
+      "Podrobno okno za vsak modul",
+      "Pripomoček Shramba prikaže vse diske",
+      "5 pripomočkov za namizje",
+      "Brezplačno, odprta koda, brez zbiranja podatkov"
+    ],
+    "demo": {"gpu": "Integrirani GPU", "keyboard": "Tipkovnica", "mouse": "Miška", "headphones": "Slušalke",
+             "system": "Sistem", "photos": "Fotografije", "backup": "Kopije", "archive": "Arhiv"}
+  },
+  "sv": {
+    "titles": [
+      "Hela din Mac i en blick i menyraden",
+      "Ett detaljerat fönster för varje modul",
+      "Widgeten Lagring visar alla skivor",
+      "5 widgetar för skrivbordet",
+      "Gratis, öppen källkod, ingen datainsamling"
+    ],
+    "demo": {"gpu": "Integrerad GPU", "keyboard": "Tangentbord", "mouse": "Mus", "headphones": "Hörlurar",
+             "system": "System", "photos": "Bilder", "backup": "Säkerhetskopia", "archive": "Arkiv"}
+  },
+  "ta": {
+    "titles": [
+      "மெனு பாரில் முழு Mac-ஐயும் ஒரே பார்வையில்",
+      "ஒவ்வொரு தொகுதிக்கும் விரிவான சாளரம்",
+      "சேமிப்பக விட்ஜெட் எல்லா டிஸ்க்குகளையும் காட்டும்",
+      "டெஸ்க்டாப்பிற்கு 5 விட்ஜெட்டுகள்",
+      "இலவசம், ஓப்பன் சோர்ஸ், தரவு சேகரிப்பு இல்லை"
+    ],
+    "demo": {"gpu": "ஒருங்கிணைந்த GPU", "keyboard": "கீபோர்டு", "mouse": "மவுஸ்", "headphones": "ஹெட்ஃபோன்",
+             "system": "சிஸ்டம்", "photos": "படங்கள்", "backup": "பேக்அப்", "archive": "காப்பகம்"}
+  },
+  "te": {
+    "titles": [
+      "మెనూ బార్‌లో మొత్తం Mac ఒక్క చూపులో",
+      "ప్రతి మాడ్యూల్‌కు వివరమైన విండో",
+      "స్టోరేజ్ విడ్జెట్ అన్ని డిస్క్‌లను చూపుతుంది",
+      "డెస్క్‌టాప్ కోసం 5 విడ్జెట్‌లు",
+      "ఉచితం, ఓపెన్ సోర్స్, డేటా సేకరణ లేదు"
+    ],
+    "demo": {"gpu": "ఇంటిగ్రేటెడ్ GPU", "keyboard": "కీబోర్డ్", "mouse": "మౌస్", "headphones": "హెడ్‌ఫోన్",
+             "system": "సిస్టమ్", "photos": "ఫోటోలు", "backup": "బ్యాకప్", "archive": "ఆర్కైవ్"}
+  },
+  "th": {
+    "titles": [
+      "ดู Mac ทั้งเครื่องได้ในพริบตา จากแถบเมนู",
+      "หน้าต่างแสดงรายละเอียด สำหรับทุกโมดูล",
+      "วิดเจ็ตพื้นที่จัดเก็บข้อมูล แสดงดิสก์ทุกลูก",
+      "วิดเจ็ต 5 แบบสำหรับเดสก์ท็อป",
+      "ฟรี โอเพนซอร์ส ไม่เก็บข้อมูลใดๆ"
+    ],
+    "demo": {"gpu": "GPU ในตัว", "keyboard": "แป้นพิมพ์", "mouse": "เมาส์", "headphones": "หูฟัง",
+             "system": "ระบบ", "photos": "รูปภาพ", "backup": "ข้อมูลสำรอง", "archive": "คลังเก็บ"}
+  },
+  "tr": {
+    "titles": [
+      "Tüm Mac’iniz bir bakışta menü çubuğunda",
+      "Her modül için ayrıntılı bir pencere",
+      "Depolama widget’ı tüm diskleri gösterir",
+      "Masaüstü için 5 widget",
+      "Ücretsiz, açık kaynak, veri toplanmaz"
+    ],
+    "demo": {"gpu": "Tümleşik GPU", "keyboard": "Klavye", "mouse": "Fare", "headphones": "Kulaklık",
+             "system": "Sistem", "photos": "Fotoğraflar", "backup": "Yedek", "archive": "Arşiv"}
+  },
+  "uk": {
+    "titles": [
+      "Весь Mac з одного погляду в рядку меню",
+      "Детальне вікно для кожного модуля",
+      "Віджет «Сховище» показує всі диски",
+      "5 віджетів для робочого столу",
+      "Безкоштовно, відкритий код, без збору даних"
+    ],
+    "demo": {"gpu": "Вбудований GPU", "keyboard": "Клавіатура", "mouse": "Миша", "headphones": "Навушники",
+             "system": "Система", "photos": "Фото", "backup": "Резервні копії", "archive": "Архів"}
+  },
+  "ur": {
+    "titles": [
+      "پورا Mac ایک نظر میں، مینو بار سے",
+      "ہر ماڈیول کے لیے تفصیلی ونڈو",
+      "اسٹوریج وجیٹ تمام ڈسکس دکھاتا ہے",
+      "ڈیسک ٹاپ کے لیے 5 وجیٹس",
+      "مفت، اوپن سورس، کوئی ڈیٹا جمع نہیں ہوتا"
+    ],
+    "demo": {"gpu": "مربوط GPU", "keyboard": "کی بورڈ", "mouse": "ماؤس", "headphones": "ہیڈ فون",
+             "system": "سسٹم", "photos": "تصاویر", "backup": "بیک اپ", "archive": "آرکائیو"}
+  },
+  "vi": {
+    "titles": [
+      "Toàn bộ máy Mac trong nháy mắt trên thanh menu",
+      "Cửa sổ chi tiết cho từng mô-đun",
+      "Tiện ích Dung lượng hiển thị mọi ổ đĩa",
+      "5 tiện ích cho màn hình nền",
+      "Miễn phí, mã nguồn mở, không thu thập dữ liệu"
+    ],
+    "demo": {"gpu": "GPU tích hợp", "keyboard": "Bàn phím", "mouse": "Chuột", "headphones": "Tai nghe",
+             "system": "Hệ thống", "photos": "Ảnh", "backup": "Sao lưu", "archive": "Lưu trữ"}
+  },
+  "zh-Hans": {
+    "titles": [
+      "在菜单栏中一览整台 Mac",
+      "每个模块都有详细窗口",
+      "“储存空间”小组件显示所有磁盘",
+      "5 款桌面小组件",
+      "免费、开源、不收集任何数据"
+    ],
+    "demo": {"gpu": "集成 GPU", "keyboard": "键盘", "mouse": "鼠标", "headphones": "耳机",
+             "system": "系统", "photos": "照片", "backup": "备份", "archive": "归档"}
+  },
+  "zh-Hant": {
+    "titles": [
+      "在選單列中一覽整台 Mac",
+      "每個模組都有詳細視窗",
+      "「儲存空間」小工具顯示所有磁碟",
+      "5 款桌面小工具",
+      "免費、開源、不收集任何資料"
+    ],
+    "demo": {"gpu": "內建 GPU", "keyboard": "鍵盤", "mouse": "滑鼠", "headphones": "耳機",
+             "system": "系統", "photos": "照片", "backup": "備份", "archive": "封存"}
   }
 }

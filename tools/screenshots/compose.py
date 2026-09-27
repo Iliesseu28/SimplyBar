@@ -15,8 +15,10 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import functools
 import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -25,38 +27,57 @@ HERE = Path(__file__).resolve().parent
 TITLES = HERE / "titles.json"
 RENDER_SCALE = 4  # pixels per point of the renderer's images
 APPSTORE_SIZE = (2880, 1800)
+TITLE_WIDTH = APPSTORE_SIZE[0] - 320  # widest title line, in pixels
 # Long dashes are refused in every text of the set (written as code points so this file holds none).
 FORBIDDEN_DASHES = {chr(0x2014): "em dash", chr(0x2013): "en dash", chr(0x2015): "horizontal bar"}
 DEMO_KEYS = ["gpu", "keyboard", "mouse", "headphones", "system", "photos", "backup", "archive"]
 RTL_LANGUAGES = {"ar", "he", "fa", "ur"}
+# Language of the app (its .lproj and titles.json key) to language of the Mac App Store listing, which names the
+# folder of its screenshots (interne/appstore-metadata/version/1.0/<code>.json). Codes not listed are the same.
+STORE_CODES = {
+    "en": "en-US", "ar": "ar-SA", "bn": "bn-BD", "de": "de-DE", "es": "es-ES", "es-419": "es-MX", "fr": "fr-FR",
+    "gu": "gu-IN", "kn": "kn-IN", "ml": "ml-IN", "mr": "mr-IN", "nb": "no", "nl": "nl-NL", "or": "or-IN",
+    "pa": "pa-IN", "sl": "sl-SI", "ta": "ta-IN", "te": "te-IN", "ur": "ur-PK",
+}
+APP_CODES = {store: app for app, store in STORE_CODES.items()}
 # Region for dates and numbers when titles.json gives none. Arabic: ar_AE keeps Latin digits and the Gregorian
 # calendar, like the rest of the set.
 LOCALES = {
     "en": "en_US", "en-GB": "en_GB", "en-AU": "en_AU", "en-CA": "en_CA", "fr": "fr_FR", "fr-CA": "fr_CA",
-    "de": "de_DE", "es": "es_ES", "es-MX": "es_MX", "it": "it_IT", "pt-BR": "pt_BR", "pt-PT": "pt_PT", "nl": "nl_NL",
-    "sv": "sv_SE", "da": "da_DK", "fi": "fi_FI", "nb": "nb_NO", "no": "nb_NO", "pl": "pl_PL", "cs": "cs_CZ",
+    "de": "de_DE", "es": "es_ES", "es-419": "es_419", "it": "it_IT", "pt-BR": "pt_BR", "pt-PT": "pt_PT",
+    "nl": "nl_NL", "sv": "sv_SE", "da": "da_DK", "fi": "fi_FI", "nb": "nb_NO", "pl": "pl_PL", "cs": "cs_CZ",
     "sk": "sk_SK", "hu": "hu_HU", "ro": "ro_RO", "hr": "hr_HR", "sl": "sl_SI", "ca": "ca_ES", "tr": "tr_TR",
     "el": "el_GR", "ru": "ru_RU", "uk": "uk_UA", "ja": "ja_JP", "ko": "ko_KR", "zh-Hans": "zh_CN",
-    "zh-Hant": "zh_TW", "zh-HK": "zh_HK", "ar": "ar_AE", "he": "he_IL", "th": "th_TH", "vi": "vi_VN",
-    "id": "id_ID", "ms": "ms_MY", "hi": "hi_IN",
+    "zh-Hant": "zh_TW", "ar": "ar_AE", "he": "he_IL", "th": "th_TH", "vi": "vi_VN", "id": "id_ID",
+    "ms": "ms_MY", "hi": "hi_IN", "bn": "bn_BD", "gu": "gu_IN", "kn": "kn_IN", "ml": "ml_IN", "mr": "mr_IN",
+    "or": "or_IN", "pa": "pa_IN", "ta": "ta_IN", "te": "te_IN", "ur": "ur_PK",
 }
-# Title fonts, by language: (file, named instance of a variable font or face index of a collection), best first.
-# The first one that has every character of the language's five titles is used for all five (the SF Arabic and
-# SF Hebrew files hold no Latin letters, so a title that says "Mac" falls back to Arial Bold).
+# Title font of each script, bold: (file, named instance of a variable font or face index of a collection).
+# SF Pro writes Latin, Greek, Cyrillic and Vietnamese. A title mixes fonts when its own lacks a character: the
+# SF Arabic, SF Hebrew and Indic files have no Latin letters, so "Mac" comes from SF Pro (see TitleType).
 FONTS = {
-    "default": [("/System/Library/Fonts/SFNS.ttf", "Bold")],
-    "ar": [("/System/Library/Fonts/SFArabic.ttf", "Bold"), ("/System/Library/Fonts/Supplemental/Arial Bold.ttf", 0)],
-    "he": [("/System/Library/Fonts/SFHebrew.ttf", "Bold"), ("/System/Library/Fonts/Supplemental/Arial Bold.ttf", 0)],
-    "ja": [("/System/Library/Fonts/\u30d2\u30e9\u30ae\u30ce\u89d2\u30b4\u30b7\u30c3\u30af W7.ttc", 0)],
-    "zh-Hans": [("/System/Library/Fonts/Hiragino Sans GB.ttc", 2)],
-    "zh-Hant": [("/System/Library/Fonts/STHeiti Medium.ttc", 0)],
-    "zh-HK": [("/System/Library/Fonts/STHeiti Medium.ttc", 0)],
-    "ko": [("/System/Library/Fonts/AppleSDGothicNeo.ttc", 6)],
-    "th": [("/System/Library/Fonts/Supplemental/Thonburi.ttc", 1)],
-    "hi": [("/System/Library/Fonts/Kohinoor.ttc", 3)],
+    "default": ("/System/Library/Fonts/SFNS.ttf", "Bold"),
+    "ar": ("/System/Library/Fonts/SFArabic.ttf", "Bold"),
+    "ur": ("/System/Library/Fonts/NotoNastaliq.ttc", 2),
+    "he": ("/System/Library/Fonts/SFHebrew.ttf", "Bold"),
+    "hi": ("/System/Library/Fonts/Kohinoor.ttc", 3),
+    "mr": ("/System/Library/Fonts/Kohinoor.ttc", 3),
+    "bn": ("/System/Library/Fonts/KohinoorBangla.ttc", 3),
+    "gu": ("/System/Library/Fonts/KohinoorGujarati.ttc", 0),
+    "te": ("/System/Library/Fonts/KohinoorTelugu.ttc", 3),
+    "kn": ("/System/Library/Fonts/NotoSansKannada.ttc", 6),
+    "ml": ("/System/Library/Fonts/Supplemental/Malayalam Sangam MN.ttc", 1),
+    "or": ("/System/Library/Fonts/NotoSansOriya.ttc", 1),
+    "pa": ("/System/Library/Fonts/MuktaMahee.ttc", 6),
+    "ta": ("/System/Library/Fonts/Supplemental/Tamil Sangam MN.ttc", 2),
+    "th": ("/System/Library/Fonts/Supplemental/Thonburi.ttc", 1),
+    "ja": ("/System/Library/Fonts/ヒラギノ角ゴシック W7.ttc", 0),
+    "zh-Hans": ("/System/Library/Fonts/Hiragino Sans GB.ttc", 2),
+    "zh-Hant": ("/System/Library/Fonts/STHeiti Medium.ttc", 0),
+    "ko": ("/System/Library/Fonts/AppleSDGothicNeo.ttc", 6),
 }
 FALLBACK_FONT = ("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", 0)
-NO_SPACE_SCRIPTS = {"ja", "zh-Hans", "zh-Hant", "zh-HK"}
+NO_SPACE_SCRIPTS = {"ja", "zh-Hans", "zh-Hant"}
 
 # The app's menu bar items, left to right: the first one declared in SimplyBarApp.swift ends up rightmost.
 MENUBAR_ORDER = ["bluetooth", "gpu", "disk", "network", "memory", "cpu"]
@@ -105,7 +126,9 @@ def untranslated(path: Path, language: str) -> int:
     return missing
 
 
-def check(languages: list[str], catalog: Path | None = None) -> dict:
+def check(languages: list[str], catalog: Path | None = None, report: bool = False) -> dict:
+    """Stops before any build when a language lacks titles or demo names, holds a long dash, is missing from the
+    string catalog, or has a title that no font can draw or no size can fit. `report` prints each title's layout."""
     titles = load_titles()
     known = catalog_languages(catalog) if catalog and catalog.exists() else None
     problems = []
@@ -127,6 +150,13 @@ def check(languages: list[str], catalog: Path | None = None) -> dict:
             problems.append(f"{language}: not in the string catalog, the app would show English")
     if problems:
         fail("titles.json is not ready:\n  " + "\n  ".join(problems))
+    for language in languages:
+        layouts = []
+        for text in titles[language]["titles"]:
+            lettering, lines = layout_title(text, language, TITLE_WIDTH, Screen.FRAME_TOP)
+            layouts.append(f"{lettering.fonts[0].size}px" + (" x2" if len(lines) > 1 else ""))
+        if report:
+            print(f"{language:8} {'  '.join(layouts)}")
     return titles
 
 
@@ -467,37 +497,118 @@ def load_font(spec: tuple, size: int) -> ImageFont.FreeTypeFont:
     return font
 
 
-def title_font_spec(language: str, titles: list[str]) -> tuple:
-    """The first font of the language's list that can write all its titles."""
-    candidates = FONTS.get(language) or FONTS.get(language.split("-")[0]) or FONTS["default"]
-    for spec in candidates + [FALLBACK_FONT]:
-        if Path(spec[0]).exists():
-            font = load_font(spec, 64)
-            if not any(missing_glyphs(font, title) for title in titles):
-                return spec
-    font = load_font(candidates[0], 64)
-    missing = sorted({char for title in titles for char in missing_glyphs(font, title)})
-    fail(f"{language}: no title font has {''.join(missing)}, add one for this language in FONTS")
+_COVERAGE: dict = {}
 
 
-def missing_glyphs(font: ImageFont.FreeTypeFont, text: str) -> list[str]:
-    """Characters the font lacks: they draw as its empty glyph, like a private-use code point."""
-    def pixels(char: str) -> bytes:
-        size = int(font.size * 2)
-        image = Image.new("L", (size, size), 0)
-        ImageDraw.Draw(image).text((size // 4, size // 4), char, font=font, fill=255)
-        return image.tobytes()
+def has_glyph(spec: tuple, char: str) -> bool:
+    """Whether a font draws `char`: a missing character draws the font's empty glyph, like an unassigned code point."""
+    if spec not in _COVERAGE:
+        font = load_font(spec, 40)
 
-    empty = pixels(chr(0xE000))
-    return sorted({char for char in text if not char.isspace() and pixels(char) == empty})
+        def pixels(text: str) -> bytes:
+            image = Image.new("L", (100, 100), 0)
+            ImageDraw.Draw(image).text((25, 25), text, font=font, fill=255)
+            return image.tobytes()
+
+        _COVERAGE[spec] = (pixels, pixels(chr(0x0378)), {})
+    pixels, empty, known = _COVERAGE[spec]
+    if char not in known:
+        known[char] = pixels(char) != empty
+    return known[char]
+
+
+def is_neutral(char: str) -> bool:
+    """Spaces, punctuation and combining marks take the font and direction of the text around them."""
+    return unicodedata.category(char)[0] in "ZPMC" or unicodedata.category(char) == "Sk"
+
+
+class TitleType:
+    """The lettering of one language's titles at one size. Pillow draws one font per call, so a title is cut into
+    runs: the language's font, then SF Pro for what it lacks ("Mac" in an Arabic or Tamil title), then Arial
+    Unicode. A right-to-left title places its runs from the right, as the bidi algorithm does for a Latin word
+    inside Arabic or Hebrew, and each run is shaped by raqm (joining, reordering of Indic vowels)."""
+
+    def __init__(self, language: str, size: int):
+        base = language.split("-")[0]
+        self.language = base
+        self.rtl = base in RTL_LANGUAGES
+        primary = FONTS.get(language) or FONTS.get(base) or FONTS["default"]
+        self.specs = [primary] + [spec for spec in (FONTS["default"], FALLBACK_FONT) if spec != primary]
+        self.fonts = [load_font(spec, size) for spec in self.specs]
+        metrics = [font.getmetrics() for font in self.fonts[:2]]
+        self.ascent = max(ascent for ascent, _ in metrics)
+        self.line_height = round(max(ascent + descent for ascent, descent in metrics) * 1.08)
+
+    def missing(self, text: str) -> list[str]:
+        return sorted({char for char in text if not is_neutral(char)
+                       and not any(has_glyph(spec, char) for spec in self.specs)})
+
+    def runs(self, text: str) -> list[tuple[str, int]]:
+        """(text, font index) in reading order."""
+        owners = [None if is_neutral(char) else
+                  next((i for i, spec in enumerate(self.specs) if has_glyph(spec, char)), 0) for char in text]
+        # A neutral character the surrounding font lacks (SF Hebrew has no hyphen) is drawn alone, so it keeps its
+        # place between the runs instead of joining the Latin word next to it.
+        isolated = set()
+        index = 0
+        while index < len(owners):
+            if owners[index] is not None:
+                index += 1
+                continue
+            end = index
+            while end < len(owners) and owners[end] is None:
+                end += 1
+            left = owners[index - 1] if index > 0 else None
+            right = owners[end] if end < len(owners) else None
+            owner = left if left == right or right is None else right if left is None else 0
+            for position in range(index, end):
+                char = text[position]
+                if char.isspace() or has_glyph(self.specs[owner or 0], char):
+                    owners[position] = owner or 0
+                else:
+                    owners[position] = next((i for i, spec in enumerate(self.specs) if has_glyph(spec, char)), 0)
+                    isolated.add(position)
+            index = end
+        runs: list[tuple[str, int]] = []
+        for position, (char, owner) in enumerate(zip(text, owners)):
+            if runs and runs[-1][1] == owner and position not in isolated and position - 1 not in isolated:
+                runs[-1] = (runs[-1][0] + char, owner)
+            else:
+                runs.append((char, owner))
+        return runs
+
+    def features(self, owner: int) -> dict:
+        return {"direction": "rtl" if self.rtl and owner == 0 else "ltr", "language": self.language}
+
+    def width(self, text: str) -> float:
+        return sum(self.fonts[owner].getlength(run, **self.features(owner)) for run, owner in self.runs(text))
+
+    def draw(self, draw: ImageDraw.ImageDraw, centre: float, baseline: float, text: str, fill) -> None:
+        runs = self.runs(text)
+        x = centre - self.width(text) / 2
+        for run, owner in reversed(runs) if self.rtl else runs:
+            features = self.features(owner)
+            draw.text((x, baseline), run, font=self.fonts[owner], fill=fill, anchor="ls", **features)
+            x += self.fonts[owner].getlength(run, **features)
+
+
+@functools.lru_cache(maxsize=None)
+def title_type(language: str, size: int) -> TitleType:
+    return TitleType(language, size)
 
 
 def wrap_options(text: str, language: str) -> list[list[str]]:
     """The title on one line, then every way to cut it in two (at spaces, or between characters for CJK)."""
     options = [[text]]
     if language in NO_SPACE_SCRIPTS:
-        closing = set("、。，！？：）」")
-        cuts = [i for i in range(1, len(text)) if text[i] not in closing and text[i - 1] != " "]
+        no_break_before = set("、。，！？：）」』”ーゃゅょっャュョッァィゥェォ")
+        no_break_after = set("（「『“ ")
+
+        def inside_word(i: int) -> bool:
+            return text[i - 1].isascii() and text[i - 1].isalnum() and text[i].isascii() and text[i].isalnum()
+
+        cuts = [i for i in range(1, len(text))
+                if text[i] not in no_break_before and text[i - 1] not in no_break_after and not inside_word(i)]
         options += [[text[:i].rstrip(), text[i:].lstrip()] for i in cuts]
     else:
         words = text.split(" ")
@@ -505,42 +616,40 @@ def wrap_options(text: str, language: str) -> list[list[str]]:
     return options
 
 
-def draw_title(canvas: Image.Image, text: str, language: str, font_spec: tuple, rtl: bool, band_height: int) -> None:
-    max_width = canvas.width - 320
-    features = {"direction": "rtl" if rtl else "ltr", "language": language.split("-")[0]}
-
-    def line_height(font: ImageFont.FreeTypeFont) -> int:
-        ascent, descent = font.getmetrics()
-        return round((ascent + descent) * 1.08)
-
+def layout_title(text: str, language: str, max_width: int, band_height: int) -> tuple[TitleType, list[str]]:
+    """Size and lines of a title: one large line; else two lines that leave a margin in the band (the most even
+    cut); else one smaller line. Fails when nothing fits, so a long translation is caught before any rendering."""
     def fitting(size: int, line_count: int):
-        """The most even cut of the title into `line_count` lines at `size`, or None if none fits."""
-        font = load_font(font_spec, size)
-        if line_height(font) * line_count > band_height - 90:
+        lettering = title_type(language, size)
+        if lettering.line_height * line_count > band_height - 90:
             return None
         best = None
         for lines in wrap_options(text, language):
             if len(lines) != line_count:
                 continue
-            widths = [font.getlength(line, **features) for line in lines]
+            widths = [lettering.width(line) for line in lines]
             if max(widths) <= max_width and (best is None or max(widths) - min(widths) < best[0]):
                 best = (max(widths) - min(widths), lines)
-        return (font, best[1]) if best else None
+        return (lettering, best[1]) if best else None
 
-    # One large line; else two lines that leave a margin in the band; else one smaller line.
+    missing = title_type(language, 64).missing(text)
+    if missing:
+        fail(f"{language}: no font draws {''.join(missing)}, add one for this script in FONTS")
     passes = [(range(112, 83, -4), 1), (range(104, 55, -4), 2), (range(80, 47, -4), 1)]
     chosen = next((found for sizes, count in passes for size in sizes if (found := fitting(size, count))), None)
     if chosen is None:
-        fail(f"title too long for the canvas: {text!r}")
-    font, lines = chosen
-    ascent, _ = font.getmetrics()
-    step = line_height(font)
-    top = (band_height - step * len(lines)) // 2 + 6
+        fail(f"{language}: title too long for the screenshot, shorten it in titles.json: {text!r}")
+    return chosen
+
+
+def draw_title(canvas: Image.Image, text: str, language: str, band_height: int) -> None:
+    lettering, lines = layout_title(text, language, TITLE_WIDTH, band_height)
+    top = (band_height - lettering.line_height * len(lines)) // 2 + 6
     layer = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
     for index, line in enumerate(lines):
-        draw.text((canvas.width / 2, top + index * step + ascent), line, font=font,
-                  fill=(255, 255, 255, 255), anchor="ms", **features)
+        lettering.draw(draw, canvas.width / 2, top + index * lettering.line_height + lettering.ascent, line,
+                       (255, 255, 255, 255))
     shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
     shadow.putalpha(layer.getchannel("A").point(lambda value: round(value * 0.45)).filter(ImageFilter.GaussianBlur(10)))
     canvas.alpha_composite(shadow, (0, 6))
@@ -590,12 +699,11 @@ def compose_language(args, language: str, entry: dict, docs_languages: set[str])
             path = root / "docs" / "images" / f"{name}{suffix}.png"
             size = save_png(image, path, limit=1_000_000)
             written.append(f"{path.relative_to(root)} {image.width}x{image.height} {size // 1024} KB")
-    font_spec = title_font_spec(language, entry["titles"])
     for index, (shot, text) in enumerate(zip(appstore_shots(assets, rtl), entry["titles"]), start=1):
-        draw_title(shot, text, language, font_spec, rtl, Screen.FRAME_TOP)
+        draw_title(shot, text, language, Screen.FRAME_TOP)
         if shot.size != APPSTORE_SIZE:
             fail(f"{language} {index:02d}: {shot.size} instead of {APPSTORE_SIZE}")
-        path = root / "interne" / "appstore-screenshots" / language / f"{index:02d}.png"
+        path = root / "interne" / "appstore-screenshots" / STORE_CODES.get(language, language) / f"{index:02d}.png"
         size = save_png(shot, path)
         written.append(f"{path.relative_to(root)} {shot.width}x{shot.height} {size // 1024} KB")
     return written
@@ -608,15 +716,17 @@ def main() -> None:
     parser.add_argument("--work")
     parser.add_argument("--renderer")
     parser.add_argument("--check", action="store_true", help="only check titles.json for these languages")
+    parser.add_argument("--titles", action="store_true", help="with --check, print the size of each title (x2: two lines)")
     parser.add_argument("--list-catalog-languages", metavar="XCSTRINGS")
     args = parser.parse_args()
 
     if args.list_catalog_languages:
         print("\n".join(catalog_languages(Path(args.list_catalog_languages))))
         return
-    languages = args.languages or ["en", "fr"]
+    # App codes (de, nb) or listing codes (de-DE, no) are both accepted.
+    languages = [APP_CODES.get(code, code) for code in args.languages or ["en", "fr"]]
     catalog = (Path(args.root) if args.root else HERE.parent.parent) / "Shared" / "Localizable.xcstrings"
-    titles = check(languages, catalog)
+    titles = check(languages, catalog, report=args.titles)
     if args.check:
         return
     for option in ("root", "work", "renderer"):
