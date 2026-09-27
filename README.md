@@ -7,6 +7,10 @@
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black.svg)
 ![Swift 6](https://img.shields.io/badge/Swift-6-orange.svg)
 
+[![SimplyBar in action: the settings, the menu bar popups and the desktop widgets](docs/video/simplybar-promo-poster.jpg)](docs/video/simplybar-promo.mp4)
+
+See it in action: click the picture to play the 29-second video.
+
 A free and open source system monitor for the macOS menu bar. SimplyBar shows CPU, memory, network, disk,
 GPU and Bluetooth battery levels at a glance, opens a detailed popup when you click an item, and adds five
 widgets to your desktop.

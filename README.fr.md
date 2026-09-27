@@ -7,6 +7,10 @@
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black.svg)
 ![Swift 6](https://img.shields.io/badge/Swift-6-orange.svg)
 
+[![SimplyBar en action : les réglages, les fenêtres de la barre de menus et les widgets du bureau](docs/video/simplybar-promo-poster.jpg)](docs/video/simplybar-promo.mp4)
+
+La démonstration en vidéo : cliquez sur l'image pour lancer la vidéo de 29 secondes (en anglais).
+
 Un moniteur système gratuit et open source pour la barre de menus de macOS. SimplyBar affiche d'un coup d'œil
 le processeur, la mémoire, le réseau, le disque, la carte graphique et la batterie des appareils Bluetooth,
 ouvre une fenêtre détaillée quand on clique sur un élément, et ajoute cinq widgets au bureau.
