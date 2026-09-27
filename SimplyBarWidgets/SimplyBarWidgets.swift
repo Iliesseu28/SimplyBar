@@ -146,13 +146,19 @@ struct WidgetHeader: View {
             VStack(alignment: .leading, spacing: 1) {
                 title.font(.system(size: 12, weight: .semibold)).lineLimit(1)
                 if let date {
-                    Text("Updated \(Text(date, style: .time))")
-                        .font(.system(size: 9)).foregroundStyle(.secondary).lineLimit(1)
+                    // A fixed time: `Text(date, style: .time)` makes WidgetKit keep room for a wider live date, which
+                    // cut the line short. Where the label does not fit beside the value, the time shows alone.
+                    let time = Text(date, format: .dateTime.hour().minute())
+                    ViewThatFits(in: .horizontal) {
+                        Text("Updated \(time)")
+                        time
+                    }
+                    .font(.system(size: 9)).foregroundStyle(.secondary).lineLimit(1)
                 }
             }
             Spacer(minLength: 2)
             if let value {
-                Text(value).font(.system(size: 20, weight: .bold)).monospacedDigit().widgetAccentable()
+                Text(value).font(.system(size: 20, weight: .bold)).monospacedDigit().widgetAccentable().fixedSize()
             }
         }
     }
