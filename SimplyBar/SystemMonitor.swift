@@ -282,7 +282,8 @@ final class SystemMonitor {
 
     // MARK: - Diagnostics
 
-    /// One log line to compare the sandboxed numbers with `df` and `vm_stat` (see docs/ECARTS.md).
+    /// One log line to compare the sandboxed numbers with `df` and `vm_stat`. Free disk space differs by design:
+    /// it includes purgeable space, and the sandbox rounds it down (see `DiskReader`).
     private func logStartupNumbers() {
         let disk = DiskReader.read()
         let blocks = DiskReader.freeBlocks()

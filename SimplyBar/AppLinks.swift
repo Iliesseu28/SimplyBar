@@ -1,6 +1,6 @@
 import Foundation
 
-/// Every address the app shows, in one place. The simplibot.fr pages do not exist yet: docs/A-FAIRE.md lists them.
+/// Every address the app shows, in one place. The simplibot.fr pages below must be online before the app ships.
 enum AppLinks {
     static let site = URL(string: "https://simplibot.fr/simplybar")!
     static let privacy = URL(string: "https://simplibot.fr/simplybar/confidentialite")!

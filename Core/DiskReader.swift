@@ -3,11 +3,11 @@ import Foundation
 /// Space of the startup volume.
 ///
 /// Free space is `volumeAvailableCapacityForImportantUsage`: free blocks plus the purgeable space macOS reclaims on
-/// demand. Finder and the reference app show this number; `df` shows free blocks only (see docs/ECARTS.md).
+/// demand. Finder shows this number too; `df` counts free blocks only, so it shows less.
 nonisolated enum DiskReader {
     /// Used-space change between two samples that makes the menu bar item flash (500 MB). The sandbox rounds free
     /// space down to 3 significant digits of blocks, a 409.6 MB step on a 245 GB disk: a smaller threshold would
-    /// flash on rounding alone (see docs/ECARTS.md).
+    /// flash on rounding alone.
     static let significantChange = 500_000_000.0
 
     static func isSignificantChange(_ change: Double) -> Bool {

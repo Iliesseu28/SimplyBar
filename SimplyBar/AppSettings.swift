@@ -116,7 +116,7 @@ struct CPUSettings: Codable, Equatable, Sendable {
     var interval = 3
     var showIcon = true
     var showLabel = true
-    /// Two bars side by side, user then system, as the reference app shows by default.
+    /// Two bars side by side, user then system: the default look of the CPU item.
     var metric = CPUMetric.userSystem
     var style = ValueStyle.bar
 }

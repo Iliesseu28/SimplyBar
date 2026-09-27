@@ -83,7 +83,7 @@ enum StatusItemModels {
         case .percent: return .text(Format.percent(fraction), bold: false)
         case .gigabytes:
             if settings.metric == .pressure { return .text(Format.percent(fraction), bold: false) }
-            // With its unit, in the system language ("GB", "Go"), as the reference app shows it.
+            // With its unit, in the system language ("GB", "Go").
             return .text("\(Format.memoryGigabytes(bytes)) \(String(localized: "GB"))", bold: true)
         }
     }

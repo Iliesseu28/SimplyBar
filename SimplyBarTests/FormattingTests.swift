@@ -19,7 +19,7 @@ struct FormattingTests {
     }
 
     @Test func diskIsDecimalAndMemoryIsBinary() {
-        // Reference value: 108 560 000 000 free bytes read 108.56 GB (decimal gigabytes, as for disks).
+        // 108 560 000 000 free bytes read 108.56 GB (decimal gigabytes, as for disks).
         #expect(Format.diskGigabytes(108_560_000_000, locale: english) == "108.56")
         #expect(Format.diskGigabytes(1_234_000_000_000, decimals: 0, locale: english) == "1234")
         // 16 GiB of RAM reads 16.0, not 17.2.
@@ -75,7 +75,7 @@ struct ModelTests {
         #expect(History(capacity: 2, values: [1, 2, 3]).values == [2, 3])
     }
 
-    @Test func memoryPercentagesMatchTheReferenceValues() {
+    @Test func memoryPercentagesMatchHandComputedValues() {
         // 16 GiB Mac: 1.8 GiB wired and 1.8 GiB compressed give a 22.8 % pressure.
         let gib = 1_073_741_824.0
         let memory = MemorySample(total: 16 * gib, app: 4 * gib, wired: 1.85 * gib, compressed: 1.8 * gib)

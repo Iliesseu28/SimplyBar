@@ -107,7 +107,7 @@ struct SettingsView: View {
         } detail: {
             let tab = selection.tab ?? .module(.cpu)
             if case .module(let module) = tab, !settings.isShown(module) {
-                // As in the reference app: a module left out of the menu bar shows only the switch that brings it back.
+                // A module left out of the menu bar shows only the switch that brings it back.
                 Toggle("Show in menu bar", isOn: shown(module))
                     .toggleStyle(.switch)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -267,8 +267,8 @@ private struct GeneralSettings: View {
     }
 }
 
-/// Laid out like the reference app's support page: blocks of text and links, centered. Its subscription block
-/// becomes the version and a store review.
+/// About and support: the app's name and version, then blocks of text and links (store review, legal pages,
+/// contact).
 private struct AboutView: View {
     private var version: String {
         let info = Bundle.main.infoDictionary
