@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build and test (Xcode ${{ matrix.xcode }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26
+            xcode: "26.6"
+          - runner: xcode-27
+            xcode: "27.0"
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Show toolchain
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+
+      # Signing is turned off on the command line, so no certificate or Apple account is needed.
+      - name: Build and run the tests
+        run: |
+          mkdir -p build
+          status=0
+          xcodebuild test \
+            -project SimplyBar.xcodeproj \
+            -scheme SimplyBar \
+            -destination 'platform=macOS' \
+            -derivedDataPath build/DerivedData \
+            -resultBundlePath build/SimplyBar.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            > build/xcodebuild.log 2>&1 || status=$?
+          grep -nE "error:|failed on|\*\* (BUILD|TEST) (SUCCEEDED|FAILED) \*\*" build/xcodebuild.log || true
+          exit $status
+
+      - name: Keep the logs of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-xcode-${{ matrix.xcode }}
+          path: |
+            build/xcodebuild.log
+            build/SimplyBar.xcresult
+          if-no-files-found: ignore
+          retention-days: 7
