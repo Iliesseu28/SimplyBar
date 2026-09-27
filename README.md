@@ -9,7 +9,7 @@
 
 https://github.com/user-attachments/assets/f5201cb8-1857-4e28-ada7-00c3b93f18bb
 
-See it in action: click the picture to play the 29-second video.
+See it in action in 29 seconds, with sound.
 
 A free and open source system monitor for the macOS menu bar. SimplyBar shows CPU, memory, network, disk,
 GPU and Bluetooth battery levels at a glance, opens a detailed popup when you click an item, and adds five

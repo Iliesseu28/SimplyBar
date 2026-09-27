@@ -9,7 +9,7 @@
 
 https://github.com/user-attachments/assets/f5201cb8-1857-4e28-ada7-00c3b93f18bb
 
-La démonstration en vidéo : cliquez sur l'image pour lancer la vidéo de 29 secondes (en anglais).
+La démonstration en vidéo : 29 secondes, en anglais, avec le son.
 
 Un moniteur système gratuit et open source pour la barre de menus de macOS. SimplyBar affiche d'un coup d'œil
 le processeur, la mémoire, le réseau, le disque, la carte graphique et la batterie des appareils Bluetooth,
