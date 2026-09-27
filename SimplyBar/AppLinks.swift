@@ -10,7 +10,7 @@ enum AppLinks {
     /// The public repository: SimplyBar is open source.
     static let sourceCode = URL(string: "https://github.com/Iliesseu28/SimplyBar")!
     /// Apple ID of the app, known once its App Store Connect record exists. Until then the review link is inactive.
-    static let appStoreID: String? = nil
+    static let appStoreID: String? = "6816678897"
 
     /// The Mac App Store page of the app, opened on its review form.
     static var appStoreReview: URL? {
