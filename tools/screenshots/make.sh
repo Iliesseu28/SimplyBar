@@ -4,6 +4,8 @@
 #   zsh tools/screenshots/make.sh              # en fr
 #   zsh tools/screenshots/make.sh en fr de ja  # a list of languages (codes of the string catalog)
 #   zsh tools/screenshots/make.sh all          # every language of Shared/Localizable.xcstrings
+#   zsh tools/screenshots/make.sh --video <folder>  # English assets of the promo video (tools/promo-video),
+#                                                   # add --settings-only to redraw the settings window alone
 #
 # Output:
 #   docs/images/{overview,menubar,popups,widgets}.png   English, for the README and the site (no title)
@@ -23,6 +25,14 @@ APP="$WORK/Renderer.app/Contents"
 LOG="$ROOT/build/screenshots-renderer.log"
 mkdir -p "$ROOT/build"
 
+VIDEO_OUT=""
+if [[ "${1:-}" == "--video" ]]; then
+  [[ -n "${2:-}" ]] || { echo "usage: make.sh --video <output folder>" >&2; exit 2; }
+  mkdir -p "$2"
+  VIDEO_OUT="$(cd "$2" && pwd)"
+  VIDEO_FLAGS=(--video ${3:+"$3"})  # --settings-only redraws the settings window alone
+  set -- en
+fi
 if [[ $# -eq 0 ]]; then
   set -- en fr
 elif [[ "$1" == "all" ]]; then
@@ -79,5 +89,39 @@ cat > "$APP/Info.plist" <<'PLIST'
 <key>LSUIElement</key><true/>
 </dict></plist>
 PLIST
+
+if [[ -n "$VIDEO_OUT" ]]; then
+  # The video's assets: English, drawn at 4 pixels per point. The settings window must be the active one: the
+  # renderer runs as a regular app launched by `open` (macOS brings that one to the front, not a process started
+  # from a shell), and writes on the internal disk (launched that way, it would ask access to an external volume).
+  plutil -replace LSUIElement -bool NO "$APP/Info.plist"
+  STAGE="$WORK/video"
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE"
+  if [[ "${3:-}" == "--settings-only" ]]; then
+    # The other sizes come from the full run before: the renderer adds the settings to them.
+    [[ -f "$VIDEO_OUT/video-assets.json" ]] && cp "$VIDEO_OUT/video-assets.json" "$STAGE/"
+  fi
+  python3 -c 'import json, sys; print(json.dumps(json.load(open(sys.argv[1]))["en"]["demo"]))' "$TOOL/titles.json" \
+    > "$STAGE/demo.json"
+  # `open -W` waits without a limit: a system prompt left unanswered would block it, so a watchdog ends it.
+  ( sleep 300; pkill -f "$WORK/Renderer.app/Contents/MacOS/" ) &
+  WATCHDOG=$!
+  open -W -n "$WORK/Renderer.app" \
+    --args "$STAGE" "$STAGE/demo.json" 4 ltr "${VIDEO_FLAGS[@]}" -AppleLanguages "(en)" -AppleLocale en_US
+  kill $WATCHDOG 2>/dev/null || true
+  if ! grep -q "^rendered " "$STAGE/render.log" 2>/dev/null; then
+    tail -20 "$STAGE/render.log" >&2 || true
+    echo "Video assets failed, full log: $STAGE/render.log" >&2
+    exit 1
+  fi
+  if [[ "${3:-}" != "--settings-only" ]]; then
+    # A full run replaces everything: no image of an earlier run stays behind.
+    rm -f "$VIDEO_OUT"/*.png(N) "$VIDEO_OUT/video-assets.json"
+  fi
+  cp "$STAGE"/*.png "$STAGE/video-assets.json" "$VIDEO_OUT/"
+  grep -E "^Renderer:|^rendered " "$STAGE/render.log"
+  exit 0
+fi
 
 python3 "$TOOL/compose.py" --root "$ROOT" --work "$WORK" --renderer "$APP/MacOS/Renderer" "$@"

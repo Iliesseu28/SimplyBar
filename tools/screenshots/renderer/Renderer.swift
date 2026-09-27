@@ -7,7 +7,8 @@ import WidgetKit
 // It draws the real views (menu bar items, popups, widgets) with demo numbers into transparent PNGs; `compose.py`
 // then lays them out on a desktop.
 //
-// Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl>
+// Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl> [--video]
+// With --video it draws the assets of the promo video instead (VideoAssets.swift).
 
 /// Stands in for the one of `SimplyBarApp.swift`, which this build leaves out (it holds the app's `@main`).
 @MainActor
@@ -33,6 +34,14 @@ struct ScreenshotRenderer {
             fail("usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl>")
         }
         let output = URL(fileURLWithPath: arguments[1], isDirectory: true)
+        if arguments.contains("--video") {
+            // Launched by `open`, which leaves no terminal: messages go to a file of the output folder.
+            try? FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+            let log = output.appendingPathComponent("render.log").path
+            guard freopen(log, "w", stdout) != nil else { fail("cannot write \(log)") }
+            setvbuf(stdout, nil, _IOLBF, 0)
+            dup2(STDOUT_FILENO, STDERR_FILENO)
+        }
         let rtl = arguments[4] == "rtl"
         let names: DemoNames
         do {
@@ -47,7 +56,11 @@ struct ScreenshotRenderer {
         try? FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
 
         let renderer = AssetRenderer(output: output, scale: scale, rtl: rtl, demo: DemoData(names: names))
-        renderer.renderAll()
+        if arguments.contains("--video") {
+            VideoAssetRenderer(renderer: renderer).renderAll(settingsOnly: arguments.contains("--settings-only"))
+        } else {
+            renderer.renderAll()
+        }
         UserDefaults.standard.removePersistentDomain(forName: RenderDefaults.name)
         print("rendered \(renderer.count) images into \(output.path) (\(Bundle.main.preferredLocalizations.first ?? "?"))")
         exit(0)
@@ -95,7 +108,13 @@ final class AssetRenderer {
             renderPopup(module)
         }
 
-        // Widgets, from the payload the app itself would write.
+        renderWidgets()
+    }
+
+    /// Widgets, from the payload the app itself would write.
+    func renderWidgets() {
+        let labelMonitor = SystemMonitor(settings: settings)
+        demo.apply(to: labelMonitor)
         let payload = demo.payload(from: labelMonitor)
         save(WidgetFrame(size: .small) { CPUWidgetView(payload: payload) }, name: "widget-cpu")
         save(WidgetFrame(size: .small) { MemoryWidgetView(payload: payload) }, name: "widget-memory")
@@ -147,16 +166,18 @@ final class AssetRenderer {
 
     // MARK: - Drawing
 
-    private func save<V: View>(_ view: V, name: String, mirrored: Bool = true) {
+    /// Writes `name`.png and returns its size in points.
+    @discardableResult
+    func save<V: View>(_ view: V, name: String, mirrored: Bool = true) -> (name: String, size: CGSize) {
         guard let image = capture(AnyView(view), mirrored: mirrored, prepare: {}) else {
             ScreenshotRenderer.fail("nothing drawn for \(name)")
         }
-        write(image, name: name)
+        return write(image, name: name)
     }
 
     /// Draws a view the way a window shows it (buttons included, which `ImageRenderer` leaves out) at `scale`
     /// pixels per point, on a transparent background.
-    private func capture(_ view: AnyView, mirrored: Bool = true, prepare: () -> Void) -> CGImage? {
+    func capture(_ view: AnyView, mirrored: Bool = true, prepare: () -> Void) -> CGImage? {
         let direction: LayoutDirection = rtl && mirrored ? .rightToLeft : .leftToRight
         let host = NSHostingView(rootView: view
             .environment(\.colorScheme, .light)
@@ -193,7 +214,8 @@ final class AssetRenderer {
         return rep.cgImage
     }
 
-    private func write(_ image: CGImage, name: String) {
+    @discardableResult
+    func write(_ image: CGImage, name: String) -> (name: String, size: CGSize) {
         let url = output.appendingPathComponent("\(name).png")
         guard let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil) else {
             ScreenshotRenderer.fail("cannot write \(url.path)")
@@ -201,6 +223,7 @@ final class AssetRenderer {
         CGImageDestinationAddImage(destination, image, nil)
         guard CGImageDestinationFinalize(destination) else { ScreenshotRenderer.fail("cannot write \(url.path)") }
         count += 1
+        return (name, CGSize(width: CGFloat(image.width) / scale, height: CGFloat(image.height) / scale))
     }
 
     private func spin(for seconds: TimeInterval) {
