@@ -79,7 +79,7 @@ nonisolated struct BluetoothDevice: Codable, Equatable, Sendable, Identifiable {
     /// Unique in a list of devices: two devices may share a name (see `BluetoothReader.merge`).
     var id: String
     var name: String
-    /// Bluetooth address (`EC:A1:2F:54:96:BF`) when the source gives it.
+    /// Bluetooth address (`00:11:22:33:44:55`) when the source gives it.
     var address: String?
     /// Empty when the device does not report its battery.
     var levels: [Level]

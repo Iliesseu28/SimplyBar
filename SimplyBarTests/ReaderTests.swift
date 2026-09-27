@@ -39,7 +39,7 @@ struct CPUTests {
 
 struct MemoryTests {
     @Test func appMemoryIsAnonymousMinusPurgeable() {
-        // Figures read from vm_stat on the reference Mac (16 KB pages).
+        // Figures read from vm_stat on a 16 GB Mac (16 KB pages).
         let pages = MemoryPages(internalPages: 269_911, purgeable: 20_786, wired: 118_319, compressor: 117_195, pageSize: 16_384)
         let sample = MemoryMath.sample(pages: pages, physicalMemory: 17_179_869_184)
         #expect(sample.app == Double(269_911 - 20_786) * 16_384)
@@ -141,7 +141,7 @@ struct BluetoothTests {
     }
 
     @Test func laterSourcesOnlyAddMissingDevices() {
-        let address = "EC:A1:2F:54:96:BF"
+        let address = "00:11:22:33:44:55"
         let powerSources = [BluetoothDevice(name: "Headset", levels: [.init(part: .main, percent: 40)])]
         let audio = [BluetoothDevice(name: "Headset", address: address, levels: []),
                      BluetoothDevice(name: "Headset", address: address, levels: []),
@@ -152,10 +152,10 @@ struct BluetoothTests {
     }
 
     @Test func addressesAreNormalized() {
-        #expect(BluetoothReader.normalizedAddress("ec-a1-2f-54-96-bf") == "EC:A1:2F:54:96:BF")
-        #expect(BluetoothReader.normalizedAddress("EC-A1-2F-54-96-BF:output") == "EC:A1:2F:54:96:BF")
+        #expect(BluetoothReader.normalizedAddress("0a-1b-2c-3d-4e-5f") == "0A:1B:2C:3D:4E:5F")
+        #expect(BluetoothReader.normalizedAddress("0A-1B-2C-3D-4E-5F:output") == "0A:1B:2C:3D:4E:5F")
         #expect(BluetoothReader.normalizedAddress("BuiltInSpeakerDevice") == nil)
-        #expect(BluetoothReader.normalizedAddress("EC:A1:2F:54:96") == nil)
+        #expect(BluetoothReader.normalizedAddress("0A:1B:2C:3D:4E") == nil)
     }
 }
 

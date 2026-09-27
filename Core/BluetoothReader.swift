@@ -3,8 +3,8 @@ import Foundation
 import IOKit
 import IOKit.ps
 
-/// Connected Bluetooth devices and their battery levels, from sources readable inside the App Sandbox (see
-/// docs/ECARTS.md), in order of preference:
+/// Connected Bluetooth devices and their battery levels, from the sources an app can still read inside the App
+/// Sandbox, in order of preference:
 /// - the IOKit registry (Apple keyboards, mice and trackpads publish `BatteryPercent`);
 /// - IOPowerSources (accessories macOS lists as power sources, the ones `pmset -g accps` prints);
 /// - devices connected without a battery level: Bluetooth HID devices (IOKit) and audio devices (Core Audio).
@@ -133,8 +133,8 @@ nonisolated enum BluetoothReader {
 
     // MARK: - Merge
 
-    /// `"ec-a1-2f-54-96-bf"`, `"EC:A1:2F:54:96:BF"` or an audio device UID such as `"EC-A1-2F-54-96-BF:output"`
-    /// give `"EC:A1:2F:54:96:BF"`; anything else gives nil.
+    /// `"0a-1b-2c-3d-4e-5f"`, `"0A:1B:2C:3D:4E:5F"` or an audio device UID such as `"0A-1B-2C-3D-4E-5F:output"`
+    /// give `"0A:1B:2C:3D:4E:5F"`; anything else gives nil.
     static func normalizedAddress(_ text: String) -> String? {
         let candidate = text.uppercased().replacingOccurrences(of: "-", with: ":").prefix(17)
         let bytes = candidate.split(separator: ":", omittingEmptySubsequences: false)
