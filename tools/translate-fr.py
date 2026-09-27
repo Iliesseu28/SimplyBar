@@ -115,13 +115,21 @@ FR = {
     "Disk": "Disque",
     "Disks appear within 5 minutes.": "Les disques s'affichent d'ici 5 minutes.",
     "Including %@ GB purgeable": "Dont %@ Go purgeables",
+    "%@": "%@",
+    "%@:": "%@ :",
+    "%@ Usage History": "Historique d'utilisation (%@)",
+    "External": "Externe",
     # InfoPlist.xcstrings
     "CFBundleDisplayName": "SimplyBar",
+    "CFBundleName": "SimplyBar",
+    "NSHumanReadableCopyright": "© 2026 Simplibot",
 }
 
 # Keys of InfoPlist.xcstrings are Info.plist keys; English values come from the build settings.
 EN_INFOPLIST = {
     "CFBundleDisplayName": "SimplyBar",
+    "CFBundleName": "SimplyBar",
+    "NSHumanReadableCopyright": "© 2026 Simplibot",
 }
 
 
