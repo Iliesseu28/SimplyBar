@@ -1,0 +1,46 @@
+{
+  "_readme": [
+    "One entry per language code of the string catalog (en, fr, de, ja, zh-Hans, pt-BR...).",
+    "titles: the 5 titles of the Mac App Store screenshots 01 to 05, short and factual. No em dash or en dash.",
+    "demo: names the app does not translate because they are user data (GPU model, Bluetooth devices, disk names).",
+    "locale (optional): region used for dates and numbers, e.g. ar_AE; by default the language code with _ (pt_BR) or its usual country."
+  ],
+  "en": {
+    "titles": [
+      "Your whole Mac at a glance in the menu bar",
+      "A detailed window for every module",
+      "The Storage widget shows every disk",
+      "5 desktop widgets",
+      "Free, open source, no data collected"
+    ],
+    "demo": {
+      "gpu": "Integrated GPU",
+      "keyboard": "Keyboard",
+      "mouse": "Mouse",
+      "headphones": "Headphones",
+      "system": "System",
+      "photos": "Photos",
+      "backup": "Backup",
+      "archive": "Archive"
+    }
+  },
+  "fr": {
+    "titles": [
+      "Tout votre Mac d’un coup d’œil dans la barre des menus",
+      "Une fenêtre détaillée pour chaque module",
+      "Le widget Stockage affiche tous vos disques",
+      "5 widgets pour le bureau",
+      "Gratuit, open source, aucune donnée collectée"
+    ],
+    "demo": {
+      "gpu": "GPU intégré",
+      "keyboard": "Clavier",
+      "mouse": "Souris",
+      "headphones": "Casque",
+      "system": "Système",
+      "photos": "Photos",
+      "backup": "Sauvegarde",
+      "archive": "Archives"
+    }
+  }
+}
