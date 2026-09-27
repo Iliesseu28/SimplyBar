@@ -3,10 +3,9 @@ import Foundation
 /// Names shown on the screenshots that are user data, not strings of the app (a disk name, a Bluetooth device):
 /// the app does not translate them, so `titles.json` carries them for each language.
 struct DemoNames: Decodable {
-    var gpu: String
     var keyboard: String
     var mouse: String
-    var earbuds: String
+    var trackpad: String
     var system: String
     var photos: String
     var backup: String
@@ -40,17 +39,19 @@ struct DemoData {
     let gpuUtilization = 0.37
     let localIP = "192.168.1.24"
 
-    var gpus: [GPUSample] { [GPUSample(model: names.gpu, utilization: gpuUtilization)] }
+    /// The IOKit model string, as `GPUReader` reads it on a Mac with 8 CPU cores: never translated.
+    let gpuModel = "Apple M3"
 
+    var gpus: [GPUSample] { [GPUSample(model: gpuModel, utilization: gpuUtilization)] }
+
+    /// Only what `BluetoothReader` gives inside the App Sandbox: one level per device (`.main`), as keyboards, mice
+    /// and trackpads publish it (`BatteryPercent`). Its own merge sorts them by name in the language shown.
     var bluetoothDevices: [BluetoothDevice] {
-        [
+        BluetoothReader.merge([[
             BluetoothDevice(name: names.keyboard, levels: [.init(part: .main, percent: 78)]),
             BluetoothDevice(name: names.mouse, levels: [.init(part: .main, percent: 16)]),
-            // Earbuds report each side and the case, which shows how the popup lays out several levels.
-            BluetoothDevice(name: names.earbuds, levels: [
-                .init(part: .left, percent: 90), .init(part: .right, percent: 85), .init(part: .caseBattery, percent: 62),
-            ]),
-        ]
+            BluetoothDevice(name: names.trackpad, levels: [.init(part: .main, percent: 54)]),
+        ]])
     }
 
     var volumes: [VolumeSample] {
