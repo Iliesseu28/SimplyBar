@@ -1,0 +1,63 @@
+name: Bug report
+description: Something in SimplyBar does not work as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. For a security problem, do not use this form: follow SECURITY.md instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect to see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Turn on the Network module in Settings.
+        2. Click the network item in the menu bar.
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      multiple: true
+      options:
+        - Menu bar
+        - Popup
+        - Desktop widget
+        - Settings
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: SimplyBar version
+      description: Settings, About tab.
+      placeholder: "1.0 (1)"
+    validations:
+      required: true
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      placeholder: "macOS 15.6"
+    validations:
+      required: true
+  - type: input
+    id: mac-model
+    attributes:
+      label: Mac model
+      placeholder: "MacBook Air with M2"
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots or anything else
+      description: Screenshots help a lot. Remove anything personal from them first.

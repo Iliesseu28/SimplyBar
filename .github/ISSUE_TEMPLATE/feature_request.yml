@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest an idea or an improvement for SimplyBar.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        SimplyBar runs in the App Sandbox with no network access, so it can only show what macOS gives to sandboxed apps. Temperatures, fan speeds and the battery of wireless headphones are out of reach for that reason.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to do?
+      description: Describe the need first, then the solution you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: How could SimplyBar help?
+      description: Where would it appear (menu bar, popup, widget, settings) and what would it show?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Anything else
+      description: Workarounds you use today, sketches, screenshots.
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Ground rules
+      options:
+        - label: This works inside the App Sandbox, needs no network access and no third-party dependency (see CONTRIBUTING.md).
+          required: true

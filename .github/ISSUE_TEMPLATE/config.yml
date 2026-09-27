@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/Iliesseu28/SimplyBar/security/advisories/new
+    about: Please report security problems privately, not in a public issue.
+  - name: Support
+    url: https://simplibot.fr/simplybar/support
+    about: Help with installing and using SimplyBar.
