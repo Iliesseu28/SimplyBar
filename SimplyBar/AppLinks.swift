@@ -7,6 +7,8 @@ enum AppLinks {
     static let support = URL(string: "https://simplibot.fr/simplybar/support")!
     static let contactEmail = "contact@simplibot.fr"
     static let contact = URL(string: "mailto:contact@simplibot.fr")!
+    /// The public repository: SimplyBar is open source.
+    static let sourceCode = URL(string: "https://github.com/Iliesseu28/SimplyBar")!
     /// Apple ID of the app, known once its App Store Connect record exists. Until then the review link is inactive.
     static let appStoreID: String? = nil
 

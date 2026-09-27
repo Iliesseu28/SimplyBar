@@ -309,6 +309,7 @@ private struct AboutView: View {
                 }
                 Link("Support", destination: AppLinks.support)
                 Link("Website", destination: AppLinks.site)
+                Link("Source Code on GitHub", destination: AppLinks.sourceCode)
             }
         }
         // A fixed width: measured at a narrow width, wrapping text would ask for a very tall window and push
