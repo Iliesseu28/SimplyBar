@@ -270,17 +270,7 @@ struct BluetoothPopup: View {
             } else {
                 VStack(spacing: 6) {
                     ForEach(monitor.bluetoothDevices) { device in
-                        HStack(spacing: 8) {
-                            Text(verbatim: device.name).lineLimit(1)
-                            Spacer()
-                            if device.levels.isEmpty {
-                                Text("Battery not reported").foregroundStyle(.secondary)
-                            }
-                            ForEach(device.levels, id: \.part) { level in
-                                BatteryLevelView(level: level)
-                            }
-                        }
-                        .font(.system(size: 12))
+                        BluetoothDeviceRow(device: device)
                     }
                 }
             }
@@ -289,6 +279,49 @@ struct BluetoothPopup: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// A device and its battery levels. The levels never shrink: they sit beside the whole name when they fit, else
+/// under it, else one per line, so no label is cut or wrapped in any language.
+private struct BluetoothDeviceRow: View {
+    let device: BluetoothDevice
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
+                name
+                Spacer(minLength: 0)
+                HStack(spacing: 8) { levels }.fixedSize()
+            }
+            VStack(alignment: .trailing, spacing: 2) {
+                nameLine
+                HStack(spacing: 8) { levels }.fixedSize()
+            }
+            VStack(alignment: .trailing, spacing: 2) {
+                nameLine
+                VStack(alignment: .trailing, spacing: 2) { levels }.fixedSize()
+            }
+        }
+        .font(.system(size: 12))
+    }
+
+    private var name: some View {
+        Text(verbatim: device.name).lineLimit(1)
+    }
+
+    /// The name on a line of its own may be cut: only the levels decide which layout fits.
+    private var nameLine: some View {
+        name.frame(minWidth: 0, idealWidth: 0, maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder private var levels: some View {
+        if device.levels.isEmpty {
+            Text("Battery not reported").foregroundStyle(.secondary)
+        }
+        ForEach(device.levels, id: \.part) { level in
+            BatteryLevelView(level: level)
         }
     }
 }
