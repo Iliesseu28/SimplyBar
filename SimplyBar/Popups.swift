@@ -232,15 +232,18 @@ struct GPUPopup: View {
             ForEach(Array(monitor.gpus.enumerated()), id: \.offset) { item in
                 let gpu = item.element
                 HStack(spacing: 4) {
-                    Text(verbatim: "\(gpu.model):")
+                    Text("\(gpu.model):", comment: "GPU model name, such as Apple M4, followed by a colon before its usage.")
                     Text(Format.percent(gpu.utilization)).foregroundStyle(Palette.load(gpu.utilization)).monospacedDigit()
                 }
                 .font(.system(size: 13, weight: .medium))
                 TickBar(value: gpu.utilization)
             }
-            HStack(spacing: 4) {
-                if let model = monitor.gpus.first?.model { Text(verbatim: model) }
-                Text("Usage History")
+            Group {
+                if let model = monitor.gpus.first?.model {
+                    Text("\(model) Usage History", comment: "Title of the GPU history chart; the argument is the GPU model, such as Apple M4.")
+                } else {
+                    Text("Usage History")
+                }
             }
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(.secondary)

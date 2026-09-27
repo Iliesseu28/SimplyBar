@@ -61,7 +61,9 @@ extension WidgetPayload {
         volumes: [
             VolumeSample(id: "/", name: "Macintosh HD", isInternal: true, total: 245_110_000_000, free: 108_560_000_000,
                          purgeable: 3_480_000_000),
-            VolumeSample(id: "/Volumes/External", name: "External", isInternal: false, total: 1_023_000_000_000,
+            VolumeSample(id: "/Volumes/External",
+                         name: String(localized: "External", comment: "Name of the sample external disk in the widget gallery preview."),
+                         isInternal: false, total: 1_023_000_000_000,
                          free: 212_000_000_000, purgeable: nil),
         ]
     )
