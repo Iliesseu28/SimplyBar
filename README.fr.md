@@ -7,7 +7,7 @@
 ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-black.svg)
 ![Swift 6](https://img.shields.io/badge/Swift-6-orange.svg)
 
-[![SimplyBar en action : les réglages, les fenêtres de la barre de menus et les widgets du bureau](docs/video/simplybar-promo-poster.jpg)](docs/video/simplybar-promo.mp4)
+https://github.com/user-attachments/assets/f5201cb8-1857-4e28-ada7-00c3b93f18bb
 
 La démonstration en vidéo : cliquez sur l'image pour lancer la vidéo de 29 secondes (en anglais).
 
