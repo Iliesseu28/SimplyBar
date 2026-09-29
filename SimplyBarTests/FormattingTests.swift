@@ -123,7 +123,7 @@ struct ModelTests {
     }
 
     @Test func olderOrBrokenSharedFilesDoNotCrash() throws {
-        // Written by an older version, with a GPU the widgets never drew: the extra key is ignored.
+        // Written by an older version, before the widgets had new values: it still decodes.
         let older = Data("""
             {"date":1790000000,"cpuHistory":[],"uploadHistory":[],"downloadHistory":[],
              "gpu":{"model":"GPU","utilization":0.1}}
