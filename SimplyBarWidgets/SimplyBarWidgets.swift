@@ -6,9 +6,12 @@ struct SimplyBarWidgets: WidgetBundle {
     var body: some Widget {
         CPUWidget()
         MemoryWidget()
+        GPUWidget()
         NetworkWidget()
         DiskWidget()
         StorageWidget()
+        BluetoothWidget()
+        KeepAwakeWidget()
     }
 }
 
@@ -65,7 +68,18 @@ extension WidgetPayload {
                          name: String(localized: "External", comment: "Name of the sample external disk in the widget gallery preview."),
                          isInternal: false, total: 1_023_000_000_000,
                          free: 212_000_000_000, purgeable: nil),
-        ]
+        ],
+        gpu: GPUSample(model: "GPU", utilization: 0.12),
+        gpuHistory: [0.05, 0.1, 0.08, 0.2, 0.35, 0.15, 0.1, 0.06, 0.08, 0.12, 0.3, 0.25, 0.1, 0.07, 0.09, 0.14, 0.2, 0.12, 0.1, 0.12],
+        bluetooth: [
+            BluetoothDevice(name: String(localized: "Keyboard", comment: "Sample Bluetooth device in the widget gallery preview."),
+                            levels: [.init(part: .main, percent: 78)]),
+            BluetoothDevice(name: String(localized: "Mouse", comment: "Sample Bluetooth device in the widget gallery preview."),
+                            levels: [.init(part: .main, percent: 16)]),
+            BluetoothDevice(name: String(localized: "Trackpad", comment: "Sample Bluetooth device in the widget gallery preview."),
+                            levels: [.init(part: .main, percent: 54)]),
+        ],
+        keepAwake: KeepAwakeStatus(isActive: true, end: nil, keepsDisplayOn: false)
     )
 }
 
@@ -89,6 +103,17 @@ struct MemoryWidget: Widget {
         }
         .configurationDisplayName("RAM")
         .description("Memory in use and how it splits.")
+        .supportedFamilies([.systemSmall])
+    }
+}
+
+struct GPUWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: SharedStore.gpuWidgetKind, provider: PayloadProvider()) { entry in
+            GPUWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
+        }
+        .configurationDisplayName("GPU")
+        .description("GPU load and its recent history.")
         .supportedFamilies([.systemSmall])
     }
 }
@@ -231,6 +256,30 @@ struct MemoryWidgetView: View {
             Text(verbatim: "\(Format.memoryGigabytes(bytes)) \(String(localized: "GB"))").monospacedDigit()
         }
         .font(.system(size: 11))
+    }
+}
+
+struct GPUWidgetView: View {
+    let payload: WidgetPayload?
+
+    var body: some View {
+        if let payload, let gpu = payload.gpu {
+            VStack(alignment: .leading, spacing: 8) {
+                WidgetHeader(symbol: "square.3.layers.3d", title: "GPU", value: Format.percent(gpu.utilization), date: payload.date)
+                TickBar(value: gpu.utilization, height: 22)
+                HistoryChart(
+                    values: payload.gpuHistory, capacity: WidgetPayload.historyLength,
+                    scale: ChartScale(values: payload.gpuHistory, minimum: 0.1),
+                    barColor: { Palette.load($0) }, axisLabel: { Format.percent($0) }, labelWidth: 0
+                )
+            }
+        } else if let payload {
+            // Measured without a readable GPU, or not measured yet: the app notices a new widget within 5 minutes.
+            NotRunningView(symbol: "square.3.layers.3d", title: "GPU",
+                           message: payload.gpuHistory.isEmpty ? "Appears within 5 minutes." : "Unavailable")
+        } else {
+            NotRunningView(symbol: "square.3.layers.3d", title: "GPU")
+        }
     }
 }
 
