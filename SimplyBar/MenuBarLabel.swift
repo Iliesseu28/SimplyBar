@@ -7,6 +7,7 @@ struct StatusItemModel: Equatable {
         case bars([Double])
         case text(String, bold: Bool)
         case lines(String, String)
+        case iconOnly
     }
 
     var symbol: String?
@@ -48,6 +49,10 @@ enum StatusItemModels {
             let lowest = monitor.bluetoothDevices.compactMap(\.lowest).min()
             return StatusItemModel(symbol: s.showIcon ? module.symbol : nil, letters: s.showLabel ? module.shortLabel : nil,
                                    content: .text(lowest.map { "\($0)%" } ?? "-", bold: false))
+        case .keepAwake:
+            // Filled while the Mac is kept awake.
+            return StatusItemModel(symbol: monitor.keepAwake.isActive ? "cup.and.saucer.fill" : module.symbol, letters: nil,
+                                   content: .iconOnly)
         }
     }
 
@@ -156,6 +161,8 @@ struct StatusItemView: View {
             }
             .font(.system(size: 9, weight: .medium))
             .monospacedDigit()
+        case .iconOnly:
+            EmptyView()
         }
     }
 }

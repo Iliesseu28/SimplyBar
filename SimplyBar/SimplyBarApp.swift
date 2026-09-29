@@ -17,6 +17,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        AppServices.monitor.stop()
+    }
+
     /// Opening the app again while it runs (Finder, Spotlight, Launchpad) shows the settings, the only way back
     /// when every menu bar item is hidden.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -72,6 +76,13 @@ struct SimplyBarApp: App {
             BluetoothPopup(monitor: monitor)
         } label: {
             MenuBarLabel(module: .bluetooth, settings: settings, monitor: monitor)
+        }
+        .menuBarExtraStyle(.window)
+
+        MenuBarExtra(isInserted: $settings.keepAwake.shown) {
+            KeepAwakePopup(monitor: monitor, keepAwake: monitor.keepAwake)
+        } label: {
+            MenuBarLabel(module: .keepAwake, settings: settings, monitor: monitor)
         }
         .menuBarExtraStyle(.window)
     }

@@ -35,6 +35,7 @@ final class SystemMonitor {
     private(set) var gpuHistory = History(capacity: historyLength)
     private(set) var bluetoothDevices: [BluetoothDevice] = []
     private(set) var bluetoothLoaded = false
+    let keepAwake: KeepAwakeController
 
     @ObservationIgnored private let settings: AppSettings
     @ObservationIgnored private let cpuReader = CPUReader()
@@ -54,10 +55,13 @@ final class SystemMonitor {
 
     init(settings: AppSettings) {
         self.settings = settings
+        keepAwake = KeepAwakeController(settings: settings)
     }
 
     func start() {
         settings.onChange = { [weak self] in self?.reschedule() }
+        keepAwake.onChange = { [weak self] in self?.keepAwakeChanged() }
+        observeKeepAwakeRequests()
         reschedule()
         logStartupNumbers()
 
@@ -90,6 +94,8 @@ final class SystemMonitor {
     /// Seconds between two samples of a module, or nil when nothing needs it: neither the menu bar, nor an open
     /// popup, nor a desktop widget.
     func interval(for module: Module) -> TimeInterval? {
+        // Keep Awake measures nothing.
+        if module == .keepAwake { return nil }
         let open = openPopups.contains(module)
         let pace: TimeInterval = switch module {
         case .cpu: TimeInterval(settings.cpu.interval)
@@ -98,6 +104,7 @@ final class SystemMonitor {
         case .disk: open ? 5 : Self.slowInterval
         case .gpu: TimeInterval(settings.gpu.interval)
         case .bluetooth: TimeInterval(settings.bluetooth.interval)
+        case .keepAwake: 0 // Never used: returned above.
         }
         if open || settings.isShown(module) { return pace }
         return widgetModules.contains(module) ? Self.slowInterval : nil
@@ -120,7 +127,7 @@ final class SystemMonitor {
                 case .cpu, .network:
                     prime(module)
                     firstTick = min(wanted, 1)
-                case .memory, .disk, .gpu, .bluetooth:
+                case .memory, .disk, .gpu, .bluetooth, .keepAwake:
                     sample(module)
                 }
             }
@@ -166,8 +173,13 @@ final class SystemMonitor {
                 let devices = await BluetoothReader.read()
                 guard let self else { return }
                 if devices != self.bluetoothDevices { self.bluetoothDevices = devices }
+                let first = !self.bluetoothLoaded
                 self.bluetoothLoaded = true
+                // A first reading slower than the publication that follows a new widget: publish it now.
+                if first, self.widgetKinds.contains(SharedStore.bluetoothWidgetKind) { self.publishToWidgets() }
             }
+        case .keepAwake:
+            break
         }
     }
 
@@ -212,10 +224,10 @@ final class SystemMonitor {
 
     // MARK: - Widgets
 
-    /// Only what the widgets draw: no per-core values, no GPU, and no startup disk name (the SSD widget shows
-    /// its size, not its name).
+    /// Only what the widgets draw: no per-core values, no startup disk name (the SSD widget shows its size, not its
+    /// name), and GPU and Bluetooth devices only while their widgets are on the desktop.
     func widgetPayload(now: Date = .now) -> WidgetPayload {
-        WidgetPayload(
+        var payload = WidgetPayload(
             date: now,
             cpu: cpu.map { CPUSample(user: $0.user, system: $0.system, idle: $0.idle, perCore: []) },
             cpuHistory: cpuHistory.last(WidgetPayload.historyLength),
@@ -223,8 +235,17 @@ final class SystemMonitor {
             network: network,
             uploadHistory: uploadHistory.last(WidgetPayload.historyLength),
             downloadHistory: downloadHistory.last(WidgetPayload.historyLength),
-            disk: disk.map { DiskSample(name: "", total: $0.total, free: $0.free) }
+            disk: disk.map { DiskSample(name: "", total: $0.total, free: $0.free) },
+            keepAwake: keepAwake.status
         )
+        if widgetKinds.contains(SharedStore.gpuWidgetKind) {
+            payload.gpu = gpus.max { $0.utilization < $1.utilization }
+            payload.gpuHistory = gpuHistory.last(WidgetPayload.historyLength)
+        }
+        if widgetKinds.contains(SharedStore.bluetoothWidgetKind), bluetoothLoaded {
+            payload.bluetooth = bluetoothDevices
+        }
+        return payload
     }
 
     /// Asks WidgetKit which widgets are on the desktop. The modules they show keep being sampled (every minute when
@@ -260,8 +281,9 @@ final class SystemMonitor {
         }
     }
 
-    /// Writes the latest numbers for the widgets on the desktop and asks WidgetKit to redraw them.
-    func publishToWidgets() {
+    /// Writes the latest numbers for the widgets on the desktop and asks WidgetKit to redraw them all, or only the
+    /// widgets of `kind` (the other ones keep their 30-minute pace).
+    func publishToWidgets(onlyKind kind: String? = nil) {
         guard !widgetKinds.isEmpty else { return }
         var payload = widgetPayload()
         // Every disk, read only when a Storage widget shows them.
@@ -276,8 +298,60 @@ final class SystemMonitor {
                 """)
             return
         }
-        lastWidgetReload = .now
-        WidgetCenter.shared.reloadAllTimelines()
+        if let kind {
+            WidgetCenter.shared.reloadTimelines(ofKind: kind)
+        } else {
+            lastWidgetReload = .now
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    // MARK: - Keep Awake
+
+    /// The Keep Awake widget follows every change at once, whoever made it.
+    private func keepAwakeChanged() {
+        guard widgetKinds.contains(SharedStore.keepAwakeWidgetKind) else { return }
+        publishToWidgets(onlyKind: SharedStore.keepAwakeWidgetKind)
+    }
+
+    /// The widget's intent runs in the extension, which cannot keep the Mac awake: it writes a request in the App
+    /// Group and posts a Darwin notification, handled here on the main thread.
+    private func observeKeepAwakeRequests() {
+        let observer = Unmanaged.passUnretained(self).toOpaque()
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(), observer,
+            { _, observer, _, _, _ in
+                guard let observer else { return }
+                let monitor = Unmanaged<SystemMonitor>.fromOpaque(observer).takeUnretainedValue()
+                DispatchQueue.main.async {
+                    MainActor.assumeIsolated { monitor.keepAwakeRequested() }
+                }
+            },
+            SharedStore.keepAwakeNotification as CFString, nil, .deliverImmediately
+        )
+    }
+
+    private func keepAwakeRequested() {
+        guard let request = SharedStore.loadKeepAwakeRequest(),
+              Date.now.timeIntervalSince(request.date) < KeepAwakeWidgetState.pendingWindow else { return }
+        Self.log.notice("Keep Awake requested from the widget: \(request.isActive, privacy: .public)")
+        // The widget that asked is on the desktop, even if the last check has not seen it yet.
+        widgetKinds.insert(SharedStore.keepAwakeWidgetKind)
+        let wasActive = keepAwake.isActive
+        keepAwake.isActive = request.isActive
+        // A change publishes by itself; an unchanged state (a second click, a refused assertion) is confirmed too.
+        if keepAwake.isActive == wasActive { publishToWidgets(onlyKind: SharedStore.keepAwakeWidgetKind) }
+    }
+
+    /// Called as the app quits: lets the Mac sleep again and tells the Keep Awake widget the app is gone. The numbers
+    /// keep their date, so the other widgets still turn to "not running" on time.
+    func stop() {
+        keepAwake.onChange = nil
+        keepAwake.isActive = false
+        guard var payload = SharedStore.load(), payload.keepAwake != nil else { return }
+        payload.keepAwake = nil
+        try? SharedStore.save(payload)
+        WidgetCenter.shared.reloadTimelines(ofKind: SharedStore.keepAwakeWidgetKind)
     }
 
     // MARK: - Diagnostics

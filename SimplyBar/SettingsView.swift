@@ -64,7 +64,7 @@ final class SettingsWindowController {
         selection.tab = tab
         if window == nil {
             let hosting = NSHostingController(rootView: SettingsView(
-                settings: AppServices.settings, selection: selection
+                settings: AppServices.settings, keepAwake: AppServices.monitor.keepAwake, selection: selection
             ))
             let window = NSWindow(contentViewController: hosting)
             window.title = String(localized: "SimplyBar Settings")
@@ -88,6 +88,7 @@ final class SettingsSelection {
 
 struct SettingsView: View {
     @Bindable var settings: AppSettings
+    @Bindable var keepAwake: KeepAwakeController
     @Bindable var selection: SettingsSelection
 
     var body: some View {
@@ -135,6 +136,7 @@ struct SettingsView: View {
         case .module(.network): network
         case .module(.disk): disk
         case .module(.bluetooth): bluetooth
+        case .module(.keepAwake): keepAwakeSettings
         case .general: GeneralSettings(settings: settings)
         case .about: EmptyView() // Laid out on its own, outside the form.
         }
@@ -205,6 +207,25 @@ struct SettingsView: View {
             IntervalPicker(value: $settings.bluetooth.interval, options: Sampling.bluetoothIntervals)
             Toggle("Show icon", isOn: $settings.bluetooth.showIcon)
             Toggle("Show label", isOn: $settings.bluetooth.showLabel)
+        }
+    }
+
+    private var keepAwakeSettings: some View {
+        Section {
+            Toggle("Show in menu bar", isOn: $settings.keepAwake.shown)
+            KeepAwakeDurationPicker(duration: $keepAwake.duration)
+            Toggle("Keep the display on too", isOn: $keepAwake.keepsDisplayOn)
+        }
+    }
+}
+
+/// Also in the Keep Awake popup: the duration of the next session.
+struct KeepAwakeDurationPicker: View {
+    @Binding var duration: KeepAwakeDuration
+
+    var body: some View {
+        Picker("Duration:", selection: $duration) {
+            ForEach(KeepAwakeDuration.allCases) { Text($0.title).tag($0) }
         }
     }
 }

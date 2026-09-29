@@ -4,7 +4,7 @@ import SwiftUI
 
 /// The modules, in the order of the settings sidebar.
 enum Module: String, CaseIterable, Identifiable, Sendable {
-    case cpu, memory, gpu, network, disk, bluetooth
+    case cpu, memory, gpu, network, disk, bluetooth, keepAwake
 
     var id: String { rawValue }
 
@@ -16,6 +16,7 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "Network"
         case .disk: "SSD"
         case .bluetooth: "Bluetooth"
+        case .keepAwake: "Keep Awake"
         }
     }
 
@@ -28,6 +29,8 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "NET"
         case .disk: "SSD"
         case .bluetooth: "BT"
+        // Never drawn: the icon alone tells whether the Mac is kept awake.
+        case .keepAwake: ""
         }
     }
 
@@ -39,6 +42,7 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "network"
         case .disk: "internaldrive"
         case .bluetooth: "dot.radiowaves.left.and.right"
+        case .keepAwake: "cup.and.saucer"
         }
     }
 }
@@ -175,6 +179,7 @@ final class AppSettings {
     var network: NetworkSettings { didSet { save(network, key: "network") } }
     var disk: DiskSettings { didSet { save(disk, key: "disk") } }
     var bluetooth: BluetoothSettings { didSet { save(bluetooth, key: "bluetooth") } }
+    var keepAwake: KeepAwakeSettings { didSet { save(keepAwake, key: "keepAwake") } }
     var openSettingsAtLaunch: Bool { didSet { defaults.set(openSettingsAtLaunch, forKey: "openSettingsAtLaunch") } }
 
     init(defaults: UserDefaults = .standard) {
@@ -193,6 +198,7 @@ final class AppSettings {
         // Older versions offered 2 to 59 seconds for Bluetooth too.
         bluetooth.interval = Sampling.closest(to: bluetooth.interval, in: Sampling.bluetoothIntervals)
         self.bluetooth = bluetooth
+        keepAwake = Self.load(KeepAwakeSettings.self, key: "keepAwake", from: defaults) ?? KeepAwakeSettings()
         openSettingsAtLaunch = defaults.object(forKey: "openSettingsAtLaunch") as? Bool ?? true
     }
 
@@ -204,6 +210,7 @@ final class AppSettings {
         case .network: network.shown
         case .disk: disk.shown
         case .bluetooth: bluetooth.shown
+        case .keepAwake: keepAwake.shown
         }
     }
 
@@ -215,6 +222,7 @@ final class AppSettings {
         case .network: network.shown = shown
         case .disk: disk.shown = shown
         case .bluetooth: bluetooth.shown = shown
+        case .keepAwake: keepAwake.shown = shown
         }
     }
 

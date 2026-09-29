@@ -283,6 +283,41 @@ struct BluetoothPopup: View {
     }
 }
 
+struct KeepAwakePopup: View {
+    let monitor: SystemMonitor
+    @Bindable var keepAwake: KeepAwakeController
+
+    var body: some View {
+        PopupChrome(module: .keepAwake, title: "Keep Awake", monitor: monitor) {
+            HStack(spacing: 8) {
+                Text("Keep this Mac awake").font(.system(size: 13, weight: .medium))
+                Spacer()
+                Toggle("Keep this Mac awake", isOn: $keepAwake.isActive)
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+            }
+            KeepAwakeDurationPicker(duration: $keepAwake.duration)
+                .font(.system(size: 12))
+            Toggle("Keep the display on too", isOn: $keepAwake.keepsDisplayOn)
+                .font(.system(size: 12))
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if keepAwake.isActive, let end = keepAwake.end, end > .now {
+                HStack(spacing: 8) {
+                    Text("Time left:")
+                    Spacer()
+                    Text(timerInterval: Date.now...end, countsDown: true).monospacedDigit()
+                }
+                .font(.system(size: 12))
+            }
+            Text("Closing the lid or choosing Sleep still puts the Mac to sleep.")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
 /// A device and its battery levels. The levels never shrink: they sit beside the whole name when they fit, else
 /// under it, else one per line, so no label is cut or wrapped in any language.
 private struct BluetoothDeviceRow: View {
