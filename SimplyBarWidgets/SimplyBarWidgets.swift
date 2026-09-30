@@ -12,6 +12,7 @@ struct SimplyBarWidgets: WidgetBundle {
         StorageWidget()
         BluetoothWidget()
         HealthWidget()
+        DiagnosticWidget()
         KeepAwakeWidget()
     }
 }
