@@ -19,13 +19,13 @@ struct DiagnosticContent: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             card
-            if let message = diagnostic.status.message ?? diagnostic.failure?.diagnosticMessage {
+            if let message = diagnostic.status.message ?? diagnostic.card.failure?.diagnosticMessage {
                 AIStatusNote(message: message, action: diagnostic.status.settingsAction, perform: diagnostic.perform)
             }
             Divider()
             conversation
-            // Only where the model writes: without it, the rules wrote the card.
-            if diagnostic.status == .available {
+            // Only when the model wrote something shown: the card or an answer.
+            if diagnostic.card.report?.source == .ai || diagnostic.messages.contains(where: { $0.role == .answer }) {
                 Text("Written on this Mac by Apple's on-device AI. Nothing leaves your Mac.")
                     .font(.system(size: 10)).foregroundStyle(.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -33,19 +33,31 @@ struct DiagnosticContent: View {
         }
     }
 
+    /// The model's text shows only once checked: while it writes, the rules' verdict and "Analyzing".
     @ViewBuilder private var card: some View {
-        if let draft = diagnostic.draft, let title = draft.title, !title.isEmpty {
-            DiagnosticCard(verdict: draft.verdict ?? diagnostic.report?.verdict ?? .ok, title: title,
-                           explanation: draft.explanation ?? "", actions: [], perform: diagnostic.perform)
-        } else if let report = diagnostic.report {
+        switch diagnostic.card.display {
+        case .report(let report):
             DiagnosticCard(verdict: report.verdict, title: report.title, explanation: report.explanation,
                            actions: report.actions, perform: diagnostic.perform)
-        } else {
-            HStack(spacing: 8) {
-                ProgressView().controlSize(.small)
-                Text("Checking your Mac…").foregroundStyle(.secondary)
+        case .analyzing(let verdict):
+            VStack(alignment: .leading, spacing: 8) {
+                if let verdict {
+                    HStack(spacing: 6) {
+                        Image(systemName: verdict.symbol).foregroundStyle(verdict.color)
+                        Text(verdict.title).font(.system(size: 11, weight: .semibold)).foregroundStyle(verdict.color)
+                    }
+                }
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Group {
+                        if verdict == nil { Text("Checking your Mac…") } else { Text("Analyzing…") }
+                    }
+                    .foregroundStyle(.secondary)
+                }
             }
-            .frame(maxWidth: .infinity, minHeight: 60)
+            .padding(10)
+            .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+            .background((verdict?.color ?? .secondary).opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
         }
     }
 
@@ -74,22 +86,27 @@ struct DiagnosticContent: View {
                                 .font(.system(size: 12))
                         }
                         .buttonStyle(.borderless)
-                        .disabled(diagnostic.isAnswering)
+                        .disabled(diagnostic.isBusy)
                     }
                 }
             } else {
-                DiagnosticMessages(messages: diagnostic.messages, partialAnswer: diagnostic.partialAnswer,
-                                   isAnswering: diagnostic.isAnswering, perform: diagnostic.perform)
+                DiagnosticMessages(messages: diagnostic.messages, isAnswering: diagnostic.isAnswering,
+                                   perform: diagnostic.perform)
             }
             HStack(spacing: 6) {
                 TextField("Ask about your Mac", text: $question)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit(send)
+                    .onChange(of: question) {
+                        if question.count > DiagnosticGuard.maximumQuestionLength {
+                            question = String(question.prefix(DiagnosticGuard.maximumQuestionLength))
+                        }
+                    }
                 Button(action: send) {
                     Image(systemName: "arrow.up.circle.fill").font(.system(size: 16))
                 }
                 .buttonStyle(.borderless)
-                .disabled(question.trimmingCharacters(in: .whitespaces).isEmpty || diagnostic.isAnswering)
+                .disabled(question.trimmingCharacters(in: .whitespaces).isEmpty || diagnostic.isBusy)
                 .help(Text("Send"))
             }
         } else {
@@ -100,7 +117,7 @@ struct DiagnosticContent: View {
     }
 
     private func send() {
-        guard !diagnostic.isAnswering else { return }
+        guard !diagnostic.isBusy else { return }
         diagnostic.ask(question)
         question = ""
     }
@@ -180,7 +197,7 @@ struct AIStatusNote: View {
 
 struct DiagnosticMessages: View {
     let messages: [DiagnosticMessage]
-    let partialAnswer: String?
+    /// The answer shows once whole and checked; until then, a spinner.
     let isAnswering: Bool
     let perform: (DiagnosticAction) -> Void
 
@@ -192,15 +209,9 @@ struct DiagnosticMessages: View {
                         bubble(message)
                     }
                     if isAnswering {
-                        Group {
-                            if let partialAnswer, !partialAnswer.isEmpty {
-                                Text(partialAnswer).font(.system(size: 12))
-                            } else {
-                                ProgressView().controlSize(.small)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .id("partial")
+                        ProgressView().controlSize(.small)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .id("answering")
                     }
                 }
                 .padding(.vertical, 2)
@@ -208,7 +219,7 @@ struct DiagnosticMessages: View {
             .frame(maxHeight: 220)
             .fixedSize(horizontal: false, vertical: true)
             .onChange(of: messages.count) { proxy.scrollTo(messages.last?.id) }
-            .onChange(of: partialAnswer) { proxy.scrollTo("partial") }
+            .onChange(of: isAnswering) { if isAnswering { proxy.scrollTo("answering") } }
         }
     }
 

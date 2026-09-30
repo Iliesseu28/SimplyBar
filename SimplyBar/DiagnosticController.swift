@@ -15,9 +15,11 @@ struct DiagnosticMessage: Identifiable, Equatable {
     var actions: [DiagnosticAction] = []
 }
 
-/// The Diagnostic module: the card, written by the rules and rewritten by Apple's on-device model where it can, the
-/// conversation, and the diagnostic the widget asks for. One model request at a time; closing the popup cancels
-/// the popup's own requests. Nothing leaves the Mac: the model runs on it, and the app has no network access.
+/// The Diagnostic module: the card, written by the rules and by Apple's on-device model where it can, the
+/// conversation, and the diagnostic the widget asks for. One model request at a time: a diagnostic waits for the
+/// answer being written, and no question is taken while a diagnostic or an answer runs. Nothing of the model is
+/// shown before its checks. Closing the popup cancels the popup's own requests. Nothing leaves the Mac: the model
+/// runs on it, and the app has no network access.
 @MainActor
 @Observable
 final class DiagnosticController {
@@ -27,24 +29,21 @@ final class DiagnosticController {
         "Why is my Mac slow?", "How much space is left on my disk?", "Is my Mac too hot?",
     ]
 
-    /// The card shown: the model's, or the rules' when the model cannot or its text failed a check.
-    private(set) var report: DiagnosticReport?
-    /// The card while the model writes it.
-    private(set) var draft: DiagnosticDraft?
+    /// The card: the model's once checked, the rules' otherwise, "Analyzing" while the model writes.
+    private(set) var card = DiagnosticCardState()
+    /// A diagnostic runs, the popup's or the widget's.
     private(set) var isRunning = false
+    /// A question is being answered: set when it is asked, cleared when its task ends.
+    private(set) var isAnswering = false
     private(set) var status: AIStatus = .systemTooOld
-    /// Why the card comes from the rules although the model is there.
-    private(set) var failure: AIFailure?
     private(set) var messages: [DiagnosticMessage] = []
-    /// The answer being written, shown under the last question.
-    private(set) var partialAnswer: String?
     /// Date of the last widget request answered in the payload: the widget stops waiting for it.
     private(set) var handledRequest: Date?
 
     @ObservationIgnored let source: SnapshotSource
     @ObservationIgnored private let keepAwake: KeepAwakeController
     @ObservationIgnored private var cache: DiagnosticCache?
-    @ObservationIgnored private var runTask: Task<DiagnosticReport, Never>?
+    @ObservationIgnored private var runTask: Task<Void, Never>?
     @ObservationIgnored private var askTask: Task<Void, Never>?
     /// The `DiagnosticConversation` (macOS 26), kept while the app runs; the reset button starts it over.
     @ObservationIgnored private var conversation: AnyObject?
@@ -57,7 +56,10 @@ final class DiagnosticController {
         source = SnapshotSource { [weak keepAwake] in keepAwake?.isActive ?? false }
     }
 
-    var isAnswering: Bool { askTask != nil }
+    /// The card for the widget: never a text of the model before its checks.
+    var report: DiagnosticReport? { card.report }
+    /// The model is at work: no new question until it is done.
+    var isBusy: Bool { isRunning || isAnswering }
     private var language: DiagnosticLanguage { .app }
 
     // MARK: - Popup
@@ -65,6 +67,7 @@ final class DiagnosticController {
     func popupOpened() {
         status = DiagnosticAIStatus.current(language: language)
         #if canImport(FoundationModels)
+        // For the questions; it also loads the model while the Mac is measured.
         if status == .available, #available(macOS 26, *) { currentConversation()?.prewarm() }
         #endif
         Task { await run() }
@@ -78,15 +81,22 @@ final class DiagnosticController {
 
     // MARK: - Diagnostic
 
-    /// Runs a diagnostic, or waits for the one running.
-    @discardableResult
-    func run() async -> DiagnosticReport {
-        if let runTask { return await runTask.value }
-        let task = Task { await diagnose() }
+    /// Runs a diagnostic, or waits for the one running. A cancelled one is never waited for: a new one starts
+    /// once it has stopped.
+    func run() async {
+        if let runTask, !runTask.isCancelled { return await runTask.value }
+        let previous = runTask
+        let task = Task {
+            await previous?.value
+            await diagnose()
+        }
         runTask = task
-        let report = await task.value
-        runTask = nil
-        return report
+        isRunning = true
+        await task.value
+        if runTask == task {
+            runTask = nil
+            isRunning = false
+        }
     }
 
     func widgetRequested(_ request: DiagnosticRequest) {
@@ -99,69 +109,60 @@ final class DiagnosticController {
         }
     }
 
-    private func diagnose() async -> DiagnosticReport {
-        isRunning = true
-        defer {
-            isRunning = false
-            draft = nil
-        }
+    private func diagnose() async {
         let start = Date.now
         let language = language
         status = DiagnosticAIStatus.current(language: language)
+        let snapshot = await source.current(fresh: true)
+        var write: DiagnosticPipeline.Writer?
         #if canImport(FoundationModels)
-        // Created before the Mac is measured, so the model loads during that second.
-        var session: AnyObject?
         if status == .available, #available(macOS 26, *) {
-            let diagnosticSession = DiagnosticAI.makeDiagnosticSession(language: language)
-            diagnosticSession.prewarm()
-            session = diagnosticSession
+            write = { [self] findings, rules in
+                card.startWriting(verdict: rules.verdict)
+                // One model request at a time: an answer being written ends first.
+                await askTask?.value
+                return await self.write(snapshot: snapshot, findings: findings, rules: rules, language: language)
+            }
         }
         #endif
-        let snapshot = await source.current(fresh: true)
-        let findings = DiagnosticRules.findings(snapshot)
-        let rules = DiagnosticRules.report(snapshot, findings: findings, locale: language.locale)
-        failure = nil
-        var result = rules
-        if let cached = cache?.reusable(for: snapshot, findings: findings, now: .now) {
-            result = cached
+        let outcome = await DiagnosticPipeline.run(snapshot: snapshot, cache: cache, locale: language.locale, write: write)
+        card.finish(outcome)
+        let result: DiagnosticReport
+        switch outcome {
+        case .cancelled:
+            Self.log.notice("Diagnostic cancelled: the card stays as it was")
+            return
+        case .reused(let report):
             Self.log.notice("Diagnostic reused: nothing changed notably since the last one")
-        } else {
-            if report?.source != .ai { report = rules }
-            #if canImport(FoundationModels)
-            if #available(macOS 26, *), let session = session as? LanguageModelSession, !Task.isCancelled {
-                switch await write(session: session, snapshot: snapshot, findings: findings, rules: rules) {
-                case .success(let written):
-                    result = written
-                    cache = DiagnosticCache(snapshot: snapshot, findings: findings, report: written)
-                case .failure(let reason):
-                    failure = reason
-                }
-            }
-            #endif
+            result = report
+        case .written(let report):
+            cache = DiagnosticCache(snapshot: snapshot, findings: DiagnosticRules.findings(snapshot), report: report)
+            result = report
+        case .rules(let report, _):
+            result = report
         }
-        report = result
         let duration = Date.now.timeIntervalSince(start)
         Self.log.notice("""
             Diagnostic done source=\(result.source.rawValue, privacy: .public) \
             verdict=\(result.verdict.rawValue, privacy: .public) status=\(String(describing: self.status), privacy: .public) \
-            failure=\(self.failure.map { String(describing: $0) } ?? "none", privacy: .public) \
+            failure=\(self.card.failure.map { String(describing: $0) } ?? "none", privacy: .public) \
             seconds=\(duration, format: .fixed(precision: 2), privacy: .public)
             """)
-        return result
     }
 
     #if canImport(FoundationModels)
-    /// The model's card, checked by `DiagnosticGuard`, or why the rules' card stays.
+    /// The model's card, checked by `DiagnosticGuard`, or why the rules' card stays. Its session is made here, once
+    /// the cache had nothing: a new one for each diagnostic.
     @available(macOS 26, *)
-    private func write(session: LanguageModelSession, snapshot: MacSnapshot, findings: [DiagnosticFinding],
-                       rules: DiagnosticReport) async -> Result<DiagnosticReport, AIFailure> {
+    private func write(snapshot: MacSnapshot, findings: [DiagnosticFinding], rules: DiagnosticReport,
+                       language: DiagnosticLanguage) async -> Result<DiagnosticReport, AIFailure> {
         let allowed = DiagnosticRules.allowedActions(findings: findings, snapshot: snapshot)
         do {
             let schema = try DiagnosticAI.diagnosisSchema(verdict: rules.verdict, allowed: allowed)
             let prompt = DiagnosticAI.diagnosticPrompt(snapshot: snapshot, findings: findings, allowed: allowed)
-            let (candidate, timing) = try await DiagnosticAI.diagnose(session: session, prompt: prompt, schema: schema) {
-                draft = $0
-            }
+            let session = DiagnosticAI.makeDiagnosticSession(language: language)
+            // The drafts are not shown: the card changes only once the text passed its checks.
+            let (candidate, timing) = try await DiagnosticAI.diagnose(session: session, prompt: prompt, schema: schema) { _ in }
             Self.log.notice("""
                 Model wrote the diagnostic first=\(timing.firstText ?? -1, format: .fixed(precision: 2), privacy: .public) \
                 total=\(timing.total, format: .fixed(precision: 2), privacy: .public) \
@@ -200,23 +201,24 @@ final class DiagnosticController {
     #endif
 
     func ask(_ question: String) {
-        let question = question.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !question.isEmpty, askTask == nil else { return }
-        messages.append(DiagnosticMessage(role: .question, text: question))
+        let question = String(question.trimmingCharacters(in: .whitespacesAndNewlines).prefix(DiagnosticGuard.maximumQuestionLength))
+        guard !question.isEmpty, !isBusy else { return }
+        let asked = DiagnosticMessage(role: .question, text: question)
+        messages.append(asked)
+        isAnswering = true
         askTask = Task {
-            defer {
-                partialAnswer = nil
-                askTask = nil
-            }
-            await answer(question)
+            await answer(question, asked: asked.id)
+            askTask = nil
+            isAnswering = false
         }
     }
 
-    private func answer(_ question: String) async {
+    /// Adds the answer once whole and checked, or a note: nothing of the model shows before its checks.
+    private func answer(_ question: String, asked: UUID) async {
         #if canImport(FoundationModels)
         if #available(macOS 26, *), let conversation = currentConversation() {
             do {
-                let answer = try await conversation.ask(question) { partialAnswer = DiagnosticGuard.display($0) }
+                let answer = try await conversation.ask(question) { _ in }
                 if answer.restarted {
                     messages.append(DiagnosticMessage(role: .notice, text: String(localized: "The conversation was too long and started over.")))
                 }
@@ -231,8 +233,15 @@ final class DiagnosticController {
                     """)
             } catch {
                 let failure = DiagnosticAI.failure(from: error)
-                guard failure != .cancelled else { return }
-                Self.log.notice("Answer failed: \(String(describing: failure), privacy: .public)")
+                if failure == .cancelled || Task.isCancelled {
+                    // The popup closed: the question stays, marked. After a reset it is gone, and so is the note.
+                    if messages.contains(where: { $0.id == asked }) {
+                        messages.append(DiagnosticMessage(role: .notice, text: String(localized: "Answer interrupted. Ask the question again.")))
+                    }
+                    return
+                }
+                let reason = (error as? DiagnosticGuard.Rejection)?.rawValue ?? String(describing: failure)
+                Self.log.notice("Answer set aside: \(reason, privacy: .public)")
                 messages.append(DiagnosticMessage(role: .notice, text: failure.answerMessage))
             }
             return
@@ -245,7 +254,6 @@ final class DiagnosticController {
     func resetConversation() {
         askTask?.cancel()
         messages = []
-        partialAnswer = nil
         #if canImport(FoundationModels)
         if #available(macOS 26, *) { (conversation as? DiagnosticConversation)?.reset() }
         #endif

@@ -31,7 +31,7 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "NET"
         case .disk: "SSD"
         case .bluetooth: "BT"
-        // Never drawn: the icon alone tells the heat level, the diagnostic's verdict, or whether the Mac is kept awake.
+        // Never drawn: the icon alone tells the heat level or whether the Mac is kept awake; the diagnostic's stays plain.
         case .health, .diagnostic, .keepAwake: ""
         }
     }
