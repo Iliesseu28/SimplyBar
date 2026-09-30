@@ -104,6 +104,15 @@ struct DiagnosticWidgetContent: View {
                 HStack(spacing: 5) {
                     Image(systemName: report.verdict.symbol).foregroundStyle(report.verdict.color).widgetAccentable()
                     Text(report.verdict.title).foregroundStyle(report.verdict.color)
+                    if report.source == .ai {
+                        Spacer(minLength: 0)
+                        // The explanation was written by Apple's on-device model.
+                        Text("AI")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 4).padding(.vertical, 1)
+                            .overlay(Capsule().strokeBorder(.secondary.opacity(0.6), lineWidth: 0.5))
+                    }
                 }
                 .font(.system(size: 12, weight: .semibold))
                 Text(report.title)
