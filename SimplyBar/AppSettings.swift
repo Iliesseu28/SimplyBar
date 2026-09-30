@@ -4,7 +4,7 @@ import SwiftUI
 
 /// The modules, in the order of the settings sidebar.
 enum Module: String, CaseIterable, Identifiable, Sendable {
-    case cpu, memory, gpu, network, disk, bluetooth, health, keepAwake
+    case cpu, memory, gpu, network, disk, bluetooth, health, diagnostic, keepAwake
 
     var id: String { rawValue }
 
@@ -17,6 +17,7 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .disk: "SSD"
         case .bluetooth: "Bluetooth"
         case .health: "Health"
+        case .diagnostic: "Diagnostic"
         case .keepAwake: "Keep Awake"
         }
     }
@@ -30,8 +31,8 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "NET"
         case .disk: "SSD"
         case .bluetooth: "BT"
-        // Never drawn: the icon alone tells the heat level, or whether the Mac is kept awake.
-        case .health, .keepAwake: ""
+        // Never drawn: the icon alone tells the heat level, the diagnostic's verdict, or whether the Mac is kept awake.
+        case .health, .diagnostic, .keepAwake: ""
         }
     }
 
@@ -44,6 +45,7 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .disk: "internaldrive"
         case .bluetooth: "dot.radiowaves.left.and.right"
         case .health: "thermometer.medium"
+        case .diagnostic: "stethoscope"
         case .keepAwake: "cup.and.saucer"
         }
     }
@@ -180,6 +182,19 @@ struct HealthSettings: Codable, Equatable, Sendable {
     }
 }
 
+/// Shown by default: the rules write the diagnostic on every Mac, Apple's on-device model rewrites it where it can.
+struct DiagnosticSettings: Codable, Equatable, Sendable {
+    var shown = true
+
+    init() {}
+
+    init(from decoder: any Decoder) throws {
+        self.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        if let shown = try? values.decodeIfPresent(Bool.self, forKey: .shown) { self.shown = shown }
+    }
+}
+
 /// User settings, saved in the app's own UserDefaults (one JSON value per module).
 @MainActor
 @Observable
@@ -195,6 +210,7 @@ final class AppSettings {
     var disk: DiskSettings { didSet { save(disk, key: "disk") } }
     var bluetooth: BluetoothSettings { didSet { save(bluetooth, key: "bluetooth") } }
     var health: HealthSettings { didSet { save(health, key: "health") } }
+    var diagnostic: DiagnosticSettings { didSet { save(diagnostic, key: "diagnostic") } }
     var keepAwake: KeepAwakeSettings { didSet { save(keepAwake, key: "keepAwake") } }
     var alerts: AlertSettings { didSet { save(alerts, key: "alerts") } }
     /// Alerts already sent, kept across launches so that a relaunch does not repeat them within the hour.
@@ -223,6 +239,7 @@ final class AppSettings {
         bluetooth.interval = Sampling.closest(to: bluetooth.interval, in: Sampling.bluetoothIntervals)
         self.bluetooth = bluetooth
         health = Self.load(HealthSettings.self, key: "health", from: defaults) ?? HealthSettings()
+        diagnostic = Self.load(DiagnosticSettings.self, key: "diagnostic", from: defaults) ?? DiagnosticSettings()
         keepAwake = Self.load(KeepAwakeSettings.self, key: "keepAwake", from: defaults) ?? KeepAwakeSettings()
         alerts = Self.load(AlertSettings.self, key: "alerts", from: defaults) ?? AlertSettings()
         alertTracker = defaults.data(forKey: "alerts.tracker")
@@ -239,6 +256,7 @@ final class AppSettings {
         case .disk: disk.shown
         case .bluetooth: bluetooth.shown
         case .health: health.shown
+        case .diagnostic: diagnostic.shown
         case .keepAwake: keepAwake.shown
         }
     }
@@ -252,6 +270,7 @@ final class AppSettings {
         case .disk: disk.shown = shown
         case .bluetooth: bluetooth.shown = shown
         case .health: health.shown = shown
+        case .diagnostic: diagnostic.shown = shown
         case .keepAwake: keepAwake.shown = shown
         }
     }

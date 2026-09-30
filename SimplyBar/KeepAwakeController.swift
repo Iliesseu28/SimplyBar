@@ -64,7 +64,16 @@ final class KeepAwakeController {
         KeepAwakeStatus(isActive: session.isActive, end: session.end, keepsDisplayOn: keepsDisplayOn)
     }
 
+    /// A session of `duration`, the saved one staying for the next sessions: the diagnostic's one-hour button.
+    func start(for duration: KeepAwakeDuration) {
+        start(duration)
+    }
+
     private func start() {
+        start(duration)
+    }
+
+    private func start(_ duration: KeepAwakeDuration) {
         // Already on: the countdown goes on and nothing is published twice.
         guard !session.isActive else { return }
         if systemAssertion == nil {

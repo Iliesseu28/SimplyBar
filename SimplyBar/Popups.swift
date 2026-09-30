@@ -8,6 +8,7 @@ struct PopupChrome<Content: View>: View {
     let module: Module
     let title: LocalizedStringKey
     let monitor: SystemMonitor
+    var width: CGFloat = 300
     @ViewBuilder var content: Content
 
     var body: some View {
@@ -31,7 +32,7 @@ struct PopupChrome<Content: View>: View {
                 .controlSize(.small)
         }
         .padding(14)
-        .frame(width: 300)
+        .frame(width: width)
         .onAppear { monitor.popupOpened(module) }
         .onDisappear { monitor.popupClosed(module) }
     }

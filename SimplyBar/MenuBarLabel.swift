@@ -64,6 +64,8 @@ enum StatusItemModels {
         case .health:
             return StatusItemModel(symbol: module.symbol, letters: nil, content: .iconOnly,
                                    tint: healthTint(monitor.health?.thermal))
+        case .diagnostic:
+            return StatusItemModel(symbol: module.symbol, letters: nil, content: .iconOnly)
         case .keepAwake:
             // Filled while the Mac is kept awake.
             return StatusItemModel(symbol: monitor.keepAwake.isActive ? "cup.and.saucer.fill" : module.symbol, letters: nil,

@@ -86,6 +86,13 @@ struct SimplyBarApp: App {
         }
         .menuBarExtraStyle(.window)
 
+        MenuBarExtra(isInserted: $settings.diagnostic.shown) {
+            DiagnosticPopup(monitor: monitor, diagnostic: monitor.diagnostic)
+        } label: {
+            MenuBarLabel(module: .diagnostic, settings: settings, monitor: monitor)
+        }
+        .menuBarExtraStyle(.window)
+
         MenuBarExtra(isInserted: $settings.keepAwake.shown) {
             KeepAwakePopup(monitor: monitor, keepAwake: monitor.keepAwake)
         } label: {

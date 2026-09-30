@@ -39,6 +39,7 @@ final class SystemMonitor {
     private(set) var health: HealthSample?
     let keepAwake: KeepAwakeController
     let notifier = AlertNotifier()
+    let diagnostic: DiagnosticController
 
     @ObservationIgnored private let settings: AppSettings
     @ObservationIgnored private let cpuReader = CPUReader()
@@ -55,6 +56,8 @@ final class SystemMonitor {
     @ObservationIgnored private var flashTask: Task<Void, Never>?
     /// Date of the last Keep Awake request from the widget, handled once and written back for the widget.
     @ObservationIgnored private var lastKeepAwakeRequest: Date?
+    /// Date of the last diagnostic request from the widget, handled once.
+    @ObservationIgnored private var lastDiagnosticRequest: Date?
     @ObservationIgnored private var thermalObserver: (any NSObjectProtocol)?
     /// Keys of the alerts being sent right now.
     @ObservationIgnored private var sendingAlerts: Set<String> = []
@@ -63,13 +66,17 @@ final class SystemMonitor {
 
     init(settings: AppSettings) {
         self.settings = settings
-        keepAwake = KeepAwakeController(settings: settings)
+        let keepAwake = KeepAwakeController(settings: settings)
+        self.keepAwake = keepAwake
+        diagnostic = DiagnosticController(keepAwake: keepAwake)
     }
 
     func start() {
         settings.onChange = { [weak self] in self?.reschedule() }
         keepAwake.onChange = { [weak self] in self?.keepAwakeChanged() }
         observeKeepAwakeRequests()
+        observeDiagnosticRequests()
+        diagnostic.onChange = { [weak self] in self?.diagnosticChanged() }
         observeThermalState()
         notifier.onChange = { [weak self] in self?.reschedule() }
         notifier.activate()
@@ -88,6 +95,7 @@ final class SystemMonitor {
     // MARK: - Popups
 
     func popupOpened(_ module: Module) {
+        if module == .diagnostic { diagnostic.popupOpened() }
         let running = intervals[module] != nil
         openPopups.insert(module)
         reschedule()
@@ -96,6 +104,7 @@ final class SystemMonitor {
     }
 
     func popupClosed(_ module: Module) {
+        if module == .diagnostic { diagnostic.popupClosed() }
         openPopups.remove(module)
         reschedule()
     }
@@ -105,8 +114,8 @@ final class SystemMonitor {
     /// Seconds between two samples of a module, or nil when nothing needs it: neither the menu bar, nor an open
     /// popup, nor a desktop widget, nor an alert that may notify.
     func interval(for module: Module) -> TimeInterval? {
-        // Keep Awake measures nothing.
-        if module == .keepAwake { return nil }
+        // Keep Awake measures nothing; the diagnostic measures once per run (`MacSnapshotReader`).
+        if module == .keepAwake || module == .diagnostic { return nil }
         let open = openPopups.contains(module)
         let pace: TimeInterval = switch module {
         case .cpu: TimeInterval(settings.cpu.interval)
@@ -117,7 +126,7 @@ final class SystemMonitor {
         case .bluetooth: TimeInterval(settings.bluetooth.interval)
         // The heat level also arrives by notification (see `observeThermalState`).
         case .health: open ? 5 : Self.slowInterval
-        case .keepAwake: 0 // Never used: returned above.
+        case .diagnostic, .keepAwake: 0 // Never used: returned above.
         }
         if open || settings.isShown(module) { return pace }
         // Without the permission an alert would measure for nothing: `notifier.onChange` reschedules once it comes.
@@ -145,7 +154,7 @@ final class SystemMonitor {
                 case .cpu, .network:
                     prime(module)
                     firstTick = min(wanted, 1)
-                case .memory, .disk, .gpu, .bluetooth, .health, .keepAwake:
+                case .memory, .disk, .gpu, .bluetooth, .health, .diagnostic, .keepAwake:
                     sample(module)
                 }
             }
@@ -203,7 +212,7 @@ final class SystemMonitor {
             let value = HealthReader.read(battery: shown)
             if value != health { health = value }
             checkAlerts(.heat) { $0.heat(value.thermal, now: $1) }
-        case .keepAwake:
+        case .diagnostic, .keepAwake:
             break
         }
     }
@@ -273,6 +282,9 @@ final class SystemMonitor {
         }
         if widgetKinds.contains(SharedStore.healthWidgetKind) {
             payload.health = health
+        }
+        if widgetKinds.contains(SharedStore.diagnosticWidgetKind) {
+            payload.diagnostic = DiagnosticStatus(report: diagnostic.report, requestDate: diagnostic.handledRequest)
         }
         return payload
     }
@@ -410,15 +422,53 @@ final class SystemMonitor {
         if keepAwake.isActive == wasActive { publishToWidgets(onlyKind: SharedStore.keepAwakeWidgetKind) }
     }
 
-    /// Called as the app quits: lets the Mac sleep again and tells the Keep Awake widget the app is gone. The numbers
-    /// keep their date, so the other widgets still turn to "not running" on time.
+    /// Called as the app quits: lets the Mac sleep again and tells the Keep Awake and Diagnostic widgets the app is
+    /// gone. The numbers keep their date, so the other widgets still turn to "not running" on time.
     func stop() {
         keepAwake.onChange = nil
         keepAwake.isActive = false
-        guard var payload = SharedStore.load(), payload.keepAwake != nil else { return }
+        diagnostic.onChange = nil
+        guard var payload = SharedStore.load(), payload.keepAwake != nil || payload.diagnostic != nil else { return }
         payload.keepAwake = nil
+        payload.diagnostic = nil
         try? SharedStore.save(payload)
         WidgetCenter.shared.reloadTimelines(ofKind: SharedStore.keepAwakeWidgetKind)
+        WidgetCenter.shared.reloadTimelines(ofKind: SharedStore.diagnosticWidgetKind)
+    }
+
+    // MARK: - Diagnostic widget
+
+    /// Like Keep Awake: the widget's intent writes a request and posts a Darwin notification; the app runs the
+    /// diagnostic (the extension does not link the model) and writes the result for the widget.
+    private func observeDiagnosticRequests() {
+        let observer = Unmanaged.passUnretained(self).toOpaque()
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(), observer,
+            { _, observer, _, _, _ in
+                guard let observer else { return }
+                let monitor = Unmanaged<SystemMonitor>.fromOpaque(observer).takeUnretainedValue()
+                DispatchQueue.main.async {
+                    MainActor.assumeIsolated { monitor.diagnosticRequested() }
+                }
+            },
+            SharedStore.diagnosticNotification as CFString, nil, .deliverImmediately
+        )
+    }
+
+    private func diagnosticRequested() {
+        guard let request = SharedStore.loadDiagnosticRequest(),
+              request.isNew(after: lastDiagnosticRequest, now: .now) else { return }
+        lastDiagnosticRequest = request.date
+        DiagnosticController.log.notice("Diagnostic requested from the widget")
+        // The widget that asked is on the desktop, even if the last check has not seen it yet.
+        widgetKinds.insert(SharedStore.diagnosticWidgetKind)
+        diagnostic.widgetRequested(request)
+    }
+
+    /// A diagnostic finished: the widget shows it when it is on the desktop.
+    private func diagnosticChanged() {
+        guard widgetKinds.contains(SharedStore.diagnosticWidgetKind) else { return }
+        publishToWidgets(onlyKind: SharedStore.diagnosticWidgetKind)
     }
 
     // MARK: - Diagnostics

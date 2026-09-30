@@ -143,6 +143,7 @@ struct SettingsView: View {
         case .module(.disk): disk
         case .module(.bluetooth): bluetooth
         case .module(.health): health
+        case .module(.diagnostic): DiagnosticSettingsView(settings: settings)
         case .module(.keepAwake): keepAwakeSettings
         case .alerts: AlertsSettings(settings: settings, notifier: notifier)
         case .general: GeneralSettings(settings: settings)
@@ -236,6 +237,25 @@ struct SettingsView: View {
             }
             KeepAwakeDurationPicker(duration: $keepAwake.duration)
             Toggle("Keep the display on too", isOn: $keepAwake.keepsDisplayOn)
+        }
+    }
+}
+
+/// The Diagnostic tab: the menu bar item, and what Apple Intelligence can do on this Mac.
+struct DiagnosticSettingsView: View {
+    @Bindable var settings: AppSettings
+
+    var body: some View {
+        Section {
+            Toggle("Show in menu bar", isOn: $settings.diagnostic.shown)
+            Text("""
+                Rules check the processor, memory, disks, heat and batteries on every Mac. Where Apple Intelligence \
+                is available, its on-device model explains the result and answers your questions. Nothing leaves \
+                your Mac.
+                """)
+                .font(.callout).foregroundStyle(.secondary)
+            Text(DiagnosticAIStatus.current(language: .app).message ?? String(localized: "Apple Intelligence is available."))
+                .font(.callout)
         }
     }
 }
