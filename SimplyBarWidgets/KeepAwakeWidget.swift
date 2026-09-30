@@ -5,8 +5,8 @@ import WidgetKit
 // MARK: - Intent
 
 /// Turns Keep Awake on or off from the widget. It runs in the widget extension, which quits right after and so cannot
-/// hold the power assertion: it leaves a request for the app, then waits a moment for the app's answer, because
-/// WidgetKit redraws the widget as soon as it returns.
+/// hold the power assertion: it leaves a request for the app, then waits a moment for the app's answer (the request's
+/// date written back), because WidgetKit redraws the widget as soon as it returns.
 struct SetKeepAwakeIntent: AppIntent {
     static let title: LocalizedStringResource = "Keep Awake"
     static let isDiscoverable = false
@@ -26,7 +26,7 @@ struct SetKeepAwakeIntent: AppIntent {
         SharedStore.postKeepAwakeRequest()
         for _ in 0..<20 {
             try? await Task.sleep(for: .milliseconds(100))
-            if let payload = SharedStore.load(), payload.date >= request.date { break }
+            if let answered = SharedStore.load()?.keepAwake?.requestDate, answered >= request.date { break }
         }
         return .result()
     }

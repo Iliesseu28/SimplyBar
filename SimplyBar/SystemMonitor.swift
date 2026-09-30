@@ -50,6 +50,8 @@ final class SystemMonitor {
     @ObservationIgnored private var lastWidgetReload = Date.distantPast
     @ObservationIgnored private var bluetoothTask: Task<Void, Never>?
     @ObservationIgnored private var flashTask: Task<Void, Never>?
+    /// Date of the last Keep Awake request from the widget, handled once and written back for the widget.
+    @ObservationIgnored private var lastKeepAwakeRequest: Date?
 
     static let log = Logger(subsystem: "fr.simplibot.simplybar", category: "monitor")
 
@@ -236,7 +238,7 @@ final class SystemMonitor {
             uploadHistory: uploadHistory.last(WidgetPayload.historyLength),
             downloadHistory: downloadHistory.last(WidgetPayload.historyLength),
             disk: disk.map { DiskSample(name: "", total: $0.total, free: $0.free) },
-            keepAwake: keepAwake.status
+            keepAwake: keepAwakeStatus
         )
         if widgetKinds.contains(SharedStore.gpuWidgetKind) {
             payload.gpu = gpus.max { $0.utilization < $1.utilization }
@@ -308,6 +310,12 @@ final class SystemMonitor {
 
     // MARK: - Keep Awake
 
+    private var keepAwakeStatus: KeepAwakeStatus {
+        var status = keepAwake.status
+        status.requestDate = lastKeepAwakeRequest
+        return status
+    }
+
     /// The Keep Awake widget follows every change at once, whoever made it.
     private func keepAwakeChanged() {
         guard widgetKinds.contains(SharedStore.keepAwakeWidgetKind) else { return }
@@ -333,7 +341,8 @@ final class SystemMonitor {
 
     private func keepAwakeRequested() {
         guard let request = SharedStore.loadKeepAwakeRequest(),
-              Date.now.timeIntervalSince(request.date) < KeepAwakeWidgetState.pendingWindow else { return }
+              request.isNew(after: lastKeepAwakeRequest, now: .now) else { return }
+        lastKeepAwakeRequest = request.date
         Self.log.notice("Keep Awake requested from the widget: \(request.isActive, privacy: .public)")
         // The widget that asked is on the desktop, even if the last check has not seen it yet.
         widgetKinds.insert(SharedStore.keepAwakeWidgetKind)

@@ -52,6 +52,8 @@ nonisolated struct KeepAwakeStatus: Codable, Equatable, Sendable {
     /// End of a timed session; nil while off, or when it lasts until turned off.
     var end: Date?
     var keepsDisplayOn: Bool
+    /// Date of the last widget request the app handled: the widget waits for it, not for any write of the file.
+    var requestDate: Date?
 
     /// A timed session past its end counts as off, even before the app says so.
     func isActive(at now: Date) -> Bool {
@@ -71,6 +73,57 @@ nonisolated struct KeepAwakeStatus: Codable, Equatable, Sendable {
 nonisolated struct KeepAwakeRequest: Codable, Equatable, Sendable {
     var isActive: Bool
     var date: Date
+
+    /// Handled once, and only while the widget still shows it as pending: a second notification for the same click
+    /// does nothing.
+    func isNew(after handled: Date?, now: Date) -> Bool {
+        now.timeIntervalSince(date) < KeepAwakeWidgetState.pendingWindow && (handled.map { date > $0 } ?? true)
+    }
+}
+
+/// A Keep Awake session without its power assertions: whether it is on and when it ends. The app's controller holds
+/// the assertions and follows it.
+nonisolated struct KeepAwakeSession: Equatable, Sendable {
+    /// What to do with the end timer once the Mac wakes up.
+    enum Wake: Equatable, Sendable {
+        case nothing
+        /// The end passed while the Mac slept.
+        case stop
+        /// The end is still ahead: the timer is set again for it.
+        case setTimer(Date)
+    }
+
+    private(set) var isActive = false
+    /// End of a timed session, nil while off or when it lasts until turned off.
+    private(set) var end: Date?
+
+    /// False when already on: a second start neither counts again from now nor reports a change.
+    mutating func start(_ duration: KeepAwakeDuration, now: Date) -> Bool {
+        guard !isActive else { return false }
+        isActive = true
+        end = duration.end(from: now)
+        return true
+    }
+
+    /// False when already off.
+    mutating func stop() -> Bool {
+        guard isActive else { return false }
+        isActive = false
+        end = nil
+        return true
+    }
+
+    /// A duration changed during a session counts from now.
+    mutating func change(to duration: KeepAwakeDuration, now: Date) {
+        guard isActive else { return }
+        end = duration.end(from: now)
+    }
+
+    /// A timer's clock stops while the Mac sleeps (lid closed, Sleep chosen), so it would fire late by the time slept.
+    func afterWake(now: Date) -> Wake {
+        guard isActive, let end else { return .nothing }
+        return end <= now ? .stop : .setTimer(end)
+    }
 }
 
 /// What the Keep Awake widget shows.
@@ -87,9 +140,10 @@ nonisolated struct KeepAwakeWidgetState: Equatable, Sendable {
     var date: Date
 
     /// Nil when the app is not running: no fresh file, or no Keep Awake in it (the app removes it when it quits).
+    /// A request stays pending until the app writes its date back, for `pendingWindow` at most.
     static func resolve(payload: WidgetPayload?, request: KeepAwakeRequest?, now: Date = .now) -> KeepAwakeWidgetState? {
         guard let payload, SharedStore.isFresh(payload, now: now), let status = payload.keepAwake else { return nil }
-        if let request, request.date > payload.date, now.timeIntervalSince(request.date) < pendingWindow {
+        if let request, request.date > status.requestDate ?? .distantPast, now.timeIntervalSince(request.date) < pendingWindow {
             return KeepAwakeWidgetState(isActive: request.isActive, end: nil, isPending: true, date: payload.date)
         }
         let active = status.isActive(at: now)

@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import IOKit.pwr_mgt
 import Observation
 
@@ -11,23 +11,30 @@ final class KeepAwakeController {
     static let systemAssertionName = "SimplyBar: Keep Awake"
     static let displayAssertionName = "SimplyBar: Keep Display On"
 
-    /// End of the current timed session, nil while off or when it lasts until turned off.
-    private(set) var end: Date?
-    private var active = false
+    private var session = KeepAwakeSession()
 
     @ObservationIgnored private let settings: AppSettings
     @ObservationIgnored private var systemAssertion: IOPMAssertionID?
     @ObservationIgnored private var displayAssertion: IOPMAssertionID?
     @ObservationIgnored private var endTimer: Timer?
+    @ObservationIgnored private var wakeObserver: (any NSObjectProtocol)?
     /// Called after every change of state, so the widget can follow.
     @ObservationIgnored var onChange: (() -> Void)?
 
     init(settings: AppSettings) {
         self.settings = settings
+        wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.wokeUp() }
+        }
     }
 
+    /// End of the current timed session, nil while off or when it lasts until turned off.
+    var end: Date? { session.end }
+
     var isActive: Bool {
-        get { active }
+        get { session.isActive }
         set { newValue ? start() : stop() }
     }
 
@@ -36,8 +43,9 @@ final class KeepAwakeController {
         get { settings.keepAwake.duration }
         set {
             settings.keepAwake.duration = newValue
-            guard active else { return }
-            scheduleEnd()
+            guard session.isActive else { return }
+            session.change(to: newValue, now: .now)
+            setEndTimer()
             onChange?()
         }
     }
@@ -46,17 +54,19 @@ final class KeepAwakeController {
         get { settings.keepAwake.keepsDisplayOn }
         set {
             settings.keepAwake.keepsDisplayOn = newValue
-            guard active else { return }
+            guard session.isActive else { return }
             updateDisplayAssertion()
             onChange?()
         }
     }
 
     var status: KeepAwakeStatus {
-        KeepAwakeStatus(isActive: active, end: end, keepsDisplayOn: keepsDisplayOn)
+        KeepAwakeStatus(isActive: session.isActive, end: session.end, keepsDisplayOn: keepsDisplayOn)
     }
 
     private func start() {
+        // Already on: the countdown goes on and nothing is published twice.
+        guard !session.isActive else { return }
         if systemAssertion == nil {
             systemAssertion = PowerAssertion.create(type: PowerAssertion.preventSystemSleep, name: Self.systemAssertionName)
         }
@@ -64,27 +74,25 @@ final class KeepAwakeController {
             SystemMonitor.log.error("Keep Awake: the system sleep assertion was refused")
             return
         }
-        active = true
+        _ = session.start(duration, now: .now)
         updateDisplayAssertion()
-        scheduleEnd()
+        setEndTimer()
         onChange?()
     }
 
     private func stop() {
-        guard active else { return }
+        guard session.stop() else { return }
         endTimer?.invalidate()
         endTimer = nil
         if let systemAssertion { PowerAssertion.release(systemAssertion) }
         systemAssertion = nil
-        active = false
-        end = nil
         updateDisplayAssertion()
         onChange?()
     }
 
     /// Holds the display assertion exactly while Keep Awake is on with the display option.
     private func updateDisplayAssertion() {
-        let wanted = active && keepsDisplayOn
+        let wanted = session.isActive && keepsDisplayOn
         if wanted, displayAssertion == nil {
             displayAssertion = PowerAssertion.create(type: PowerAssertion.preventDisplaySleep, name: Self.displayAssertionName)
         } else if !wanted, let displayAssertion {
@@ -93,17 +101,26 @@ final class KeepAwakeController {
         }
     }
 
-    private func scheduleEnd() {
+    /// Sets the timer for the end of the session, none when it lasts until turned off.
+    private func setEndTimer() {
         endTimer?.invalidate()
         endTimer = nil
-        end = duration.end(from: .now)
-        guard let end else { return }
-        // The timer fires late after a sleep (lid closed): it then ends the session right away.
+        guard let end = session.end else { return }
+        // The timer's clock stops while the Mac sleeps, so it would fire late by the time slept: `wokeUp()` ends the
+        // session or sets the timer again.
         let timer = Timer(fire: end, interval: 0, repeats: false) { [weak self] _ in
             MainActor.assumeIsolated { self?.stop() }
         }
         timer.tolerance = 1
         RunLoop.main.add(timer, forMode: .common)
         endTimer = timer
+    }
+
+    private func wokeUp() {
+        switch session.afterWake(now: .now) {
+        case .nothing: break
+        case .stop: stop()
+        case .setTimer: setEndTimer()
+        }
     }
 }

@@ -52,10 +52,66 @@ struct KeepAwakeTests {
 
     @Test func answeredRequestGivesWayToTheApp() throws {
         let request = KeepAwakeRequest(isActive: true, date: start)
-        // The app answered after the request: it wins, even if it refused.
-        let payload = WidgetPayload(date: start.addingTimeInterval(1), keepAwake: KeepAwakeStatus(isActive: false, end: nil, keepsDisplayOn: false))
+        // The app wrote the request's date back: it wins, even if it refused.
+        let status = KeepAwakeStatus(isActive: false, end: nil, keepsDisplayOn: false, requestDate: start)
+        let payload = WidgetPayload(date: start.addingTimeInterval(1), keepAwake: status)
         let state = try #require(KeepAwakeWidgetState.resolve(payload: payload, request: request, now: start.addingTimeInterval(2)))
         #expect(!state.isActive && !state.isPending)
+    }
+
+    @Test func aLaterWriteIsNotAnAnswer() throws {
+        let request = KeepAwakeRequest(isActive: true, date: start)
+        // Written after the click (a regular refresh) but before the app handled it.
+        let status = KeepAwakeStatus(isActive: false, end: nil, keepsDisplayOn: false, requestDate: start.addingTimeInterval(-60))
+        let payload = WidgetPayload(date: start.addingTimeInterval(1), keepAwake: status)
+        let state = try #require(KeepAwakeWidgetState.resolve(payload: payload, request: request, now: start.addingTimeInterval(2)))
+        #expect(state.isActive && state.isPending)
+    }
+
+    @Test func requestIsHandledOnce() {
+        let request = KeepAwakeRequest(isActive: true, date: start)
+        let now = start.addingTimeInterval(1)
+        #expect(request.isNew(after: nil, now: now))
+        #expect(!request.isNew(after: start, now: now))
+        #expect(!request.isNew(after: start.addingTimeInterval(1), now: now))
+        #expect(request.isNew(after: start.addingTimeInterval(-1), now: now))
+        #expect(!request.isNew(after: nil, now: start.addingTimeInterval(KeepAwakeWidgetState.pendingWindow)))
+    }
+
+    @Test func secondStartKeepsTheCountdown() {
+        var session = KeepAwakeSession()
+        let started = session.start(.thirtyMinutes, now: start)
+        let startedAgain = session.start(.oneHour, now: start.addingTimeInterval(600))
+        #expect(started && !startedAgain)
+        #expect(session.isActive && session.end == start.addingTimeInterval(1_800))
+        let stopped = session.stop()
+        let stoppedAgain = session.stop()
+        #expect(stopped && !stoppedAgain)
+        #expect(!session.isActive && session.end == nil)
+    }
+
+    @Test func durationChangedDuringASessionCountsFromNow() {
+        var session = KeepAwakeSession()
+        session.change(to: .oneHour, now: start)
+        #expect(!session.isActive && session.end == nil)
+        _ = session.start(.thirtyMinutes, now: start)
+        session.change(to: .oneHour, now: start.addingTimeInterval(600))
+        #expect(session.end == start.addingTimeInterval(600 + 3_600))
+        session.change(to: .indefinitely, now: start.addingTimeInterval(700))
+        #expect(session.isActive && session.end == nil)
+    }
+
+    @Test func wakeEndsASessionThatEndedDuringSleep() {
+        var session = KeepAwakeSession()
+        #expect(session.afterWake(now: start) == .nothing)
+        _ = session.start(.thirtyMinutes, now: start)
+        let end = start.addingTimeInterval(1_800)
+        #expect(session.afterWake(now: start.addingTimeInterval(600)) == .setTimer(end))
+        #expect(session.afterWake(now: end) == .stop)
+        #expect(session.afterWake(now: start.addingTimeInterval(7_200)) == .stop)
+        var untimed = KeepAwakeSession()
+        _ = untimed.start(.indefinitely, now: start)
+        #expect(untimed.afterWake(now: start.addingTimeInterval(86_400)) == .nothing)
     }
 
     @Test func widgetSaysNotRunningWithoutAFreshAnswer() {
@@ -119,7 +175,7 @@ struct WidgetPayloadDecodingTests {
             date: start,
             gpu: GPUSample(model: "Apple M3", utilization: 0.4), gpuHistory: [0.1, 0.4],
             bluetooth: [BluetoothDevice(name: "Keyboard", address: "00:11:22:33:44:55", levels: [.init(part: .main, percent: 78)])],
-            keepAwake: KeepAwakeStatus(isActive: true, end: start.addingTimeInterval(1_800), keepsDisplayOn: true)
+            keepAwake: KeepAwakeStatus(isActive: true, end: start.addingTimeInterval(1_800), keepsDisplayOn: true, requestDate: start)
         )
         #expect(try SharedStore.decode(SharedStore.encode(payload)) == payload)
     }
