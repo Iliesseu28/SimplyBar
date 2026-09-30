@@ -11,6 +11,7 @@ struct SimplyBarWidgets: WidgetBundle {
         DiskWidget()
         StorageWidget()
         BluetoothWidget()
+        HealthWidget()
         KeepAwakeWidget()
     }
 }
@@ -79,7 +80,9 @@ extension WidgetPayload {
             BluetoothDevice(name: String(localized: "Trackpad", comment: "Sample Bluetooth device in the widget gallery preview."),
                             levels: [.init(part: .main, percent: 54)]),
         ],
-        keepAwake: KeepAwakeStatus(isActive: true, end: nil, keepsDisplayOn: false)
+        keepAwake: KeepAwakeStatus(isActive: true, end: nil, keepsDisplayOn: false),
+        health: HealthSample(thermal: .nominal,
+                             battery: MacBattery(charge: 82, isCharging: false, maximumCapacity: 94, cycleCount: 146))
     )
 }
 
