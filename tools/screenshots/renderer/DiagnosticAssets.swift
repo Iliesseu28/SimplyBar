@@ -53,7 +53,7 @@ struct DiagnosticAssetRenderer {
         let monitor = SystemMonitor(settings: AppServices.settings)
         let popup = DiagnosticController(keepAwake: monitor.keepAwake)
         popup.status = status
-        popup.report = report
+        popup.card = DiagnosticCardState(report: report)
         popup.messages = messages
         save(Self.panel(DiagnosticPopup(monitor: monitor, diagnostic: popup)), name: "apercu-diagnostic-popup")
 
@@ -65,7 +65,7 @@ struct DiagnosticAssetRenderer {
 
         let off = DiagnosticController(keepAwake: monitor.keepAwake)
         off.status = .appleIntelligenceOff
-        off.report = rules
+        off.card = DiagnosticCardState(report: rules)
         save(Self.panel(DiagnosticPopup(monitor: monitor, diagnostic: off)), name: "apercu-diagnostic-ia-desactivee")
     }
 
