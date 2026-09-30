@@ -51,12 +51,15 @@ for file in "$ROOT"/SimplyBar/*.swift; do
   [[ "$(basename "$file")" == "SimplyBarApp.swift" ]] || cp "$file" "$WORK/src/"
 done
 
-# Three edits of the copies, visibility only, so the renderer can feed demo numbers and draw every widget size:
-# the widget bundle loses its @main, the monitor's samples become settable, the Storage views leave file scope.
+# Four edits of the copies, visibility only, so the renderer can feed demo numbers and draw every widget size:
+# the widget bundle loses its @main, the monitor's samples and the diagnostic's state become settable, the Storage
+# views leave file scope.
 sed -i '' '/^@main$/d' "$WORK/src/SimplyBarWidgets.swift"
 sed -i '' -E 's/private\(set\) var /var /' "$WORK/src/SystemMonitor.swift"
+sed -i '' -E 's/private\(set\) var /var /' "$WORK/src/DiagnosticController.swift"
 sed -i '' -E 's/^private struct /struct /' "$WORK/src/StorageWidget.swift"
 if grep -q '^@main' "$WORK/src/SimplyBarWidgets.swift" || grep -q 'private(set) var' "$WORK/src/SystemMonitor.swift" \
+  || grep -q 'private(set) var' "$WORK/src/DiagnosticController.swift" \
   || grep -qE '^private struct (SmallStorageView|StorageListView)' "$WORK/src/StorageWidget.swift"; then
   echo "The sources changed shape: update the edits in tools/screenshots/make.sh" >&2
   exit 1

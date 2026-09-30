@@ -10,7 +10,8 @@ import WidgetKit
 // Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl> [--video | --front]
 // With --video it draws the assets of the promo video instead (VideoAssets.swift). With --front, launched by `open`
 // as for --video, it draws the same images from the active app, so the Keep Awake switches take their colour (an
-// inactive app draws them grey), plus the Keep Awake and Alerts settings tabs.
+// inactive app draws them grey), plus the Keep Awake and Alerts settings tabs. With --diagnostic it draws the
+// previews of the Diagnostic module, written by Apple's on-device model where it runs (DiagnosticAssets.swift).
 
 /// Stands in for the one of `SimplyBarApp.swift`, which this build leaves out (it holds the app's `@main`).
 @MainActor
@@ -61,6 +62,8 @@ struct ScreenshotRenderer {
         let renderer = AssetRenderer(output: output, scale: scale, rtl: rtl, demo: DemoData(names: names))
         if arguments.contains("--video") {
             VideoAssetRenderer(renderer: renderer).renderAll(settingsOnly: arguments.contains("--settings-only"))
+        } else if arguments.contains("--diagnostic") {
+            DiagnosticAssetRenderer(renderer: renderer).renderAll()
         } else if front {
             let settings = SettingsCapture(renderer: renderer, settings: AppServices.settings, recordSize: { _, _ in })
             settings.bringToFront()
@@ -117,8 +120,9 @@ final class AssetRenderer {
         labelMonitor.keepAwake.isActive = false
         save(SystemTray(date: DemoData.date), name: "menubar-system")
 
-        // Popups, each with its own monitor so a sample taken when it appears cannot leak into another one.
-        for module in Module.allCases {
+        // Popups, each with its own monitor so a sample taken when it appears cannot leak into another one. The
+        // Diagnostic popup has its own previews (--diagnostic): its text comes from Apple's model.
+        for module in Module.allCases where module != .diagnostic {
             renderPopup(module)
         }
 
@@ -184,6 +188,7 @@ final class AssetRenderer {
             case .disk: AnyView(DiskPopup(monitor: monitor))
             case .bluetooth: AnyView(BluetoothPopup(monitor: monitor))
             case .health: AnyView(HealthPopup(monitor: monitor))
+            case .diagnostic: AnyView(DiagnosticPopup(monitor: monitor, diagnostic: monitor.diagnostic))
             case .keepAwake: AnyView(KeepAwakePopup(monitor: monitor, keepAwake: monitor.keepAwake))
             }
             let image = capture(view) {
