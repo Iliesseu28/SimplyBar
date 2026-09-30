@@ -56,6 +56,8 @@ final class SystemMonitor {
     /// Date of the last Keep Awake request from the widget, handled once and written back for the widget.
     @ObservationIgnored private var lastKeepAwakeRequest: Date?
     @ObservationIgnored private var thermalObserver: (any NSObjectProtocol)?
+    /// Keys of the alerts being sent right now.
+    @ObservationIgnored private var sendingAlerts: Set<String> = []
 
     static let log = Logger(subsystem: "fr.simplibot.simplybar", category: "monitor")
 
@@ -344,12 +346,19 @@ final class SystemMonitor {
         }
     }
 
-    /// Runs the readings of an alert that is on through the tracker and sends what it lets through. Nothing is fed
-    /// while notifications are not allowed, so an alarm found meanwhile still fires once they are.
-    private func checkAlerts(_ kind: AlertKind, _ found: (inout AlertTracker, Date) -> [Alert]) {
+    /// Runs the readings of an alert that is on through the tracker and sends what it finds due. Nothing is fed
+    /// while notifications are not allowed, and the tracker only counts what macOS took: an alarm found meanwhile,
+    /// or a notification that failed, still fires once they are allowed.
+    private func checkAlerts(_ kind: AlertKind, _ found: (inout AlertTracker, Date) -> [DueAlert]) {
         guard settings.alerts.isOn(kind), notifier.canNotify else { return }
-        for alert in found(&settings.alertTracker, .now) {
-            notifier.post(alert)
+        // A reading that comes while the same notification is on its way does not send it twice.
+        for due in found(&settings.alertTracker, .now) where sendingAlerts.isDisjoint(with: due.keys) {
+            sendingAlerts.formUnion(due.keys)
+            Task {
+                let sent = await notifier.send(due.alert)
+                sendingAlerts.subtract(due.keys)
+                if sent { settings.alertTracker.sent(due, now: .now) }
+            }
         }
     }
 

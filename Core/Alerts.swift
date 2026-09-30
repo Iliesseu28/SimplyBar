@@ -85,11 +85,30 @@ nonisolated enum AlertRules {
     static func heat(_ level: ThermalLevel) -> AlertLevel {
         level.isHot ? .alarm : .normal
     }
+
+    /// Critical fires on its own, even while the hot alert waits; back to hot changes nothing, normal or warm is over.
+    static func criticalHeat(_ level: ThermalLevel) -> AlertLevel {
+        switch level {
+        case .critical: .alarm
+        case .serious: .near
+        case .nominal, .fair: .normal
+        }
+    }
+}
+
+/// A notification the tracker finds due, with the objects it covers. It counts once `AlertTracker.sent` confirms
+/// that it went out.
+nonisolated struct DueAlert: Equatable, Sendable {
+    let alert: Alert
+    let keys: [String]
 }
 
 /// Keeps the alerts quiet: an alert fires when its object enters the alarm, then waits for the object to be back to
 /// normal before it can fire again, and never fires twice within `minimumGap` for the same object. Saved by the app
 /// so that a relaunch does not repeat an alert.
+///
+/// Two steps: a reading returns the notifications due, and only a notification that went out (`sent`) moves the
+/// tracker on. One that could not be sent is due again on the next reading.
 nonisolated struct AlertTracker: Codable, Equatable, Sendable {
     static let minimumGap: TimeInterval = 60 * 60
 
@@ -99,7 +118,7 @@ nonisolated struct AlertTracker: Codable, Equatable, Sendable {
 
     init() {}
 
-    /// Feeds one reading of an object; true when its notification goes out now. An alarm held back by the gap fires
+    /// Feeds one reading of an object; true when its notification is due now. An alarm held back by the gap is due
     /// on a later reading once the hour has passed, if the object is still in alarm.
     mutating func update(_ key: String, _ level: AlertLevel, now: Date) -> Bool {
         switch level {
@@ -111,29 +130,45 @@ nonisolated struct AlertTracker: Codable, Equatable, Sendable {
         case .alarm:
             guard !waiting.contains(key) else { return false }
             if let last = lastFired[key], now.timeIntervalSince(last) < Self.minimumGap { return false }
+            return true
+        }
+    }
+
+    /// The notification went out: its objects wait for normal again, and their hour starts now. Entries past the
+    /// hour that no longer wait are dropped, so the saved state does not grow with every device ever seen.
+    mutating func sent(_ due: DueAlert, now: Date) {
+        lastFired = lastFired.filter { waiting.contains($0.key) || now.timeIntervalSince($0.value) < Self.minimumGap }
+        for key in due.keys {
             waiting.insert(key)
             lastFired[key] = now
-            return true
         }
     }
 
     /// One alert per connected device at or under the low level (its lowest part: left, right or case). A device
     /// that disconnects keeps its state until it comes back.
-    mutating func bluetooth(_ devices: [BluetoothDevice], now: Date) -> [Alert] {
+    mutating func bluetooth(_ devices: [BluetoothDevice], now: Date) -> [DueAlert] {
         devices.compactMap { device in
-            guard let lowest = device.lowest,
-                  update(Self.key(.bluetoothBattery, device.id), AlertRules.bluetooth(lowest), now: now) else { return nil }
-            return .bluetoothBattery(device: device.name, percent: lowest)
+            let key = Self.key(.bluetoothBattery, device.id)
+            guard let lowest = device.lowest, update(key, AlertRules.bluetooth(lowest), now: now) else { return nil }
+            return DueAlert(alert: .bluetoothBattery(device: device.name, percent: lowest), keys: [key])
         }
     }
 
-    mutating func disk(_ sample: DiskSample, now: Date) -> [Alert] {
-        let level = AlertRules.disk(free: sample.free, total: sample.total)
-        return update(Self.key(.diskSpace, "/"), level, now: now) ? [.diskSpace(free: sample.free, total: sample.total)] : []
+    mutating func disk(_ sample: DiskSample, now: Date) -> [DueAlert] {
+        let key = Self.key(.diskSpace, "/")
+        guard update(key, AlertRules.disk(free: sample.free, total: sample.total), now: now) else { return [] }
+        return [DueAlert(alert: .diskSpace(free: sample.free, total: sample.total), keys: [key])]
     }
 
-    mutating func heat(_ level: ThermalLevel, now: Date) -> [Alert] {
-        update(Self.key(.heat, "mac"), AlertRules.heat(level), now: now) ? [.heat(level)] : []
+    /// Hot and critical are two objects: going from hot to critical notifies again. A critical notification covers
+    /// hot too, so the way back down from critical stays silent.
+    mutating func heat(_ level: ThermalLevel, now: Date) -> [DueAlert] {
+        let hot = Self.key(.heat, "hot"), critical = Self.key(.heat, "critical")
+        // Both readings run, so that both re-arm.
+        let criticalDue = update(critical, AlertRules.criticalHeat(level), now: now)
+        let hotDue = update(hot, AlertRules.heat(level), now: now)
+        if criticalDue { return [DueAlert(alert: .heat(level), keys: [critical, hot])] }
+        return hotDue ? [DueAlert(alert: .heat(level), keys: [hot])] : []
     }
 
     /// An alert turned off starts afresh when turned on again; the hour between two notifications still holds.

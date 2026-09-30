@@ -46,21 +46,25 @@ final class AlertNotifier {
         }
     }
 
-    func post(_ alert: Alert) {
-        guard active, canNotify else { return }
+    /// Sends one alert; true once macOS took it. The permission is read again first: an alert turned off in System
+    /// Settings since the last reading is not sent, and does not count as sent.
+    func send(_ alert: Alert) async -> Bool {
+        guard active else { return false }
+        await refreshStatus()
+        guard canNotify else { return false }
         let content = UNMutableNotificationContent()
         content.title = Self.title(alert)
         content.body = Self.body(alert)
         content.sound = .default
         // One notification per object: a newer one replaces the older in Notification Center.
         let request = UNNotificationRequest(identifier: Self.identifier(alert), content: content, trigger: nil)
-        Task {
-            do {
-                try await UNUserNotificationCenter.current().add(request)
-                SystemMonitor.log.notice("Alert sent: \(alert.kind.rawValue, privacy: .public)")
-            } catch {
-                SystemMonitor.log.error("Alert not sent: \((error as NSError).code, privacy: .public)")
-            }
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+            SystemMonitor.log.notice("Alert sent: \(alert.kind.rawValue, privacy: .public)")
+            return true
+        } catch {
+            SystemMonitor.log.error("Alert not sent: \((error as NSError).code, privacy: .public)")
+            return false
         }
     }
 
