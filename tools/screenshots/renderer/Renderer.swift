@@ -10,7 +10,7 @@ import WidgetKit
 // Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl> [--video | --front]
 // With --video it draws the assets of the promo video instead (VideoAssets.swift). With --front, launched by `open`
 // as for --video, it draws the same images from the active app, so the Keep Awake switches take their colour (an
-// inactive app draws them grey), plus the Keep Awake settings tab.
+// inactive app draws them grey), plus the Keep Awake and Alerts settings tabs.
 
 /// Stands in for the one of `SimplyBarApp.swift`, which this build leaves out (it holds the app's `@main`).
 @MainActor
@@ -66,6 +66,7 @@ struct ScreenshotRenderer {
             settings.bringToFront()
             renderer.renderAll()
             settings.captureKeepAwake()
+            settings.captureAlerts()
         } else {
             renderer.renderAll()
         }
@@ -139,6 +140,19 @@ final class AssetRenderer {
         save(WidgetFrame(size: .medium) { BluetoothWidgetView(payload: payload) }, name: "widget-bluetooth-medium")
         let keepAwake = KeepAwakeWidgetState.resolve(payload: payload, request: nil, now: DemoData.date)
         save(WidgetFrame(size: .small) { KeepAwakeWidgetView(state: keepAwake) }, name: "widget-keepAwake")
+        // Mac Health picks its size from the widget family too: both are drawn from its content view, then once
+        // more for a Mac without a battery, where the battery part is left out.
+        if let health = payload.health {
+            for (medium, size) in [(false, "small"), (true, "medium")] {
+                save(WidgetFrame(size: medium ? .medium : .small) {
+                    HealthWidgetContent(health: health, date: payload.date, medium: medium)
+                }, name: "widget-health-\(size)")
+                save(WidgetFrame(size: medium ? .medium : .small) {
+                    HealthWidgetContent(health: HealthSample(thermal: health.thermal, battery: nil), date: payload.date,
+                                        medium: medium)
+                }, name: "widget-health-\(size)-desktop")
+            }
+        }
         // The Storage widget picks its view from the widget family, which only WidgetKit can set: its three
         // sizes are drawn with the views it picks (small: the chosen disk; medium: 2 disks; large: 5, detailed).
         // The small one shows Photos, a short name in every language (a long one is cut next to the percentage).
@@ -169,6 +183,7 @@ final class AssetRenderer {
             case .network: AnyView(NetworkPopup(monitor: monitor))
             case .disk: AnyView(DiskPopup(monitor: monitor))
             case .bluetooth: AnyView(BluetoothPopup(monitor: monitor))
+            case .health: AnyView(HealthPopup(monitor: monitor))
             case .keepAwake: AnyView(KeepAwakePopup(monitor: monitor, keepAwake: monitor.keepAwake))
             }
             let image = capture(view) {

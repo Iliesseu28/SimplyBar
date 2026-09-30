@@ -236,6 +236,19 @@ struct SettingsCapture {
         window.orderOut(nil)
     }
 
+    /// The Alerts tab with two alerts on, as `Renderer --front` draws it (not in the video). The notifier is never
+    /// activated here: no permission is asked and the tab shows no refusal.
+    func captureAlerts() {
+        let (window, selection) = openWindow()
+        settings.alerts.set(.bluetoothBattery, true)
+        settings.alerts.set(.heat, true)
+        selection.tab = .alerts
+        spin(0.5)
+        guard NSApp.isActive else { ScreenshotRenderer.fail("the settings window lost the focus") }
+        capture(window, name: "settings-alerts")
+        window.orderOut(nil)
+    }
+
     /// Makes the renderer the active app (launched by `open`), else its switches would be drawn grey.
     func bringToFront(showing window: NSWindow? = nil) {
         NSApp.setActivationPolicy(.regular)
@@ -251,7 +264,8 @@ struct SettingsCapture {
     private func openWindow() -> (RenderWindow, SettingsSelection) {
         let selection = SettingsSelection()
         let hosting = NSHostingController(rootView: SettingsView(
-            settings: settings, keepAwake: AppServices.monitor.keepAwake, selection: selection
+            settings: settings, keepAwake: AppServices.monitor.keepAwake, notifier: AppServices.monitor.notifier,
+            selection: selection
         ).environment(\.colorScheme, .light))
         let window = RenderWindow(contentViewController: hosting)
         window.forcedScale = renderer.scale

@@ -37,6 +37,9 @@ struct DemoData {
     let network = NetworkSample(upload: 1_240_000, download: 18_600_000)
     let disk = DiskSample(name: "", total: 494.38 * gb, free: 142.71 * gb)
     let gpuUtilization = 0.37
+    /// A laptop running hot, its battery charging: the heat level only, macOS gives no temperature.
+    let health = HealthSample(thermal: .serious, battery: MacBattery(charge: 87, isCharging: true, maximumCapacity: 91,
+                                                                      cycleCount: 312, condition: .normal))
     let localIP = "192.168.1.24"
 
     /// The IOKit model string, as `GPUReader` reads it on a Mac with 8 CPU cores: never translated.
@@ -139,13 +142,14 @@ struct DemoData {
         monitor.gpuHistory = History(capacity: SystemMonitor.historyLength, values: Self.gpuHistory)
         monitor.bluetoothDevices = bluetoothDevices
         monitor.bluetoothLoaded = true
+        monitor.health = health
     }
 
     /// True while nothing measured on this Mac has replaced the demo numbers (a popup samples when it appears).
     func isShown(by monitor: SystemMonitor) -> Bool {
         monitor.cpu == cpu && monitor.memory == memory && monitor.disk == disk && monitor.network == network
             && monitor.gpus == gpus && monitor.bluetoothDevices == bluetoothDevices && monitor.localIP == localIP
-            && monitor.cpuHistory.values == Self.cpuHistory && monitor.bluetoothLoaded
+            && monitor.cpuHistory.values == Self.cpuHistory && monitor.bluetoothLoaded && monitor.health == health
     }
 
     /// What the widgets receive, built by the app's own `widgetPayload`.
@@ -156,6 +160,7 @@ struct DemoData {
         payload.gpu = monitor.gpus.first
         payload.gpuHistory = monitor.gpuHistory.last(WidgetPayload.historyLength)
         payload.bluetooth = monitor.bluetoothDevices
+        payload.health = monitor.health
         payload.keepAwake = KeepAwakeStatus(isActive: true, end: Self.date.addingTimeInterval(TimeInterval(Self.keepAwakeDuration.rawValue)),
                                             keepsDisplayOn: false)
         return payload
