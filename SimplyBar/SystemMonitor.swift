@@ -198,7 +198,9 @@ final class SystemMonitor {
                 if first, self.widgetKinds.contains(SharedStore.bluetoothWidgetKind) { self.publishToWidgets() }
             }
         case .health:
-            let value = HealthReader.read()
+            // The heat alert alone needs the heat level only: the battery is read when something shows it.
+            let shown = openPopups.contains(.health) || settings.isShown(.health) || widgetModules.contains(.health)
+            let value = HealthReader.read(battery: shown)
             if value != health { health = value }
             checkAlerts(.heat) { $0.heat(value.thermal, now: $1) }
         case .keepAwake:
@@ -429,7 +431,7 @@ final class SystemMonitor {
         let memory = MemoryReader.read()
         let pages = MemoryReader.pages()
         // Proof of what the sandbox lets the app read: the heat level, the power sources, the battery registry entry.
-        let health = HealthReader.read()
+        let health = HealthReader.read(battery: true)
         let registry = MacBatteryReader.registryProperties()
         let installed = (registry?["BatteryInstalled"] as? Bool).map(String.init(describing:)) ?? "none"
         Self.log.notice("""

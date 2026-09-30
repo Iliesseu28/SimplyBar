@@ -113,8 +113,9 @@ struct HealthTests {
 
     /// This Mac, through the real APIs: a level always comes back, and a battery only with a charge in range.
     @Test func realReadingIsConsistent() {
-        let sample = HealthReader.read()
+        let sample = HealthReader.read(battery: true)
         #expect(ThermalLevel.allCases.contains(sample.thermal))
+        #expect(HealthReader.read(battery: false).battery == nil)
         if let battery = sample.battery {
             #expect((0...100).contains(battery.charge))
             #expect(battery.maximumCapacity.map { (1...100).contains($0) } ?? true)

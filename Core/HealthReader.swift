@@ -10,8 +10,10 @@ import IOKit.ps
 /// A Mac without a battery (Mac mini, iMac, Mac Studio) has no internal battery power source, yet may still publish an
 /// `AppleSmartBattery` entry with `BatteryInstalled` = No and zeros: without the power source there is no battery.
 nonisolated enum HealthReader {
-    static func read() -> HealthSample {
-        HealthSample(thermal: ThermalLevel(ProcessInfo.processInfo.thermalState), battery: MacBatteryReader.read())
+    /// `battery` false reads the heat level only (the power sources and the registry are left alone).
+    static func read(battery: Bool) -> HealthSample {
+        HealthSample(thermal: ThermalLevel(ProcessInfo.processInfo.thermalState),
+                     battery: battery ? MacBatteryReader.read() : nil)
     }
 }
 
