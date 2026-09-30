@@ -53,7 +53,7 @@ enum DiagnosticEval {
             DiagnosticEval.report("""
                 EVAL diagnostic lang=\(language.code) scenario=\(scenario.name) run=\(run) pass=\(check.passed) \
                 first=\(seconds(timing.firstText)) total=\(seconds(timing.total)) rejection=\(check.rejection ?? "-") \
-                language=\(check.detectedLanguage ?? "?") text=\(candidate.title) | \(candidate.explanation)
+                language=\(check.detectedLanguage ?? "?") text=\(candidate.explanation)
                 """)
             return check.passed
         } catch {
@@ -96,7 +96,7 @@ struct DiagnosticEvalTests {
         var drafts = 0
         let passed = await DiagnosticEval.diagnose(scenario, language: DiagnosticLanguage(code: "fr"), run: 1) { _ in drafts += 1 }
         #expect(passed)
-        #expect(drafts > 1, "the card should appear piece by piece")
+        #expect(drafts > 1, "the model should stream the card")
         #expect(await DiagnosticEval.ask(DiagnosticQuestions.all[0], language: "fr"))
     }
 

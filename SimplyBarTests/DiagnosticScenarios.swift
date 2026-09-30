@@ -111,9 +111,9 @@ struct DiagnosticCheck: Sendable {
         var check = DiagnosticCheck(decoded: true)
         check.verdictMatches = candidate.verdict == scenario.verdict
         check.actionsValid = candidate.actions.allSatisfy(allowed.contains)
-        check.unknownNumbers = DiagnosticGuard.unknownNumbers(in: candidate.title + " " + candidate.explanation, facts: facts)
+        check.unknownNumbers = DiagnosticGuard.unknownNumbers(in: candidate.explanation, facts: facts)
         check.numbersKnown = check.unknownNumbers.isEmpty
-        let detected = DiagnosticGuard.language(of: candidate.title + ". " + candidate.explanation)
+        let detected = DiagnosticGuard.language(of: candidate.explanation)
         check.detectedLanguage = detected
         check.languageMatches = detected == Locale(identifier: language.code).language.languageCode?.identifier
         switch DiagnosticGuard.validate(candidate, rules: rules, allowed: allowed, facts: facts) {

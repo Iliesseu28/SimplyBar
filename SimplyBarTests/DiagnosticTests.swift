@@ -170,15 +170,16 @@ struct DiagnosticGuardTests {
         DiagnosticGuard.validate(candidate, rules: rules, allowed: allowed, facts: facts, now: now)
     }
 
-    private func candidate(verdict: DiagnosticVerdict = .watch, title: String = "Souris presque vide",
+    private func candidate(verdict: DiagnosticVerdict = .watch,
                            explanation: String = "La batterie de ⟦Magic Mouse⟧ est à 8 %. Pensez à la recharger.",
                            actions: [DiagnosticAction] = [.openAlerts, .openAlerts]) -> DiagnosticCandidate {
-        DiagnosticCandidate(verdict: verdict, title: title, explanation: explanation, actions: actions)
+        DiagnosticCandidate(verdict: verdict, explanation: explanation, actions: actions)
     }
 
-    @Test func aGoodTextIsShownWithoutBracketsOrDoubles() throws {
+    @Test func aGoodTextIsShownUnderTheRulesTitleWithoutBracketsOrDoubles() throws {
         let report = try validate(candidate()).get()
         #expect(report.source == .ai)
+        #expect(report.title == rules.title)
         #expect(report.explanation == "La batterie de Magic Mouse est à 8 %. Pensez à la recharger.")
         #expect(report.actions == [.openAlerts])
         #expect(report.date == now)
@@ -191,7 +192,7 @@ struct DiagnosticGuardTests {
         #expect(validate(candidate(actions: [.openAppleIntelligenceSettings])) == .failure(.actionNotAllowed))
         #expect(validate(candidate(explanation: "La batterie est à 9 %.")) == .failure(.inventedNumber))
         #expect(validate(candidate(explanation: "La souris a 3 ans.")) == .failure(.inventedNumber))
-        #expect(validate(candidate(title: " ⟦⟧ ")) == .failure(.emptyText))
+        #expect(validate(candidate(explanation: " ⟦⟧ ")) == .failure(.emptyText))
         #expect(validate(candidate(explanation: String(repeating: "a", count: 401))) == .failure(.tooLong))
     }
 
@@ -209,6 +210,25 @@ struct DiagnosticGuardTests {
         #expect(DiagnosticGuard.unknownNumbers(in: "13 %", facts: facts) == [13])
     }
 
+    @Test func anAnswerCitingANumberItWasNotGivenIsSetAside() {
+        let snapshot = DiagnosticQuestions.snapshot
+        let reference = snapshot.facts + "\nCombien d'espace reste-t-il sur mes 2 disques ?"
+        #expect(DiagnosticGuard.rejection(ofAnswer: "Il reste 4,2 Go sur 245 Go sur ⟦Macintosh HD⟧.", reference: reference) == nil)
+        #expect(DiagnosticGuard.rejection(ofAnswer: "Vos 2 disques ont de la place.", reference: reference) == nil)
+        #expect(DiagnosticGuard.rejection(ofAnswer: "Il reste 12 Go.", reference: reference) == .inventedNumber)
+        #expect(DiagnosticGuard.rejection(ofAnswer: " ⟦⟧ ", reference: reference) == .emptyText)
+        #expect(DiagnosticGuard.maximumQuestionLength == 500)
+    }
+
+    @Test func aFailedTranslationLeavesTheCheckedAnswer() {
+        let reference = DiagnosticQuestions.snapshot.facts
+        let checked = "Your startup disk has 4.2 GB free out of 245 GB."
+        #expect(DiagnosticGuard.answerText(checked: checked, translation: nil, reference: reference) == checked)
+        #expect(DiagnosticGuard.answerText(checked: checked, translation: "Il reste 42 Go.", reference: reference) == checked)
+        let translation = "Il reste 4,2 Go sur 245 Go."
+        #expect(DiagnosticGuard.answerText(checked: checked, translation: translation, reference: reference) == translation)
+    }
+
     @Test func answerButtonsNeedAToolCallAndTheirCondition() throws {
         let full = try scenario("diskAlmostFull").snapshot
         #expect(DiagnosticGuard.answerActions([.openStorageSettings], toolCalls: [], snapshot: full).isEmpty)
@@ -223,6 +243,74 @@ struct DiagnosticGuardTests {
         #expect(DiagnosticGuard.isWritten("マウスのバッテリーが少なくなっています。", in: japanese))
         #expect(!DiagnosticGuard.isWritten("Your mouse battery is running low, charge it soon.", in: japanese))
         #expect(DiagnosticGuard.isWritten("Your mouse battery is running low.", in: DiagnosticLanguage(code: "en")))
+    }
+}
+
+// MARK: - Order of a diagnostic, card
+
+@MainActor
+struct DiagnosticFlowTests {
+    private let snapshot = DiagnosticScenarios.changed { $0.devices[0].battery = 8 }
+    private var findings: [DiagnosticFinding] { DiagnosticRules.findings(snapshot) }
+    private var rules: DiagnosticReport { DiagnosticRules.report(snapshot, findings: findings, now: now) }
+
+    private func written(_ explanation: String = "La batterie de la souris est à 8 %.") -> DiagnosticReport {
+        var report = rules
+        report.explanation = explanation
+        report.source = .ai
+        return report
+    }
+
+    @Test func theCacheIsReadBeforeAnythingOfTheModelIsMade() async {
+        var sessions = 0
+        let cache = DiagnosticCache(snapshot: snapshot, findings: findings, report: written())
+        let reused = await DiagnosticPipeline.run(snapshot: snapshot, cache: cache, locale: Locale(identifier: "fr"),
+                                                  now: now.addingTimeInterval(30)) { _, _ in
+            sessions += 1
+            return .failure(.other)
+        }
+        #expect(reused == .reused(written()))
+        #expect(sessions == 0)
+
+        let fresh = await DiagnosticPipeline.run(snapshot: snapshot, cache: nil, locale: Locale(identifier: "fr"), now: now) { _, rules in
+            sessions += 1
+            #expect(rules.verdict == .watch)
+            return .success(self.written("Autre texte."))
+        }
+        #expect(fresh == .written(written("Autre texte.")))
+        #expect(sessions == 1)
+    }
+
+    @Test func withoutTheModelOrOnAFailureTheRulesWrite() async {
+        let locale = Locale(identifier: "fr")
+        let rules = DiagnosticRules.report(snapshot, findings: findings, now: now, locale: locale)
+        #expect(await DiagnosticPipeline.run(snapshot: snapshot, cache: nil, locale: locale, now: now, write: nil) == .rules(rules, nil))
+        let busy = await DiagnosticPipeline.run(snapshot: snapshot, cache: nil, locale: locale, now: now) { _, _ in .failure(.rateLimited) }
+        #expect(busy == .rules(rules, .rateLimited))
+        let stopped = await DiagnosticPipeline.run(snapshot: snapshot, cache: nil, locale: locale, now: now) { _, _ in .failure(.cancelled) }
+        #expect(stopped == .cancelled)
+    }
+
+    @Test func theModelsTextNeverShowsBeforeItsChecks() {
+        var card = DiagnosticCardState()
+        #expect(card.display == .analyzing(nil))
+        card.finish(.rules(rules, nil))
+        #expect(card.display == .report(rules))
+        // While the model writes, only the rules' verdict: its drafts have no way into the card.
+        card.startWriting(verdict: rules.verdict)
+        #expect(card.display == .analyzing(.watch))
+        card.finish(.written(written()))
+        #expect(card.display == .report(written()))
+        #expect(card.failure == nil)
+    }
+
+    @Test func aCancellationLeavesTheCardAndItsNote() {
+        var card = DiagnosticCardState(report: rules, failure: .rateLimited)
+        card.startWriting(verdict: rules.verdict)
+        card.finish(.cancelled)
+        #expect(card.report == rules)
+        #expect(card.failure == .rateLimited)
+        #expect(card.display == .report(rules))
     }
 }
 
