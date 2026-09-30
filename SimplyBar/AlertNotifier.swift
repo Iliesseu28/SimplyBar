@@ -10,6 +10,8 @@ final class AlertNotifier {
     /// Nil until read, and in the screenshot renderer, which never activates it.
     private(set) var status: UNAuthorizationStatus?
 
+    /// Called when the permission changes, so the monitor stops or resumes the readings the alerts need.
+    @ObservationIgnored var onChange: (() -> Void)?
     @ObservationIgnored private var active = false
     @ObservationIgnored private let presenter = BannerPresenter()
 
@@ -24,7 +26,9 @@ final class AlertNotifier {
     func refreshStatus() async {
         guard active else { return }
         let status = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
-        if status != self.status { self.status = status }
+        guard status != self.status else { return }
+        self.status = status
+        onChange?()
     }
 
     /// Shows the macOS prompt the first time; afterwards it only reads the answer again.

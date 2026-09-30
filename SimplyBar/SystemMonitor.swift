@@ -71,6 +71,7 @@ final class SystemMonitor {
         keepAwake.onChange = { [weak self] in self?.keepAwakeChanged() }
         observeKeepAwakeRequests()
         observeThermalState()
+        notifier.onChange = { [weak self] in self?.reschedule() }
         notifier.activate()
         reschedule()
         logStartupNumbers()
@@ -102,7 +103,7 @@ final class SystemMonitor {
     // MARK: - Scheduling
 
     /// Seconds between two samples of a module, or nil when nothing needs it: neither the menu bar, nor an open
-    /// popup, nor a desktop widget, nor an alert.
+    /// popup, nor a desktop widget, nor an alert that may notify.
     func interval(for module: Module) -> TimeInterval? {
         // Keep Awake measures nothing.
         if module == .keepAwake { return nil }
@@ -119,7 +120,8 @@ final class SystemMonitor {
         case .keepAwake: 0 // Never used: returned above.
         }
         if open || settings.isShown(module) { return pace }
-        let watched = AlertKind.allCases.contains { settings.alerts.isOn($0) && $0.module == module }
+        // Without the permission an alert would measure for nothing: `notifier.onChange` reschedules once it comes.
+        let watched = notifier.canNotify && AlertKind.allCases.contains { settings.alerts.isOn($0) && $0.module == module }
         return widgetModules.contains(module) || watched ? Self.slowInterval : nil
     }
 
