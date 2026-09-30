@@ -56,4 +56,12 @@ nonisolated enum MemoryReader {
         guard let pages = pages() else { return nil }
         return MemoryMath.sample(pages: pages, physicalMemory: ProcessInfo.processInfo.physicalMemory)
     }
+
+    /// Bytes of swap in use (`sysctl vm.swapusage`), memory macOS had to write to the disk. Nil when unreadable.
+    static func swapUsed() -> Double? {
+        var usage = xsw_usage()
+        var size = MemoryLayout<xsw_usage>.size
+        guard sysctlbyname("vm.swapusage", &usage, &size, nil, 0) == 0 else { return nil }
+        return Double(usage.xsu_used)
+    }
 }

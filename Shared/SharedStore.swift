@@ -26,6 +26,9 @@ nonisolated struct WidgetPayload: Codable, Equatable, Sendable {
     var keepAwake: KeepAwakeStatus?
     /// Heat level and battery, written only while a Mac Health widget is on the desktop.
     var health: HealthSample?
+    /// The last diagnostic, written only while a Diagnostic widget is on the desktop; nil when the app is not running
+    /// (it removes it when it quits).
+    var diagnostic: DiagnosticStatus?
 }
 
 extension WidgetPayload {
@@ -47,6 +50,7 @@ extension WidgetPayload {
         bluetooth = try? values.decodeIfPresent([BluetoothDevice].self, forKey: .bluetooth)
         keepAwake = try? values.decodeIfPresent(KeepAwakeStatus.self, forKey: .keepAwake)
         health = try? values.decodeIfPresent(HealthSample.self, forKey: .health)
+        diagnostic = try? values.decodeIfPresent(DiagnosticStatus.self, forKey: .diagnostic)
     }
 }
 
@@ -62,7 +66,7 @@ nonisolated enum SharedStore {
     static let freshness: TimeInterval = 45 * 60
 
     /// A widget's kind is this prefix plus what it shows (`cpu`, `memory`, `gpu`, `network`, `disk`, `storage`,
-    /// `bluetooth`, `keepAwake`, `health`), so the app can tell from the widgets on the desktop which numbers to keep
+    /// `bluetooth`, `keepAwake`, `health`, `diagnostic`), so the app can tell from the widgets on the desktop which numbers to keep
     /// up to date.
     static let widgetKindPrefix = "fr.simplibot.simplybar."
     static let storageWidgetKind = widgetKindPrefix + "storage"
@@ -70,13 +74,17 @@ nonisolated enum SharedStore {
     static let bluetoothWidgetKind = widgetKindPrefix + "bluetooth"
     static let keepAwakeWidgetKind = widgetKindPrefix + "keepAwake"
     static let healthWidgetKind = widgetKindPrefix + "health"
+    static let diagnosticWidgetKind = widgetKindPrefix + "diagnostic"
 
     /// Darwin notification the Keep Awake widget posts after writing its request. Under the App Group's name, the
     /// prefix the sandbox lets the app and its extension share.
     static let keepAwakeNotification = appGroup + ".keepAwake"
+    /// Posted by the Diagnostic widget after writing its request.
+    static let diagnosticNotification = appGroup + ".diagnostic"
 
     private static let fileName = "widget-payload.json"
     private static let requestFileName = "keep-awake-request.json"
+    private static let diagnosticRequestFileName = "diagnostic-request.json"
 
     static var fileURL: URL? { url(of: fileName) }
 
@@ -134,6 +142,36 @@ nonisolated enum SharedStore {
     static func postKeepAwakeRequest() {
         CFNotificationCenterPostNotification(
             CFNotificationCenterGetDarwinNotifyCenter(), CFNotificationName(keepAwakeNotification as CFString), nil, nil, true
+        )
+    }
+
+    // MARK: - Diagnostic requests
+
+    static func encode(_ request: DiagnosticRequest) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .secondsSince1970
+        return try encoder.encode(request)
+    }
+
+    static func decodeDiagnosticRequest(_ data: Data) throws -> DiagnosticRequest {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        return try decoder.decode(DiagnosticRequest.self, from: data)
+    }
+
+    /// Written by the widget's Analyze button, then announced with `postDiagnosticRequest()`.
+    static func saveDiagnosticRequest(_ request: DiagnosticRequest) throws {
+        try write(encode(request), to: diagnosticRequestFileName)
+    }
+
+    static func loadDiagnosticRequest() -> DiagnosticRequest? {
+        guard let url = url(of: diagnosticRequestFileName), let data = try? Data(contentsOf: url) else { return nil }
+        return try? decodeDiagnosticRequest(data)
+    }
+
+    static func postDiagnosticRequest() {
+        CFNotificationCenterPostNotification(
+            CFNotificationCenterGetDarwinNotifyCenter(), CFNotificationName(diagnosticNotification as CFString), nil, nil, true
         )
     }
 
