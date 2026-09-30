@@ -19387,304 +19387,6 @@
         }
       }
     },
-    "Hot: macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear.": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ساخن: يبطئ macOS جهاز Mac لتبريده. أغلق التطبيقات الثقيلة واترك فتحات التهوية مكشوفة."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "গরম: ঠান্ডা করতে macOS Mac-কে ধীর করে দেয়। ভারী অ্যাপ বন্ধ করুন এবং বাতাস চলাচলের পথ খোলা রাখুন।"
-          }
-        },
-        "ca": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Calent: el macOS alenteix el Mac per refredar-lo. Tanca les apps pesades i deixa lliures les sortides d’aire."
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Horký: macOS Mac zpomaluje, aby ho ochladil. Ukončete náročné aplikace a nezakrývejte větrací otvory."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Varm: macOS gør Mac'en langsommere for at køle den ned. Afslut tunge apps, og hold ventilationsåbningerne fri."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heiß: macOS bremst den Mac, um ihn zu kühlen. Beende rechenintensive Apps und halte die Lüftungsöffnungen frei."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ζεστό: Το macOS επιβραδύνει το Mac για να το δροσίσει. Κλείστε τις απαιτητικές εφαρμογές και αφήστε ελεύθερους τους αεραγωγούς."
-          }
-        },
-        "en-AU": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hot: macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
-          }
-        },
-        "en-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hot: macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hot: macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caliente: macOS ralentiza el Mac para enfriarlo. Cierra las apps pesadas y deja libres las rejillas de ventilación."
-          }
-        },
-        "es-419": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caliente: macOS ralentiza la Mac para enfriarla. Cierra las apps pesadas y deja libres las rejillas de ventilación."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kuuma: macOS hidastaa Macia jäähdyttääkseen sen. Sulje raskaat apit ja pidä tuuletusaukot vapaina."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chaud : macOS ralentit le Mac pour le refroidir. Quittez les apps gourmandes et dégagez les aérations."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chaud : macOS ralentit le Mac pour le refroidir. Quittez les apps gourmandes et dégagez les aérations."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ગરમ: ઠંડું કરવા macOS Macને ધીમું કરે છે. ભારે ઍપ્સ બંધ કરો અને હવાના છિદ્રો ખુલ્લા રાખો."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "חם: macOS מאט את ה-Mac כדי לקרר אותו. סגרו אפליקציות כבדות והשאירו את פתחי האוורור פנויים."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "गर्म: macOS ठंडा करने के लिए Mac को धीमा कर देता है। भारी ऐप्स बंद करें और हवा के छेद खुले रखें।"
-          }
-        },
-        "hr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vruće: macOS usporava Mac kako bi ga ohladio. Zatvorite zahtjevne aplikacije i ostavite otvore za ventilaciju slobodnima."
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Forró: a macOS lelassítja a Macet, hogy lehűtse. Lépj ki a nagy terhelésű appokból, és hagyd szabadon a szellőzőnyílásokat."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Panas: macOS memperlambat Mac untuk mendinginkannya. Tutup app yang berat dan jaga ventilasi tetap terbuka."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caldo: macOS rallenta il Mac per raffreddarlo. Chiudi le app pesanti e lascia libere le prese d'aria."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "高温：macOSはMacを冷やすために動作を遅くしています。負荷の高いアプリを終了し、通気口をふさがないでください。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಬಿಸಿ: ತಂಪಾಗಿಸಲು macOS Mac ಅನ್ನು ನಿಧಾನಗೊಳಿಸುತ್ತದೆ. ಭಾರೀ ಆ್ಯಪ್‌ಗಳನ್ನು ಮುಚ್ಚಿ ಮತ್ತು ಗಾಳಿ ರಂಧ್ರಗಳನ್ನು ತೆರೆದಿಡಿ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "뜨거움: macOS가 Mac을 식히려고 속도를 늦춥니다. 무거운 앱을 종료하고 통풍구를 막지 마십시오."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ചൂട്: തണുപ്പിക്കാൻ macOS Mac-ന്റെ വേഗത കുറയ്ക്കുന്നു. ഭാരമേറിയ ആപ്പുകൾ അടയ്ക്കുക, വായുദ്വാരങ്ങൾ തുറന്നിടുക."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "गरम: थंड करण्यासाठी macOS Mac चा वेग कमी करते. जड ॲप्स बंद करा आणि हवेची छिद्रे मोकळी ठेवा."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Panas: macOS memperlahankan Mac untuk menyejukkannya. Tutup app berat dan pastikan lubang udara tidak terhalang."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Varm: macOS gjør Macen tregere for å kjøle den ned. Avslutt tunge apper, og hold luftehullene frie."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heet: macOS vertraagt de Mac om hem af te koelen. Stop zware apps en houd de ventilatieopeningen vrij."
-          }
-        },
-        "or": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ଗରମ: ଥଣ୍ଡା କରିବାକୁ macOS Macକୁ ମନ୍ଥର କରେ। ଭାରୀ ଆପ୍ସ ବନ୍ଦ କରନ୍ତୁ ଏବଂ ପବନ ଛିଦ୍ର ଖୋଲା ରଖନ୍ତୁ।"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਗਰਮ: ਠੰਢਾ ਕਰਨ ਲਈ macOS Mac ਨੂੰ ਹੌਲੀ ਕਰ ਦਿੰਦਾ ਹੈ। ਭਾਰੀ ਐਪਾਂ ਬੰਦ ਕਰੋ ਅਤੇ ਹਵਾ ਦੇ ਸੁਰਾਖ਼ ਖੁੱਲ੍ਹੇ ਰੱਖੋ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gorący: macOS spowalnia Maca, aby go schłodzić. Zamknij wymagające aplikacje i nie zasłaniaj otworów wentylacyjnych."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quente: o macOS deixa o Mac mais lento para resfriá-lo. Feche os apps pesados e deixe as saídas de ar livres."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quente: o macOS abranda o Mac para o arrefecer. Feche as apps pesadas e mantenha as saídas de ar livres."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fierbinte: macOS încetinește Mac-ul ca să-l răcească. Închide aplicațiile solicitante și nu acoperi grilele de aerisire."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Горячий: macOS замедляет Mac, чтобы охладить его. Завершите ресурсоёмкие приложения и не загораживайте вентиляционные отверстия."
-          }
-        },
-        "sk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Horúci: macOS Mac spomaľuje, aby ho ochladil. Ukončite náročné aplikácie a nezakrývajte vetracie otvory."
-          }
-        },
-        "sl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vroče: macOS upočasni Mac, da ga ohladi. Zaprite zahtevne aplikacije in pustite prezračevalne reže proste."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Het: macOS gör Macen långsammare för att kyla den. Avsluta tunga appar och håll ventilationsöppningarna fria."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "சூடு: குளிர்விக்க macOS Mac ஐ மெதுவாக்குகிறது. கனமான ஆப்களை மூடி, காற்றுத் துளைகளைத் திறந்து வைக்கவும்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "వేడి: చల్లబరచడానికి macOS Mac ని నెమ్మదిస్తుంది. భారీ యాప్‌లను మూసివేసి, గాలి రంధ్రాలను తెరిచి ఉంచండి."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ร้อน: macOS จะทำให้ Mac ช้าลงเพื่อลดความร้อน ให้ปิดแอปที่ใช้ทรัพยากรมากและอย่าปิดกั้นช่องระบายอากาศ"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcak: macOS, Mac'i soğutmak için yavaşlatır. Ağır uygulamalardan çıkın ve havalandırma deliklerini açık tutun."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Гарячий: macOS сповільнює Mac, щоб охолодити його. Закрийте ресурсомісткі програми й не затуляйте вентиляційні отвори."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "گرم: macOS ٹھنڈا کرنے کے لیے Mac کو سست کر دیتا ہے۔ بھاری ایپس بند کریں اور ہوا کے سوراخ کھلے رکھیں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nóng: macOS làm chậm máy Mac để hạ nhiệt. Hãy thoát các ứng dụng nặng và để thông thoáng các khe tản nhiệt."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "热：macOS 会降低 Mac 的速度来降温。请退出占用资源多的 App，并保持通风口畅通。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "熱：macOS 會降低 Mac 的速度來降溫。請結束耗用大量資源的 App，並保持通風口暢通。"
-          }
-        }
-      }
-    },
     "IP Address": {
       "localizations": {
         "ar": {
@@ -34886,6 +34588,304 @@
         }
       }
     },
+    "Save your work, quit heavy apps and let the Mac cool down.": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "احفظ عملك، وأغلق التطبيقات الثقيلة، واترك جهاز Mac ليبرد."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার কাজ সংরক্ষণ করুন, ভারী অ্যাপ বন্ধ করুন এবং Mac-কে ঠান্ডা হতে দিন।"
+          }
+        },
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desa la feina, tanca les apps pesades i deixa que el Mac es refredi."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uložte si práci, ukončete náročné aplikace a nechte Mac vychladnout."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gem dit arbejde, afslut tunge apps, og lad Mac'en køle af."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichere deine Arbeit, beende rechenintensive Apps und lass den Mac abkühlen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αποθηκεύστε την εργασία σας, κλείστε τις απαιτητικές εφαρμογές και αφήστε το Mac να κρυώσει."
+          }
+        },
+        "en-AU": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save your work, quit heavy apps and let the Mac cool down."
+          }
+        },
+        "en-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save your work, quit heavy apps and let the Mac cool down."
+          }
+        },
+        "en-GB": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save your work, quit heavy apps and let the Mac cool down."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarda tu trabajo, cierra las apps pesadas y deja que el Mac se enfríe."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarda tu trabajo, cierra las apps pesadas y deja que la Mac se enfríe."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tallenna työsi, sulje raskaat apit ja anna Macin jäähtyä."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrez votre travail, quittez les apps gourmandes et laissez le Mac refroidir."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrez votre travail, quittez les apps gourmandes et laissez le Mac refroidir."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારું કામ સેવ કરો, ભારે ઍપ્સ બંધ કરો અને Macને ઠંડું થવા દો."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שמרו את העבודה, סגרו אפליקציות כבדות ותנו ל-Mac להתקרר."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अपना काम सहेजें, भारी ऐप्स बंद करें और Mac को ठंडा होने दें।"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spremite rad, zatvorite zahtjevne aplikacije i pustite da se Mac ohladi."
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentsd a munkádat, lépj ki a nagy terhelésű appokból, és hagyd lehűlni a Macet."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simpan pekerjaan Anda, tutup app yang berat, dan biarkan Mac mendingin."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva il lavoro, chiudi le app pesanti e lascia raffreddare il Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作業内容を保存し、負荷の高いアプリを終了して、Macを冷ましてください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಕೆಲಸವನ್ನು ಉಳಿಸಿ, ಭಾರೀ ಆ್ಯಪ್‌ಗಳನ್ನು ಮುಚ್ಚಿ ಮತ್ತು Mac ತಣ್ಣಗಾಗಲು ಬಿಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "작업을 저장하고 무거운 앱을 종료한 다음 Mac을 식히십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ ജോലി സേവ് ചെയ്യുക, ഭാരമേറിയ ആപ്പുകൾ അടയ്ക്കുക, Mac തണുക്കാൻ അനുവദിക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमचे काम सेव्ह करा, जड ॲप्स बंद करा आणि Mac ला थंड होऊ द्या."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simpan kerja anda, tutup app berat dan biarkan Mac sejuk."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagre arbeidet, avslutt tunge apper, og la Macen kjøle seg ned."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewaar je werk, stop zware apps en laat de Mac afkoelen."
+          }
+        },
+        "or": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ଆପଣଙ୍କ କାମ ସେଭ କରନ୍ତୁ, ଭାରୀ ଆପ୍ସ ବନ୍ଦ କରନ୍ତୁ ଏବଂ Macକୁ ଥଣ୍ଡା ହେବାକୁ ଦିଅନ୍ତୁ।"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਪਣਾ ਕੰਮ ਸੇਵ ਕਰੋ, ਭਾਰੀ ਐਪਾਂ ਬੰਦ ਕਰੋ ਅਤੇ Mac ਨੂੰ ਠੰਢਾ ਹੋਣ ਦਿਓ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapisz pracę, zamknij wymagające aplikacje i pozwól Macowi ostygnąć."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salve seu trabalho, feche os apps pesados e deixe o Mac esfriar."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guarde o seu trabalho, feche as apps pesadas e deixe o Mac arrefecer."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvează-ți lucrul, închide aplicațiile solicitante și lasă Mac-ul să se răcească."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохраните работу, завершите ресурсоёмкие приложения и дайте Mac остыть."
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uložte si prácu, ukončite náročné aplikácie a nechajte Mac vychladnúť."
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shranite delo, zaprite zahtevne aplikacije in pustite, da se Mac ohladi."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spara ditt arbete, avsluta tunga appar och låt Macen svalna."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் வேலையைச் சேமித்து, கனமான ஆப்களை மூடி, Mac ஐ குளிர விடவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ పనిని సేవ్ చేసి, భారీ యాప్‌లను మూసివేసి, Mac ని చల్లబడనివ్వండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บันทึกงานของคุณ ปิดแอปที่ใช้ทรัพยากรมาก และปล่อยให้ Mac เย็นลง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çalışmanızı kaydedin, ağır uygulamalardan çıkın ve Mac'in soğumasını bekleyin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Збережіть роботу, закрийте ресурсомісткі програми й дайте Mac охолонути."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنا کام محفوظ کریں، بھاری ایپس بند کریں اور Mac کو ٹھنڈا ہونے دیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy lưu công việc, thoát các ứng dụng nặng và để máy Mac nguội đi."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请存储你的工作，退出占用资源多的 App，让 Mac 降温。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請儲存你的工作，結束耗用大量資源的 App，讓 Mac 降溫。"
+          }
+        }
+      }
+    },
     "Service recommended": {
       "localizations": {
         "ar": {
@@ -47403,304 +47403,6 @@
         }
       }
     },
-    "Very hot: save your work, quit heavy apps and let the Mac cool down.": {
-      "localizations": {
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ساخن جدًا: احفظ عملك، وأغلق التطبيقات الثقيلة، واترك جهاز Mac ليبرد."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "খুব গরম: আপনার কাজ সংরক্ষণ করুন, ভারী অ্যাপ বন্ধ করুন এবং Mac-কে ঠান্ডা হতে দিন।"
-          }
-        },
-        "ca": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Molt calent: desa la feina, tanca les apps pesades i deixa que el Mac es refredi."
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Velmi horký: uložte si práci, ukončete náročné aplikace a nechte Mac vychladnout."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Meget varm: Gem dit arbejde, afslut tunge apps, og lad Mac'en køle af."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sehr heiß: Sichere deine Arbeit, beende rechenintensive Apps und lass den Mac abkühlen."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Πολύ ζεστό: Αποθηκεύστε την εργασία σας, κλείστε τις απαιτητικές εφαρμογές και αφήστε το Mac να κρυώσει."
-          }
-        },
-        "en-AU": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Very hot: save your work, quit heavy apps and let the Mac cool down."
-          }
-        },
-        "en-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Very hot: save your work, quit heavy apps and let the Mac cool down."
-          }
-        },
-        "en-GB": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Very hot: save your work, quit heavy apps and let the Mac cool down."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Muy caliente: guarda tu trabajo, cierra las apps pesadas y deja que el Mac se enfríe."
-          }
-        },
-        "es-419": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Muy caliente: guarda tu trabajo, cierra las apps pesadas y deja que la Mac se enfríe."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hyvin kuuma: tallenna työsi, sulje raskaat apit ja anna Macin jäähtyä."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Très chaud : enregistrez votre travail, quittez les apps gourmandes et laissez le Mac refroidir."
-          }
-        },
-        "fr-CA": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Très chaud : enregistrez votre travail, quittez les apps gourmandes et laissez le Mac refroidir."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ખૂબ ગરમ: તમારું કામ સેવ કરો, ભારે ઍપ્સ બંધ કરો અને Macને ઠંડું થવા દો."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "חם מאוד: שמרו את העבודה, סגרו אפליקציות כבדות ותנו ל-Mac להתקרר."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "बहुत गर्म: अपना काम सहेजें, भारी ऐप्स बंद करें और Mac को ठंडा होने दें।"
-          }
-        },
-        "hr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vrlo vruće: spremite rad, zatvorite zahtjevne aplikacije i pustite da se Mac ohladi."
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nagyon forró: mentsd a munkádat, lépj ki a nagy terhelésű appokból, és hagyd lehűlni a Macet."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sangat panas: simpan pekerjaan Anda, tutup app yang berat, dan biarkan Mac mendingin."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Molto caldo: salva il lavoro, chiudi le app pesanti e lascia raffreddare il Mac."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "非常に高温：作業内容を保存し、負荷の高いアプリを終了して、Macを冷ましてください。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ತುಂಬಾ ಬಿಸಿ: ನಿಮ್ಮ ಕೆಲಸವನ್ನು ಉಳಿಸಿ, ಭಾರೀ ಆ್ಯಪ್‌ಗಳನ್ನು ಮುಚ್ಚಿ ಮತ್ತು Mac ತಣ್ಣಗಾಗಲು ಬಿಡಿ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "매우 뜨거움: 작업을 저장하고 무거운 앱을 종료한 다음 Mac을 식히십시오."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "വളരെ ചൂട്: നിങ്ങളുടെ ജോലി സേവ് ചെയ്യുക, ഭാരമേറിയ ആപ്പുകൾ അടയ്ക്കുക, Mac തണുക്കാൻ അനുവദിക്കുക."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "खूप गरम: तुमचे काम सेव्ह करा, जड ॲप्स बंद करा आणि Mac ला थंड होऊ द्या."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sangat panas: simpan kerja anda, tutup app berat dan biarkan Mac sejuk."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Veldig varm: Lagre arbeidet, avslutt tunge apper, og la Macen kjøle seg ned."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zeer heet: bewaar je werk, stop zware apps en laat de Mac afkoelen."
-          }
-        },
-        "or": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ବହୁତ ଗରମ: ଆପଣଙ୍କ କାମ ସେଭ କରନ୍ତୁ, ଭାରୀ ଆପ୍ସ ବନ୍ଦ କରନ୍ତୁ ଏବଂ Macକୁ ଥଣ୍ଡା ହେବାକୁ ଦିଅନ୍ତୁ।"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਬਹੁਤ ਗਰਮ: ਆਪਣਾ ਕੰਮ ਸੇਵ ਕਰੋ, ਭਾਰੀ ਐਪਾਂ ਬੰਦ ਕਰੋ ਅਤੇ Mac ਨੂੰ ਠੰਢਾ ਹੋਣ ਦਿਓ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bardzo gorący: zapisz pracę, zamknij wymagające aplikacje i pozwól Macowi ostygnąć."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Muito quente: salve seu trabalho, feche os apps pesados e deixe o Mac esfriar."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Muito quente: guarde o seu trabalho, feche as apps pesadas e deixe o Mac arrefecer."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foarte fierbinte: salvează-ți lucrul, închide aplicațiile solicitante și lasă Mac-ul să se răcească."
-          }
-        },
-        "ru": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Очень горячий: сохраните работу, завершите ресурсоёмкие приложения и дайте Mac остыть."
-          }
-        },
-        "sk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Veľmi horúci: uložte si prácu, ukončite náročné aplikácie a nechajte Mac vychladnúť."
-          }
-        },
-        "sl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zelo vroče: shranite delo, zaprite zahtevne aplikacije in pustite, da se Mac ohladi."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mycket het: spara ditt arbete, avsluta tunga appar och låt Macen svalna."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "மிகவும் சூடு: உங்கள் வேலையைச் சேமித்து, கனமான ஆப்களை மூடி, Mac ஐ குளிர விடவும்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "చాలా వేడి: మీ పనిని సేవ్ చేసి, భారీ యాప్‌లను మూసివేసి, Mac ని చల్లబడనివ్వండి."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ร้อนมาก: บันทึกงานของคุณ ปิดแอปที่ใช้ทรัพยากรมาก และปล่อยให้ Mac เย็นลง"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çok sıcak: Çalışmanızı kaydedin, ağır uygulamalardan çıkın ve Mac'in soğumasını bekleyin."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Дуже гарячий: збережіть роботу, закрийте ресурсомісткі програми й дайте Mac охолонути."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بہت گرم: اپنا کام محفوظ کریں، بھاری ایپس بند کریں اور Mac کو ٹھنڈا ہونے دیں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rất nóng: hãy lưu công việc, thoát các ứng dụng nặng và để máy Mac nguội đi."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "非常热：请存储你的工作，退出占用资源多的 App，让 Mac 降温。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "非常熱：請儲存你的工作，結束耗用大量資源的 App，讓 Mac 降溫。"
-          }
-        }
-      }
-    },
     "Warm": {
       "localizations": {
         "ar": {
@@ -50379,6 +50081,304 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的 Mac 非常熱"
+          }
+        }
+      }
+    },
+    "macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear.": {
+      "localizations": {
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يبطئ macOS جهاز Mac لتبريده. أغلق التطبيقات الثقيلة واترك فتحات التهوية مكشوفة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ঠান্ডা করতে macOS Mac-কে ধীর করে দেয়। ভারী অ্যাপ বন্ধ করুন এবং বাতাস চলাচলের পথ খোলা রাখুন।"
+          }
+        },
+        "ca": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El macOS alenteix el Mac per refredar-lo. Tanca les apps pesades i deixa lliures les sortides d’aire."
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS Mac zpomaluje, aby ho ochladil. Ukončete náročné aplikace a nezakrývejte větrací otvory."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS gør Mac'en langsommere for at køle den ned. Afslut tunge apps, og hold ventilationsåbningerne fri."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS bremst den Mac, um ihn zu kühlen. Beende rechenintensive Apps und halte die Lüftungsöffnungen frei."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το macOS επιβραδύνει το Mac για να το δροσίσει. Κλείστε τις απαιτητικές εφαρμογές και αφήστε ελεύθερους τους αεραγωγούς."
+          }
+        },
+        "en-AU": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
+          }
+        },
+        "en-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
+          }
+        },
+        "en-GB": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ralentiza el Mac para enfriarlo. Cierra las apps pesadas y deja libres las rejillas de ventilación."
+          }
+        },
+        "es-419": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ralentiza la Mac para enfriarla. Cierra las apps pesadas y deja libres las rejillas de ventilación."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS hidastaa Macia jäähdyttääkseen sen. Sulje raskaat apit ja pidä tuuletusaukot vapaina."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ralentit le Mac pour le refroidir. Quittez les apps gourmandes et dégagez les aérations."
+          }
+        },
+        "fr-CA": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ralentit le Mac pour le refroidir. Quittez les apps gourmandes et dégagez les aérations."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ઠંડું કરવા macOS Macને ધીમું કરે છે. ભારે ઍપ્સ બંધ કરો અને હવાના છિદ્રો ખુલ્લા રાખો."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS מאט את ה-Mac כדי לקרר אותו. סגרו אפליקציות כבדות והשאירו את פתחי האוורור פנויים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ठंडा करने के लिए Mac को धीमा कर देता है। भारी ऐप्स बंद करें और हवा के छेद खुले रखें।"
+          }
+        },
+        "hr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS usporava Mac kako bi ga ohladio. Zatvorite zahtjevne aplikacije i ostavite otvore za ventilaciju slobodnima."
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A macOS lelassítja a Macet, hogy lehűtse. Lépj ki a nagy terhelésű appokból, és hagyd szabadon a szellőzőnyílásokat."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS memperlambat Mac untuk mendinginkannya. Tutup app yang berat dan jaga ventilasi tetap terbuka."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS rallenta il Mac per raffreddarlo. Chiudi le app pesanti e lascia libere le prese d'aria."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOSはMacを冷やすために動作を遅くしています。負荷の高いアプリを終了し、通気口をふさがないでください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ತಂಪಾಗಿಸಲು macOS Mac ಅನ್ನು ನಿಧಾನಗೊಳಿಸುತ್ತದೆ. ಭಾರೀ ಆ್ಯಪ್‌ಗಳನ್ನು ಮುಚ್ಚಿ ಮತ್ತು ಗಾಳಿ ರಂಧ್ರಗಳನ್ನು ತೆರೆದಿಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS가 Mac을 식히려고 속도를 늦춥니다. 무거운 앱을 종료하고 통풍구를 막지 마십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "തണുപ്പിക്കാൻ macOS Mac-ന്റെ വേഗത കുറയ്ക്കുന്നു. ഭാരമേറിയ ആപ്പുകൾ അടയ്ക്കുക, വായുദ്വാരങ്ങൾ തുറന്നിടുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "थंड करण्यासाठी macOS Mac चा वेग कमी करते. जड ॲप्स बंद करा आणि हवेची छिद्रे मोकळी ठेवा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS memperlahankan Mac untuk menyejukkannya. Tutup app berat dan pastikan lubang udara tidak terhalang."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS gjør Macen tregere for å kjøle den ned. Avslutt tunge apper, og hold luftehullene frie."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS vertraagt de Mac om hem af te koelen. Stop zware apps en houd de ventilatieopeningen vrij."
+          }
+        },
+        "or": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ଥଣ୍ଡା କରିବାକୁ macOS Macକୁ ମନ୍ଥର କରେ। ଭାରୀ ଆପ୍ସ ବନ୍ଦ କରନ୍ତୁ ଏବଂ ପବନ ଛିଦ୍ର ଖୋଲା ରଖନ୍ତୁ।"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਠੰਢਾ ਕਰਨ ਲਈ macOS Mac ਨੂੰ ਹੌਲੀ ਕਰ ਦਿੰਦਾ ਹੈ। ਭਾਰੀ ਐਪਾਂ ਬੰਦ ਕਰੋ ਅਤੇ ਹਵਾ ਦੇ ਸੁਰਾਖ਼ ਖੁੱਲ੍ਹੇ ਰੱਖੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS spowalnia Maca, aby go schłodzić. Zamknij wymagające aplikacje i nie zasłaniaj otworów wentylacyjnych."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O macOS deixa o Mac mais lento para resfriá-lo. Feche os apps pesados e deixe as saídas de ar livres."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O macOS abranda o Mac para o arrefecer. Feche as apps pesadas e mantenha as saídas de ar livres."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS încetinește Mac-ul ca să-l răcească. Închide aplicațiile solicitante și nu acoperi grilele de aerisire."
+          }
+        },
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS замедляет Mac, чтобы охладить его. Завершите ресурсоёмкие приложения и не загораживайте вентиляционные отверстия."
+          }
+        },
+        "sk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS Mac spomaľuje, aby ho ochladil. Ukončite náročné aplikácie a nezakrývajte vetracie otvory."
+          }
+        },
+        "sl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS upočasni Mac, da ga ohladi. Zaprite zahtevne aplikacije in pustite prezračevalne reže proste."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS gör Macen långsammare för att kyla den. Avsluta tunga appar och håll ventilationsöppningarna fria."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "குளிர்விக்க macOS Mac ஐ மெதுவாக்குகிறது. கனமான ஆப்களை மூடி, காற்றுத் துளைகளைத் திறந்து வைக்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "చల్లబరచడానికి macOS Mac ని నెమ్మదిస్తుంది. భారీ యాప్‌లను మూసివేసి, గాలి రంధ్రాలను తెరిచి ఉంచండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS จะทำให้ Mac ช้าลงเพื่อลดความร้อน ให้ปิดแอปที่ใช้ทรัพยากรมากและอย่าปิดกั้นช่องระบายอากาศ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS, Mac'i soğutmak için yavaşlatır. Ağır uygulamalardan çıkın ve havalandırma deliklerini açık tutun."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS сповільнює Mac, щоб охолодити його. Закрийте ресурсомісткі програми й не затуляйте вентиляційні отвори."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS ٹھنڈا کرنے کے لیے Mac کو سست کر دیتا ہے۔ بھاری ایپس بند کریں اور ہوا کے سوراخ کھلے رکھیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS làm chậm máy Mac để hạ nhiệt. Hãy thoát các ứng dụng nặng và để thông thoáng các khe tản nhiệt."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 会降低 Mac 的速度来降温。请退出占用资源多的 App，并保持通风口畅通。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 會降低 Mac 的速度來降溫。請結束耗用大量資源的 App，並保持通風口暢通。"
           }
         }
       }

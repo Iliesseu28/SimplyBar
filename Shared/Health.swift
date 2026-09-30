@@ -32,8 +32,8 @@ nonisolated enum ThermalLevel: String, CaseIterable, Codable, Sendable {
     var advice: LocalizedStringResource? {
         switch self {
         case .nominal, .fair: nil
-        case .serious: "Hot: macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
-        case .critical: "Very hot: save your work, quit heavy apps and let the Mac cool down."
+        case .serious: "macOS slows the Mac down to cool it. Quit heavy apps and keep the vents clear."
+        case .critical: "Save your work, quit heavy apps and let the Mac cool down."
         }
     }
 }
