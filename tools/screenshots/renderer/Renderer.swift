@@ -7,8 +7,10 @@ import WidgetKit
 // It draws the real views (menu bar items, popups, widgets) with demo numbers into transparent PNGs; `compose.py`
 // then lays them out on a desktop.
 //
-// Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl> [--video]
-// With --video it draws the assets of the promo video instead (VideoAssets.swift).
+// Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl> [--video | --front]
+// With --video it draws the assets of the promo video instead (VideoAssets.swift). With --front, launched by `open`
+// as for --video, it draws the same images from the active app, so the Keep Awake switches take their colour (an
+// inactive app draws them grey), plus the Keep Awake settings tab.
 
 /// Stands in for the one of `SimplyBarApp.swift`, which this build leaves out (it holds the app's `@main`).
 @MainActor
@@ -34,7 +36,8 @@ struct ScreenshotRenderer {
             fail("usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl>")
         }
         let output = URL(fileURLWithPath: arguments[1], isDirectory: true)
-        if arguments.contains("--video") {
+        let front = arguments.contains("--front")
+        if arguments.contains("--video") || front {
             // Launched by `open`, which leaves no terminal: messages go to a file of the output folder.
             try? FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
             let log = output.appendingPathComponent("render.log").path
@@ -58,6 +61,11 @@ struct ScreenshotRenderer {
         let renderer = AssetRenderer(output: output, scale: scale, rtl: rtl, demo: DemoData(names: names))
         if arguments.contains("--video") {
             VideoAssetRenderer(renderer: renderer).renderAll(settingsOnly: arguments.contains("--settings-only"))
+        } else if front {
+            let settings = SettingsCapture(renderer: renderer, settings: AppServices.settings, recordSize: { _, _ in })
+            settings.bringToFront()
+            renderer.renderAll()
+            settings.captureKeepAwake()
         } else {
             renderer.renderAll()
         }
@@ -101,6 +109,11 @@ final class AssetRenderer {
             let model = StatusItemModels.model(for: module, settings: settings, monitor: labelMonitor)
             save(StatusItemView(model: model), name: "menubar-\(module.rawValue)", mirrored: false)
         }
+        // Keep Awake on fills its cup.
+        demo.startKeepAwake(on: labelMonitor)
+        save(StatusItemView(model: StatusItemModels.model(for: .keepAwake, settings: settings, monitor: labelMonitor)),
+             name: "menubar-keepAwake-on", mirrored: false)
+        labelMonitor.keepAwake.isActive = false
         save(SystemTray(date: DemoData.date), name: "menubar-system")
 
         // Popups, each with its own monitor so a sample taken when it appears cannot leak into another one.
@@ -120,6 +133,12 @@ final class AssetRenderer {
         save(WidgetFrame(size: .small) { MemoryWidgetView(payload: payload) }, name: "widget-memory")
         save(WidgetFrame(size: .small) { NetworkWidgetView(payload: payload) }, name: "widget-network")
         save(WidgetFrame(size: .small) { DiskWidgetView(payload: payload) }, name: "widget-disk")
+        save(WidgetFrame(size: .small) { GPUWidgetView(payload: payload) }, name: "widget-gpu")
+        // Bluetooth picks its layout from the widget family too: with three devices, both sizes show one column.
+        save(WidgetFrame(size: .small) { BluetoothWidgetView(payload: payload) }, name: "widget-bluetooth-small")
+        save(WidgetFrame(size: .medium) { BluetoothWidgetView(payload: payload) }, name: "widget-bluetooth-medium")
+        let keepAwake = KeepAwakeWidgetState.resolve(payload: payload, request: nil, now: DemoData.date)
+        save(WidgetFrame(size: .small) { KeepAwakeWidgetView(state: keepAwake) }, name: "widget-keepAwake")
         // The Storage widget picks its view from the widget family, which only WidgetKit can set: its three
         // sizes are drawn with the views it picks (small: the chosen disk; medium: 2 disks; large: 5, detailed).
         // The small one shows Photos, a short name in every language (a long one is cut next to the percentage).
@@ -141,6 +160,8 @@ final class AssetRenderer {
             let monitor = SystemMonitor(settings: settings)
             demo.apply(to: monitor)
             if module == .bluetooth { monitor.bluetoothLoaded = false }
+            if module == .keepAwake { demo.startKeepAwake(on: monitor) }
+            defer { monitor.keepAwake.isActive = false }
             let view: AnyView = switch module {
             case .cpu: AnyView(CPUPopup(monitor: monitor))
             case .memory: AnyView(MemoryPopup(monitor: monitor))
@@ -148,6 +169,7 @@ final class AssetRenderer {
             case .network: AnyView(NetworkPopup(monitor: monitor))
             case .disk: AnyView(DiskPopup(monitor: monitor))
             case .bluetooth: AnyView(BluetoothPopup(monitor: monitor))
+            case .keepAwake: AnyView(KeepAwakePopup(monitor: monitor, keepAwake: monitor.keepAwake))
             }
             let image = capture(view) {
                 // The popup sampled this Mac when it appeared (Bluetooth asynchronously): wait for that reading,
@@ -193,7 +215,8 @@ final class AssetRenderer {
         window.backgroundColor = .clear
         window.hasShadow = false
         window.contentView = host
-        window.orderFront(nil)
+        // Key, so that in the active app (--front) its switches take their colour.
+        window.makeKeyAndOrderFront(nil)
         spin(for: 0.15)
         prepare()
         spin(for: 0.1)

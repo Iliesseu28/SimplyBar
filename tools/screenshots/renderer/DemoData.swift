@@ -152,7 +152,26 @@ struct DemoData {
     func payload(from monitor: SystemMonitor) -> WidgetPayload {
         var payload = monitor.widgetPayload(now: Self.date)
         payload.volumes = volumes
+        // The app adds these only while their widgets are on the desktop, which only WidgetKit can tell.
+        payload.gpu = monitor.gpus.first
+        payload.gpuHistory = monitor.gpuHistory.last(WidgetPayload.historyLength)
+        payload.bluetooth = monitor.bluetoothDevices
+        payload.keepAwake = KeepAwakeStatus(isActive: true, end: Self.date.addingTimeInterval(TimeInterval(Self.keepAwakeDuration.rawValue)),
+                                            keepsDisplayOn: false)
         return payload
+    }
+
+    // MARK: - Keep Awake
+
+    /// Keep Awake as the screenshots show it: on, for an hour.
+    static let keepAwakeDuration = KeepAwakeDuration.oneHour
+
+    /// The app's controller counts from now and takes real power assertions: the renderer turns it off again once
+    /// the view is drawn (macOS also drops them when the renderer quits).
+    func startKeepAwake(on monitor: SystemMonitor) {
+        monitor.keepAwake.duration = Self.keepAwakeDuration
+        monitor.keepAwake.isActive = true
+        if !monitor.keepAwake.isActive { ScreenshotRenderer.fail("Keep Awake did not turn on: power assertion refused") }
     }
 }
 

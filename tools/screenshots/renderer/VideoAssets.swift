@@ -208,25 +208,7 @@ struct SettingsCapture {
     let recordSize: (String, CGSize) -> Void
 
     func captureAll() {
-        let selection = SettingsSelection()
-        let hosting = NSHostingController(rootView: SettingsView(settings: settings, selection: selection)
-            .environment(\.colorScheme, .light))
-        let window = RenderWindow(contentViewController: hosting)
-        window.forcedScale = renderer.scale
-        window.styleMask = [.titled, .closable, .miniaturizable]
-        window.title = String(localized: "SimplyBar Settings")
-        window.appearance = NSAppearance(named: .aqua)
-        window.setContentSize(NSSize(width: 700, height: 440))
-        window.center()
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate()
-        window.makeKeyAndOrderFront(nil)
-        let limit = Date().addingTimeInterval(10)
-        while !NSApp.isActive && Date() < limit { spin(0.2) }
-        if !NSApp.isActive {
-            ScreenshotRenderer.fail("the settings window is not in front: its switches would be grey (run make.sh --video)")
-        }
-
+        let (window, selection) = openWindow()
         for module in videoModules {
             for shown in [false, true] {
                 settings.setShown(module, shown)
@@ -238,6 +220,48 @@ struct SettingsCapture {
             }
         }
         window.orderOut(nil)
+    }
+
+    /// The Keep Awake tab with Keep Awake on, as `Renderer --front` draws it (not in the video).
+    func captureKeepAwake() {
+        let (window, selection) = openWindow()
+        let monitor = AppServices.monitor
+        settings.setShown(.keepAwake, true)
+        renderer.demo.startKeepAwake(on: monitor)
+        selection.tab = .module(.keepAwake)
+        spin(0.5)
+        guard NSApp.isActive else { ScreenshotRenderer.fail("the settings window lost the focus") }
+        capture(window, name: "settings-keepAwake-on")
+        monitor.keepAwake.isActive = false
+        window.orderOut(nil)
+    }
+
+    /// Makes the renderer the active app (launched by `open`), else its switches would be drawn grey.
+    func bringToFront(showing window: NSWindow? = nil) {
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate()
+        window?.makeKeyAndOrderFront(nil)
+        let limit = Date().addingTimeInterval(10)
+        while !NSApp.isActive && Date() < limit { spin(0.2) }
+        if !NSApp.isActive {
+            ScreenshotRenderer.fail("the renderer is not in front: its switches would be grey (launch it with open)")
+        }
+    }
+
+    private func openWindow() -> (RenderWindow, SettingsSelection) {
+        let selection = SettingsSelection()
+        let hosting = NSHostingController(rootView: SettingsView(
+            settings: settings, keepAwake: AppServices.monitor.keepAwake, selection: selection
+        ).environment(\.colorScheme, .light))
+        let window = RenderWindow(contentViewController: hosting)
+        window.forcedScale = renderer.scale
+        window.styleMask = [.titled, .closable, .miniaturizable]
+        window.title = String(localized: "SimplyBar Settings")
+        window.appearance = NSAppearance(named: .aqua)
+        window.setContentSize(NSSize(width: 700, height: 440))
+        window.center()
+        bringToFront(showing: window)
+        return (window, selection)
     }
 
     private func capture(_ window: NSWindow, name: String) {

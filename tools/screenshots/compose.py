@@ -80,7 +80,7 @@ FALLBACK_FONT = ("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", 0)
 NO_SPACE_SCRIPTS = {"ja", "zh-Hans", "zh-Hant"}
 
 # The app's menu bar items, left to right: the first one declared in SimplyBarApp.swift ends up rightmost.
-MENUBAR_ORDER = ["bluetooth", "gpu", "disk", "network", "memory", "cpu"]
+MENUBAR_ORDER = ["keepAwake", "bluetooth", "gpu", "disk", "network", "memory", "cpu"]
 MENUBAR_HEIGHT = 24
 SMALL, MEDIUM, LARGE = (170, 170), (364, 170), (364, 382)
 GRID_GAP_X, GRID_GAP_Y = 24, 42  # macOS lays widgets so that 2 x 2 small ones fill one large
