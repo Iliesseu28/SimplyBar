@@ -24,6 +24,8 @@ nonisolated struct WidgetPayload: Codable, Equatable, Sendable {
     var bluetooth: [BluetoothDevice]?
     /// Keep Awake as it stands; nil when the app is not running (it removes it when it quits).
     var keepAwake: KeepAwakeStatus?
+    /// Heat level and battery, written only while a Mac Health widget is on the desktop.
+    var health: HealthSample?
 }
 
 extension WidgetPayload {
@@ -44,6 +46,7 @@ extension WidgetPayload {
         gpuHistory = (try? values.decodeIfPresent([Double].self, forKey: .gpuHistory)) ?? []
         bluetooth = try? values.decodeIfPresent([BluetoothDevice].self, forKey: .bluetooth)
         keepAwake = try? values.decodeIfPresent(KeepAwakeStatus.self, forKey: .keepAwake)
+        health = try? values.decodeIfPresent(HealthSample.self, forKey: .health)
     }
 }
 
@@ -59,12 +62,14 @@ nonisolated enum SharedStore {
     static let freshness: TimeInterval = 45 * 60
 
     /// A widget's kind is this prefix plus what it shows (`cpu`, `memory`, `gpu`, `network`, `disk`, `storage`,
-    /// `bluetooth`, `keepAwake`), so the app can tell from the widgets on the desktop which numbers to keep up to date.
+    /// `bluetooth`, `keepAwake`, `health`), so the app can tell from the widgets on the desktop which numbers to keep
+    /// up to date.
     static let widgetKindPrefix = "fr.simplibot.simplybar."
     static let storageWidgetKind = widgetKindPrefix + "storage"
     static let gpuWidgetKind = widgetKindPrefix + "gpu"
     static let bluetoothWidgetKind = widgetKindPrefix + "bluetooth"
     static let keepAwakeWidgetKind = widgetKindPrefix + "keepAwake"
+    static let healthWidgetKind = widgetKindPrefix + "health"
 
     /// Darwin notification the Keep Awake widget posts after writing its request. Under the App Group's name, the
     /// prefix the sandbox lets the app and its extension share.
