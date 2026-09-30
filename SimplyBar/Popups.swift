@@ -301,19 +301,30 @@ struct KeepAwakePopup: View {
             Toggle("Keep the display on too", isOn: $keepAwake.keepsDisplayOn)
                 .font(.system(size: 12))
                 .frame(maxWidth: .infinity, alignment: .leading)
-            if keepAwake.isActive, let end = keepAwake.end, end > .now {
-                HStack(spacing: 8) {
-                    Text("Time left:")
-                    Spacer()
-                    Text(timerInterval: Date.now...end, countsDown: true).monospacedDigit()
-                }
-                .font(.system(size: 12))
+            if keepAwake.isActive, let end = keepAwake.end {
+                KeepAwakeTimeLeft(end: end).font(.system(size: 12))
             }
             Text("Closing the lid or choosing Sleep still puts the Mac to sleep.")
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// "Time left:" and a countdown, also in the settings. One reading of the clock, so the range is never reversed.
+struct KeepAwakeTimeLeft: View {
+    let end: Date
+
+    var body: some View {
+        let now = Date.now
+        if end > now {
+            HStack(spacing: 8) {
+                Text("Time left:")
+                Spacer()
+                Text(timerInterval: now...end, countsDown: true).monospacedDigit()
+            }
         }
     }
 }

@@ -213,6 +213,11 @@ struct SettingsView: View {
     private var keepAwakeSettings: some View {
         Section {
             Toggle("Show in menu bar", isOn: $settings.keepAwake.shown)
+            // Also here: with the item hidden, a session started from the widget can still be stopped.
+            Toggle("Keep this Mac awake", isOn: $keepAwake.isActive)
+            if keepAwake.isActive, let end = keepAwake.end {
+                KeepAwakeTimeLeft(end: end)
+            }
             KeepAwakeDurationPicker(duration: $keepAwake.duration)
             Toggle("Keep the display on too", isOn: $keepAwake.keepsDisplayOn)
         }
