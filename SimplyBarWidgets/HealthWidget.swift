@@ -12,41 +12,51 @@ struct HealthWidget: Widget {
     }
 }
 
-/// The heat level and, on a Mac with a battery, its charge and health. The medium size adds what to do when the Mac is
-/// hot. A Mac without a battery shows the heat level alone, never an empty battery.
+/// The heat level and, on a Mac with a battery, its charge and health. What to do when the Mac is hot takes the
+/// battery's place in the small size of a Mac without one, and sits under the level in the medium size. A Mac
+/// without a battery never shows an empty battery.
 struct HealthWidgetView: View {
     let payload: WidgetPayload?
     @Environment(\.widgetFamily) private var family
 
-    private static let symbol = "thermometer.medium"
-
     var body: some View {
         if let payload, let health = payload.health {
-            VStack(alignment: .leading, spacing: 8) {
-                WidgetHeader(symbol: Self.symbol, title: "Mac Health", date: payload.date)
-                if family == .systemSmall {
-                    heat(health.thermal, advice: false)
-                    if let battery = health.battery {
-                        Spacer(minLength: 0)
-                        HealthBatteryRows(battery: battery, showsCondition: false)
-                    } else {
-                        Spacer(minLength: 0)
-                    }
-                } else {
-                    HStack(alignment: .top, spacing: 16) {
-                        heat(health.thermal, advice: true)
-                        if let battery = health.battery {
-                            HealthBatteryRows(battery: battery, showsCondition: true)
-                        }
-                    }
-                    Spacer(minLength: 0)
-                }
-            }
+            HealthWidgetContent(health: health, date: payload.date, medium: family != .systemSmall)
         } else if payload != nil {
             // The app notices a new widget within 5 minutes, then measures.
-            NotRunningView(symbol: Self.symbol, title: "Mac Health", message: "Appears within 5 minutes.")
+            NotRunningView(symbol: HealthWidgetContent.symbol, title: "Mac Health", message: "Appears within 5 minutes.")
         } else {
-            NotRunningView(symbol: Self.symbol, title: "Mac Health")
+            NotRunningView(symbol: HealthWidgetContent.symbol, title: "Mac Health")
+        }
+    }
+}
+
+/// One size of the widget. Only WidgetKit sets the widget family: the screenshot renderer draws both sizes from here.
+struct HealthWidgetContent: View {
+    static let symbol = "thermometer.medium"
+
+    let health: HealthSample
+    let date: Date
+    let medium: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            WidgetHeader(symbol: Self.symbol, title: "Mac Health", date: date)
+            if medium {
+                HStack(alignment: .top, spacing: 16) {
+                    heat(health.thermal, advice: true)
+                    if let battery = health.battery {
+                        HealthBatteryRows(battery: battery, showsCondition: true)
+                    }
+                }
+                Spacer(minLength: 0)
+            } else {
+                heat(health.thermal, advice: health.battery == nil)
+                Spacer(minLength: 0)
+                if let battery = health.battery {
+                    HealthBatteryRows(battery: battery, showsCondition: false)
+                }
+            }
         }
     }
 
@@ -61,7 +71,7 @@ struct HealthWidgetView: View {
             if advice, let text = level.advice {
                 Text(text)
                     .font(.system(size: 10)).foregroundStyle(.secondary)
-                    .lineLimit(4)
+                    .lineLimit(5)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
