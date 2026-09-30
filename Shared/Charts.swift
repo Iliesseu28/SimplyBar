@@ -52,6 +52,16 @@ nonisolated enum Palette {
         }
     }
 
+    /// Heat level color: green, yellow, orange, red.
+    static func heat(_ level: ThermalLevel) -> Color {
+        switch level {
+        case .nominal: green
+        case .fair: yellow
+        case .serious: orange
+        case .critical: red
+        }
+    }
+
     private static func color(_ rgb: RGB) -> Color { Color(red: rgb.red, green: rgb.green, blue: rgb.blue) }
 }
 
@@ -235,5 +245,38 @@ struct CoreGauge: View {
         .padding(4)
         .frame(width: 26, height: 50)
         .background(RoundedRectangle(cornerRadius: 5, style: .continuous).strokeBorder(Palette.track, lineWidth: 1))
+    }
+}
+
+/// The four heat levels side by side, lit up to the current one in its color.
+struct HeatGauge: View {
+    let level: ThermalLevel
+    var height: CGFloat = 6
+
+    var body: some View {
+        let current = ThermalLevel.allCases.firstIndex(of: level) ?? 0
+        HStack(spacing: 3) {
+            ForEach(ThermalLevel.allCases.indices, id: \.self) { index in
+                Capsule().fill(index <= current ? Palette.heat(level) : Palette.track)
+            }
+        }
+        .frame(height: height)
+    }
+}
+
+/// A battery level as a thin bar, red at 20 % and under.
+struct BatteryBar: View {
+    let percent: Int
+
+    var body: some View {
+        GeometryReader { size in
+            ZStack(alignment: .leading) {
+                Capsule().fill(Palette.track)
+                Capsule()
+                    .fill(percent <= 20 ? Palette.red : Palette.green)
+                    .frame(width: max(3, size.size.width * CGFloat(percent) / 100))
+            }
+        }
+        .frame(height: 4)
     }
 }

@@ -7,8 +7,9 @@ import WidgetKit
 ///
 /// Cost control: one coalescing timer per module (20 % tolerance). A module is sampled at its own pace while it is
 /// in the menu bar or its popup is open, every minute when only a desktop widget shows it, and not at all
-/// otherwise; the disk needs its fast pace only while its popup is open. Widget data is written and reloaded every
-/// 30 minutes, and only while widgets are on the desktop.
+/// otherwise; the disk needs its fast pace only while its popup is open. An alert that is on keeps the module it
+/// watches sampled every minute too. Widget data is written and reloaded every 30 minutes, and only while widgets are
+/// on the desktop.
 @MainActor
 @Observable
 final class SystemMonitor {
@@ -35,7 +36,9 @@ final class SystemMonitor {
     private(set) var gpuHistory = History(capacity: historyLength)
     private(set) var bluetoothDevices: [BluetoothDevice] = []
     private(set) var bluetoothLoaded = false
+    private(set) var health: HealthSample?
     let keepAwake: KeepAwakeController
+    let notifier = AlertNotifier()
 
     @ObservationIgnored private let settings: AppSettings
     @ObservationIgnored private let cpuReader = CPUReader()
@@ -52,6 +55,7 @@ final class SystemMonitor {
     @ObservationIgnored private var flashTask: Task<Void, Never>?
     /// Date of the last Keep Awake request from the widget, handled once and written back for the widget.
     @ObservationIgnored private var lastKeepAwakeRequest: Date?
+    @ObservationIgnored private var thermalObserver: (any NSObjectProtocol)?
 
     static let log = Logger(subsystem: "fr.simplibot.simplybar", category: "monitor")
 
@@ -64,6 +68,8 @@ final class SystemMonitor {
         settings.onChange = { [weak self] in self?.reschedule() }
         keepAwake.onChange = { [weak self] in self?.keepAwakeChanged() }
         observeKeepAwakeRequests()
+        observeThermalState()
+        notifier.activate()
         reschedule()
         logStartupNumbers()
 
@@ -94,7 +100,7 @@ final class SystemMonitor {
     // MARK: - Scheduling
 
     /// Seconds between two samples of a module, or nil when nothing needs it: neither the menu bar, nor an open
-    /// popup, nor a desktop widget.
+    /// popup, nor a desktop widget, nor an alert.
     func interval(for module: Module) -> TimeInterval? {
         // Keep Awake measures nothing.
         if module == .keepAwake { return nil }
@@ -106,13 +112,19 @@ final class SystemMonitor {
         case .disk: open ? 5 : Self.slowInterval
         case .gpu: TimeInterval(settings.gpu.interval)
         case .bluetooth: TimeInterval(settings.bluetooth.interval)
+        // The heat level also arrives by notification (see `observeThermalState`).
+        case .health: open ? 5 : Self.slowInterval
         case .keepAwake: 0 // Never used: returned above.
         }
         if open || settings.isShown(module) { return pace }
-        return widgetModules.contains(module) ? Self.slowInterval : nil
+        let watched = AlertKind.allCases.contains { settings.alerts.isOn($0) && $0.module == module }
+        return widgetModules.contains(module) || watched ? Self.slowInterval : nil
     }
 
     func reschedule() {
+        for kind in AlertKind.allCases where !settings.alerts.isOn(kind) {
+            settings.alertTracker.reset(kind)
+        }
         for module in Module.allCases {
             let wanted = interval(for: module)
             let current = intervals[module]
@@ -129,7 +141,7 @@ final class SystemMonitor {
                 case .cpu, .network:
                     prime(module)
                     firstTick = min(wanted, 1)
-                case .memory, .disk, .gpu, .bluetooth, .keepAwake:
+                case .memory, .disk, .gpu, .bluetooth, .health, .keepAwake:
                     sample(module)
                 }
             }
@@ -177,9 +189,14 @@ final class SystemMonitor {
                 if devices != self.bluetoothDevices { self.bluetoothDevices = devices }
                 let first = !self.bluetoothLoaded
                 self.bluetoothLoaded = true
+                self.checkAlerts(.bluetoothBattery) { $0.bluetooth(devices, now: $1) }
                 // A first reading slower than the publication that follows a new widget: publish it now.
                 if first, self.widgetKinds.contains(SharedStore.bluetoothWidgetKind) { self.publishToWidgets() }
             }
+        case .health:
+            let value = HealthReader.read()
+            if value != health { health = value }
+            checkAlerts(.heat) { $0.heat(value.thermal, now: $1) }
         case .keepAwake:
             break
         }
@@ -212,6 +229,7 @@ final class SystemMonitor {
             if settings.disk.flashOnChange, DiskReader.isSignificantChange(change) { flashDisk() }
         }
         disk = value
+        checkAlerts(.diskSpace) { $0.disk(value, now: $1) }
     }
 
     private func flashDisk() {
@@ -227,7 +245,7 @@ final class SystemMonitor {
     // MARK: - Widgets
 
     /// Only what the widgets draw: no per-core values, no startup disk name (the SSD widget shows its size, not its
-    /// name), and GPU and Bluetooth devices only while their widgets are on the desktop.
+    /// name), and GPU, Bluetooth devices and health only while their widgets are on the desktop.
     func widgetPayload(now: Date = .now) -> WidgetPayload {
         var payload = WidgetPayload(
             date: now,
@@ -246,6 +264,9 @@ final class SystemMonitor {
         }
         if widgetKinds.contains(SharedStore.bluetoothWidgetKind), bluetoothLoaded {
             payload.bluetooth = bluetoothDevices
+        }
+        if widgetKinds.contains(SharedStore.healthWidgetKind) {
+            payload.health = health
         }
         return payload
     }
@@ -305,6 +326,30 @@ final class SystemMonitor {
         } else {
             lastWidgetReload = .now
             WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    // MARK: - Heat level and alerts
+
+    /// macOS announces a new heat level at once: the menu bar icon and the heat alert follow it without waiting for
+    /// the next sample, but only while something shows or watches it.
+    private func observeThermalState() {
+        thermalObserver = NotificationCenter.default.addObserver(
+            forName: ProcessInfo.thermalStateDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.intervals[.health] != nil else { return }
+                self.sample(.health)
+            }
+        }
+    }
+
+    /// Runs the readings of an alert that is on through the tracker and sends what it lets through. Nothing is fed
+    /// while notifications are not allowed, so an alarm found meanwhile still fires once they are.
+    private func checkAlerts(_ kind: AlertKind, _ found: (inout AlertTracker, Date) -> [Alert]) {
+        guard settings.alerts.isOn(kind), notifier.canNotify else { return }
+        for alert in found(&settings.alertTracker, .now) {
+            notifier.post(alert)
         }
     }
 
@@ -372,14 +417,31 @@ final class SystemMonitor {
         let blocks = DiskReader.freeBlocks()
         let memory = MemoryReader.read()
         let pages = MemoryReader.pages()
+        // Proof of what the sandbox lets the app read: the heat level, the power sources, the battery registry entry.
+        let health = HealthReader.read()
+        let registry = MacBatteryReader.registryProperties()
+        let installed = (registry?["BatteryInstalled"] as? Bool).map(String.init(describing:)) ?? "none"
         Self.log.notice("""
             startup disk total=\(disk?.total ?? 0, privacy: .public) important=\(disk?.free ?? 0, privacy: .public) \
             blocks=\(blocks ?? 0, privacy: .public) memory total=\(memory?.total ?? 0, privacy: .public) \
             app=\(memory?.app ?? 0, privacy: .public) wired=\(memory?.wired ?? 0, privacy: .public) \
             compressed=\(memory?.compressed ?? 0, privacy: .public) \
             pages internal=\(pages?.internalPages ?? 0, privacy: .public) purgeable=\(pages?.purgeable ?? 0, privacy: .public) \
-            wired=\(pages?.wired ?? 0, privacy: .public) compressor=\(pages?.compressor ?? 0, privacy: .public)
+            wired=\(pages?.wired ?? 0, privacy: .public) compressor=\(pages?.compressor ?? 0, privacy: .public) \
+            thermal=\(health.thermal.rawValue, privacy: .public) battery=\(health.battery != nil, privacy: .public) \
+            registry keys=\(registry?.count ?? 0, privacy: .public) installed=\(installed, privacy: .public)
             """)
+    }
+}
+
+extension AlertKind {
+    /// The module whose readings the alert watches.
+    var module: Module {
+        switch self {
+        case .bluetoothBattery: .bluetooth
+        case .diskSpace: .disk
+        case .heat: .health
+        }
     }
 }
 

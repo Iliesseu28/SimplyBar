@@ -4,14 +4,16 @@ import SwiftUI
 
 enum SettingsTab: Hashable, Identifiable {
     case module(Module)
+    case alerts
     case general
     case about
 
-    static let all: [SettingsTab] = Module.allCases.map { .module($0) } + [.general, .about]
+    static let all: [SettingsTab] = Module.allCases.map { .module($0) } + [.alerts, .general, .about]
 
     var id: String {
         switch self {
         case .module(let module): module.rawValue
+        case .alerts: "alerts"
         case .general: "general"
         case .about: "about"
         }
@@ -20,6 +22,7 @@ enum SettingsTab: Hashable, Identifiable {
     var title: LocalizedStringResource {
         switch self {
         case .module(let module): module.title
+        case .alerts: "Alerts"
         case .general: "General"
         case .about: "About"
         }
@@ -28,6 +31,7 @@ enum SettingsTab: Hashable, Identifiable {
     var symbol: String {
         switch self {
         case .module(let module): module.symbol
+        case .alerts: "bell.badge"
         case .general: "gearshape"
         case .about: "info.circle"
         }
@@ -64,7 +68,8 @@ final class SettingsWindowController {
         selection.tab = tab
         if window == nil {
             let hosting = NSHostingController(rootView: SettingsView(
-                settings: AppServices.settings, keepAwake: AppServices.monitor.keepAwake, selection: selection
+                settings: AppServices.settings, keepAwake: AppServices.monitor.keepAwake,
+                notifier: AppServices.monitor.notifier, selection: selection
             ))
             let window = NSWindow(contentViewController: hosting)
             window.title = String(localized: "SimplyBar Settings")
@@ -89,6 +94,7 @@ final class SettingsSelection {
 struct SettingsView: View {
     @Bindable var settings: AppSettings
     @Bindable var keepAwake: KeepAwakeController
+    let notifier: AlertNotifier
     @Bindable var selection: SettingsSelection
 
     var body: some View {
@@ -136,7 +142,9 @@ struct SettingsView: View {
         case .module(.network): network
         case .module(.disk): disk
         case .module(.bluetooth): bluetooth
+        case .module(.health): health
         case .module(.keepAwake): keepAwakeSettings
+        case .alerts: AlertsSettings(settings: settings, notifier: notifier)
         case .general: GeneralSettings(settings: settings)
         case .about: EmptyView() // Laid out on its own, outside the form.
         }
@@ -210,6 +218,14 @@ struct SettingsView: View {
         }
     }
 
+    private var health: some View {
+        Section {
+            Toggle("Show in menu bar", isOn: $settings.health.shown)
+            Text("The icon turns yellow, orange or red as the Mac heats up.")
+                .font(.callout).foregroundStyle(.secondary)
+        }
+    }
+
     private var keepAwakeSettings: some View {
         Section {
             Toggle("Show in menu bar", isOn: $settings.keepAwake.shown)
@@ -255,6 +271,50 @@ private struct StylePicker: View {
             ForEach(options) { $0.label.tag($0) }
         }
         .pickerStyle(.segmented)
+    }
+}
+
+/// One switch per alert, all off at first. Turning one on asks for permission to notify, once.
+private struct AlertsSettings: View {
+    @Bindable var settings: AppSettings
+    let notifier: AlertNotifier
+
+    var body: some View {
+        Section {
+            Toggle(isOn: binding(.bluetoothBattery)) {
+                Text("Bluetooth battery low")
+                Text("When a device drops to \(Format.percent(Double(AlertRules.bluetoothLow) / 100)) or less.")
+            }
+            Toggle(isOn: binding(.diskSpace)) {
+                Text("Startup disk almost full")
+                Text("When less than \(Format.percent(AlertRules.diskLow)) of the startup disk is free.")
+            }
+            Toggle(isOn: binding(.heat)) {
+                Text("Mac running hot")
+                Text("When macOS reports the Mac as hot or critical.")
+            }
+        } footer: {
+            Text("An alert comes back only once things are back to normal, and at most once an hour.")
+                .font(.callout).foregroundStyle(.secondary)
+        }
+        .task { await notifier.refreshStatus() }
+        // Permission is granted or withdrawn in System Settings: read it again when the user comes back.
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            Task { await notifier.refreshStatus() }
+        }
+        if notifier.status == .denied, AlertKind.allCases.contains(where: settings.alerts.isOn) {
+            Section {
+                Text("Notifications are off for SimplyBar.")
+                Button("Open Notification Settings") { notifier.openSystemSettings() }
+            }
+        }
+    }
+
+    private func binding(_ kind: AlertKind) -> Binding<Bool> {
+        Binding(get: { settings.alerts.isOn(kind) }, set: { on in
+            settings.alerts.set(kind, on)
+            if on { Task { await notifier.requestAuthorization() } }
+        })
     }
 }
 

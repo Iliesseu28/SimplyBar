@@ -85,19 +85,3 @@ private struct BluetoothBatteryRow: View {
         }
     }
 }
-
-private struct BatteryBar: View {
-    let percent: Int
-
-    var body: some View {
-        GeometryReader { size in
-            ZStack(alignment: .leading) {
-                Capsule().fill(Palette.track)
-                Capsule()
-                    .fill(percent <= 20 ? Palette.red : Palette.green)
-                    .frame(width: max(3, size.size.width * CGFloat(percent) / 100))
-            }
-        }
-        .frame(height: 4)
-    }
-}

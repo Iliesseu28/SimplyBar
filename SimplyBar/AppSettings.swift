@@ -4,7 +4,7 @@ import SwiftUI
 
 /// The modules, in the order of the settings sidebar.
 enum Module: String, CaseIterable, Identifiable, Sendable {
-    case cpu, memory, gpu, network, disk, bluetooth, keepAwake
+    case cpu, memory, gpu, network, disk, bluetooth, health, keepAwake
 
     var id: String { rawValue }
 
@@ -16,6 +16,7 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "Network"
         case .disk: "SSD"
         case .bluetooth: "Bluetooth"
+        case .health: "Health"
         case .keepAwake: "Keep Awake"
         }
     }
@@ -29,8 +30,8 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "NET"
         case .disk: "SSD"
         case .bluetooth: "BT"
-        // Never drawn: the icon alone tells whether the Mac is kept awake.
-        case .keepAwake: ""
+        // Never drawn: the icon alone tells the heat level, or whether the Mac is kept awake.
+        case .health, .keepAwake: ""
         }
     }
 
@@ -42,6 +43,7 @@ enum Module: String, CaseIterable, Identifiable, Sendable {
         case .network: "network"
         case .disk: "internaldrive"
         case .bluetooth: "dot.radiowaves.left.and.right"
+        case .health: "thermometer.medium"
         case .keepAwake: "cup.and.saucer"
         }
     }
@@ -165,6 +167,19 @@ struct BluetoothSettings: Codable, Equatable, Sendable {
     var interval = Sampling.defaultBluetoothInterval
 }
 
+/// Hidden by default, like Bluetooth: the icon only changes colour when the Mac heats up.
+struct HealthSettings: Codable, Equatable, Sendable {
+    var shown = false
+
+    init() {}
+
+    init(from decoder: any Decoder) throws {
+        self.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        if let shown = try? values.decodeIfPresent(Bool.self, forKey: .shown) { self.shown = shown }
+    }
+}
+
 /// User settings, saved in the app's own UserDefaults (one JSON value per module).
 @MainActor
 @Observable
@@ -179,7 +194,16 @@ final class AppSettings {
     var network: NetworkSettings { didSet { save(network, key: "network") } }
     var disk: DiskSettings { didSet { save(disk, key: "disk") } }
     var bluetooth: BluetoothSettings { didSet { save(bluetooth, key: "bluetooth") } }
+    var health: HealthSettings { didSet { save(health, key: "health") } }
     var keepAwake: KeepAwakeSettings { didSet { save(keepAwake, key: "keepAwake") } }
+    var alerts: AlertSettings { didSet { save(alerts, key: "alerts") } }
+    /// Alerts already sent, kept across launches so that a relaunch does not repeat them within the hour.
+    @ObservationIgnored var alertTracker: AlertTracker {
+        didSet {
+            guard alertTracker != oldValue, let data = try? JSONEncoder().encode(alertTracker) else { return }
+            defaults.set(data, forKey: "alerts.tracker")
+        }
+    }
     var openSettingsAtLaunch: Bool { didSet { defaults.set(openSettingsAtLaunch, forKey: "openSettingsAtLaunch") } }
 
     init(defaults: UserDefaults = .standard) {
@@ -198,7 +222,11 @@ final class AppSettings {
         // Older versions offered 2 to 59 seconds for Bluetooth too.
         bluetooth.interval = Sampling.closest(to: bluetooth.interval, in: Sampling.bluetoothIntervals)
         self.bluetooth = bluetooth
+        health = Self.load(HealthSettings.self, key: "health", from: defaults) ?? HealthSettings()
         keepAwake = Self.load(KeepAwakeSettings.self, key: "keepAwake", from: defaults) ?? KeepAwakeSettings()
+        alerts = Self.load(AlertSettings.self, key: "alerts", from: defaults) ?? AlertSettings()
+        alertTracker = defaults.data(forKey: "alerts.tracker")
+            .flatMap { try? JSONDecoder().decode(AlertTracker.self, from: $0) } ?? AlertTracker()
         openSettingsAtLaunch = defaults.object(forKey: "openSettingsAtLaunch") as? Bool ?? true
     }
 
@@ -210,6 +238,7 @@ final class AppSettings {
         case .network: network.shown
         case .disk: disk.shown
         case .bluetooth: bluetooth.shown
+        case .health: health.shown
         case .keepAwake: keepAwake.shown
         }
     }
@@ -222,6 +251,7 @@ final class AppSettings {
         case .network: network.shown = shown
         case .disk: disk.shown = shown
         case .bluetooth: bluetooth.shown = shown
+        case .health: health.shown = shown
         case .keepAwake: keepAwake.shown = shown
         }
     }

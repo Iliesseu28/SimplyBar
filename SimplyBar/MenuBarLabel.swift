@@ -10,11 +10,23 @@ struct StatusItemModel: Equatable {
         case iconOnly
     }
 
+    enum Tint: Equatable {
+        case yellow, orange, red
+
+        var color: Color {
+            switch self {
+            case .yellow: Palette.yellow
+            case .orange: Palette.orange
+            case .red: Color.red
+            }
+        }
+    }
+
     var symbol: String?
     var letters: String?
     var content: Content
-    /// Drawn in red instead of the menu bar color (disk flash).
-    var alert = false
+    /// Drawn in this colour instead of the menu bar's (disk flash, heat level).
+    var tint: Tint?
 }
 
 /// Builds each module's menu bar model from the settings and the latest sample.
@@ -43,16 +55,29 @@ enum StatusItemModels {
         case .disk:
             let s = settings.disk
             return StatusItemModel(symbol: s.showIcon ? module.symbol : nil, letters: s.showLabel ? module.shortLabel : nil,
-                                   content: diskContent(monitor.disk, settings: s), alert: monitor.diskFlashing)
+                                   content: diskContent(monitor.disk, settings: s), tint: monitor.diskFlashing ? .red : nil)
         case .bluetooth:
             let s = settings.bluetooth
             let lowest = monitor.bluetoothDevices.compactMap(\.lowest).min()
             return StatusItemModel(symbol: s.showIcon ? module.symbol : nil, letters: s.showLabel ? module.shortLabel : nil,
                                    content: .text(lowest.map { "\($0)%" } ?? "-", bold: false))
+        case .health:
+            return StatusItemModel(symbol: module.symbol, letters: nil, content: .iconOnly,
+                                   tint: healthTint(monitor.health?.thermal))
         case .keepAwake:
             // Filled while the Mac is kept awake.
             return StatusItemModel(symbol: monitor.keepAwake.isActive ? "cup.and.saucer.fill" : module.symbol, letters: nil,
                                    content: .iconOnly)
+        }
+    }
+
+    /// The menu bar colour while normal, then yellow, orange and red as the Mac heats up.
+    static func healthTint(_ level: ThermalLevel?) -> StatusItemModel.Tint? {
+        switch level {
+        case nil, .nominal: nil
+        case .fair: .yellow
+        case .serious: .orange
+        case .critical: .red
         }
     }
 
@@ -138,7 +163,7 @@ struct StatusItemView: View {
             }
             content
         }
-        .foregroundStyle(model.alert ? Color.red : Color.black)
+        .foregroundStyle(model.tint?.color ?? Color.black)
         .frame(height: 22)
         .fixedSize()
     }
@@ -194,7 +219,7 @@ final class StatusItemRenderer {
         let renderer = ImageRenderer(content: StatusItemView(model: model))
         renderer.scale = NSScreen.main?.backingScaleFactor ?? 2
         let image = renderer.nsImage ?? NSImage(size: NSSize(width: 16, height: 22))
-        image.isTemplate = !model.alert
+        image.isTemplate = model.tint == nil
         cache[module] = (model, image)
         return image
     }
@@ -209,6 +234,6 @@ struct MenuBarLabel: View {
     var body: some View {
         let model = StatusItemModels.model(for: module, settings: settings, monitor: monitor)
         Image(nsImage: StatusItemRenderer.shared.image(for: module, model: model))
-            .renderingMode(model.alert ? .original : .template)
+            .renderingMode(model.tint == nil ? .template : .original)
     }
 }

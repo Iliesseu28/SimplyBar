@@ -283,6 +283,73 @@ struct BluetoothPopup: View {
     }
 }
 
+struct HealthPopup: View {
+    let monitor: SystemMonitor
+
+    var body: some View {
+        PopupChrome(module: .health, title: "Mac Health", monitor: monitor) {
+            if let health = monitor.health {
+                Headline(title: "Heat level:", value: String(localized: health.thermal.title),
+                         color: Palette.heat(health.thermal))
+                HeatGauge(level: health.thermal, height: 8)
+                if let advice = health.thermal.advice {
+                    Text(advice)
+                        .font(.system(size: 12))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                // A Mac without a battery shows no battery section at all.
+                if let battery = health.battery {
+                    MacBatterySection(battery: battery)
+                }
+            } else {
+                Text("Measuring…").foregroundStyle(.secondary)
+            }
+            Text("macOS tells apps the heat level, not the temperature.")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// Charge and health of the Mac's battery; a value macOS does not give has no row.
+private struct MacBatterySection: View {
+    let battery: MacBattery
+
+    var body: some View {
+        SectionTitle("Battery:")
+        VStack(spacing: 5) {
+            HStack(spacing: 6) {
+                Text(verbatim: Format.percent(Double(battery.charge) / 100))
+                    .font(.system(size: 13, weight: .semibold)).monospacedDigit()
+                if battery.isCharging {
+                    Image(systemName: "bolt.fill").foregroundStyle(Palette.green)
+                }
+                Text(battery.isCharging ? "Charging" : "Not charging").foregroundStyle(.secondary)
+                Spacer()
+            }
+            .font(.system(size: 12))
+            BatteryBar(percent: battery.charge)
+        }
+        VStack(spacing: 4) {
+            if let capacity = battery.maximumCapacity {
+                DetailRow("Maximum capacity:", Format.percent(Double(capacity) / 100))
+            }
+            if let cycles = battery.cycleCount {
+                DetailRow("Cycle count:", Format.number(Double(cycles), decimals: 0))
+            }
+            if let condition = battery.condition {
+                DetailRow(title: "Condition:", value: "") {
+                    Text(condition == .normal ? "Normal" : "Service recommended")
+                        .foregroundStyle(condition == .normal ? Color.primary : Palette.orange)
+                }
+            }
+        }
+    }
+}
+
 struct KeepAwakePopup: View {
     let monitor: SystemMonitor
     @Bindable var keepAwake: KeepAwakeController
