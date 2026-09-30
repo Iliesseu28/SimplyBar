@@ -302,10 +302,21 @@ private struct AlertsSettings: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             Task { await notifier.refreshStatus() }
         }
-        if notifier.status == .denied, AlertKind.allCases.contains(where: settings.alerts.isOn) {
-            Section {
-                Text("Notifications are off for SimplyBar.")
-                Button("Open Notification Settings") { notifier.openSystemSettings() }
+        if AlertKind.allCases.contains(where: settings.alerts.isOn) {
+            switch notifier.status {
+            case .denied?:
+                Section {
+                    Text("Notifications are off for SimplyBar.")
+                    Button("Open Notification Settings") { notifier.openSystemSettings() }
+                }
+            // The macOS prompt was closed without an answer: ask again.
+            case .notDetermined?:
+                Section {
+                    Text("SimplyBar is not allowed to send notifications yet.")
+                    Button("Allow Notifications") { Task { await notifier.requestAuthorization() } }
+                }
+            default:
+                EmptyView()
             }
         }
     }

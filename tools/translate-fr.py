@@ -181,6 +181,8 @@ FR = {
     "Your Mac is hot": "Votre Mac chauffe",
     "Your Mac is very hot": "Votre Mac est très chaud",
     "macOS tells apps the heat level, not the temperature.": "macOS donne aux apps le niveau de chauffe, pas la température.",
+    "SimplyBar is not allowed to send notifications yet.": "SimplyBar n'a pas encore le droit d'envoyer des notifications.",
+    "Allow Notifications": "Autoriser les notifications",
     # InfoPlist.xcstrings
     "CFBundleDisplayName": "SimplyBar",
     "CFBundleName": "SimplyBar",
