@@ -1,10 +1,10 @@
 import Foundation
 import NaturalLanguage
 
-/// What the model wrote, before any check.
+/// What the model wrote, before any check. The title is not the model's: the rules' one, already in every language,
+/// names the main finding.
 nonisolated struct DiagnosticCandidate: Equatable, Sendable {
     var verdict: DiagnosticVerdict
-    var title: String
     var explanation: String
     var actions: [DiagnosticAction]
 }
@@ -24,24 +24,24 @@ nonisolated enum DiagnosticGuard {
         case tooLong
     }
 
-    static let maximumTitleLength = 80
     static let maximumExplanationLength = 400
+    /// A longer question is cut: the model's context is small, and no question about a Mac needs more.
+    static let maximumQuestionLength = 500
 
-    /// The report to show, or why the model's text was set aside.
+    /// The report to show, under the rules' title, or why the model's text was set aside.
     static func validate(_ candidate: DiagnosticCandidate, rules: DiagnosticReport, allowed: [DiagnosticAction],
                          facts: String, now: Date = .now) -> Result<DiagnosticReport, Rejection> {
-        let title = display(candidate.title)
         let explanation = display(candidate.explanation)
-        guard !title.isEmpty, !explanation.isEmpty else { return .failure(.emptyText) }
-        guard title.count <= maximumTitleLength, explanation.count <= maximumExplanationLength else { return .failure(.tooLong) }
+        guard !explanation.isEmpty else { return .failure(.emptyText) }
+        guard explanation.count <= maximumExplanationLength else { return .failure(.tooLong) }
         if candidate.verdict < rules.verdict { return .failure(.verdictBelowRules) }
         if candidate.verdict > rules.verdict { return .failure(.verdictAboveRules) }
         guard candidate.actions.allSatisfy(allowed.contains) else { return .failure(.actionNotAllowed) }
-        guard unknownNumbers(in: title + " " + explanation, facts: facts).isEmpty else { return .failure(.inventedNumber) }
+        guard unknownNumbers(in: explanation, facts: facts).isEmpty else { return .failure(.inventedNumber) }
         var actions: [DiagnosticAction] = []
         for action in candidate.actions where !actions.contains(action) { actions.append(action) }
         return .success(DiagnosticReport(
-            verdict: candidate.verdict, title: title, explanation: explanation,
+            verdict: candidate.verdict, title: rules.title, explanation: explanation,
             actions: Array(actions.prefix(DiagnosticReport.maximumActions)), source: .ai, date: now
         ))
     }
@@ -66,6 +66,22 @@ nonisolated enum DiagnosticGuard {
     }
 
     static let maximumAnswerActions = 2
+
+    // MARK: - Answers
+
+    /// Why an answer of the conversation cannot be shown, or nil. Like the card, it may cite only numbers it was
+    /// given: the tools' facts, the snapshot, the owner's questions (`reference`).
+    static func rejection(ofAnswer text: String, reference: String) -> Rejection? {
+        if display(text).isEmpty { return .emptyText }
+        return unknownNumbers(in: text, facts: reference).isEmpty ? nil : .inventedNumber
+    }
+
+    /// The answer to show once the checked one is in English: its translation when there is one that keeps to the
+    /// facts, otherwise the English answer itself, already checked.
+    static func answerText(checked: String, translation: String?, reference: String) -> String {
+        guard let translation, rejection(ofAnswer: translation, reference: reference) == nil else { return checked }
+        return translation
+    }
 
     /// The facts the model gets, the reference for the numbers it may cite.
     static func referenceFacts(_ snapshot: MacSnapshot, findings: [DiagnosticFinding]) -> String {
@@ -228,10 +244,9 @@ nonisolated struct DiagnosticLanguage: Equatable, Sendable {
     }
 }
 
-/// The diagnostic while the model writes it: each part appears as soon as it is known.
+/// The diagnostic while the model writes it, before any check: for measures and tests, never shown.
 nonisolated struct DiagnosticDraft: Equatable, Sendable {
     var verdict: DiagnosticVerdict?
-    var title: String?
     var explanation: String?
 }
 
