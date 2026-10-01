@@ -18,6 +18,7 @@ Run alone on a folder of an earlier run: python3 compose_store.py --root <repo> 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -40,6 +41,7 @@ TITLES = [  # in two beats, white then blue
     "Tout votre Mac. D’un coup d’œil.",
     "Pas de veille. Pas de pause.",
     "Votre Mac, expliqué. Par l’IA d’Apple.",
+    "Il chauffe\u00a0? Vous le saurez.",
 ]
 
 
@@ -137,6 +139,63 @@ def backdrop(top, bottom, blobs, size=APPSTORE_SIZE) -> Image.Image:
 
 
 ACCENT_ON_DARK = (72, 150, 255)  # the blue of the app icon, lightened for the dark pages: the one accent
+
+
+GLOW_PAD = 260
+
+
+def glowing(glyph: Image.Image) -> Image.Image:
+    """A template glyph of the app (black on transparent) lit in the accent blue: lighter on top, with a soft halo."""
+    size = (glyph.width + 2 * GLOW_PAD, glyph.height + 2 * GLOW_PAD)
+    shape = Image.new("L", size, 0)
+    shape.paste(glyph.getchannel("A"), (GLOW_PAD, GLOW_PAD))
+    out = Image.new("RGBA", size, (0, 0, 0, 0))
+    for blur, color, strength in [(110, (30, 100, 255), 0.55), (36, (80, 160, 255), 0.55), (10, (130, 190, 255), 0.5)]:
+        halo = Image.new("RGBA", size, color + (0,))
+        halo.putalpha(shape.filter(ImageFilter.GaussianBlur(blur)).point(lambda value: round(value * strength)))
+        out.alpha_composite(halo)
+    top, bottom = (170, 214, 255), ACCENT_ON_DARK
+    fill = Image.new("RGBA", size)
+    for y in range(size[1]):
+        t = min(1, max(0, (y - GLOW_PAD) / max(1, glyph.height)))
+        fill.paste(lerp(top, bottom, t) + (255,), (0, y, size[0], y + 1))
+    fill.putalpha(shape)
+    out.alpha_composite(fill)
+    return out
+
+
+def catalog_fr(root: Path, key: str) -> str:
+    """The French text of the app for `key`, from its String Catalog."""
+    strings = json.loads((root / "Shared" / "Localizable.xcstrings").read_text())["strings"]
+    try:
+        return strings[key]["localizations"]["fr"]["stringUnit"]["value"]
+    except KeyError:
+        fail(f"no French text for {key!r} in the String Catalog")
+
+
+def notification(root: Path, title: str, body: str, when: str, k: float) -> Image.Image:
+    """A macOS notification banner of the app, drawn after the system one in light mode: the app icon on the left,
+    the title in bold with the time on its right, the body under it, on a light rounded material."""
+    width, pad, gap, side = round(344 * k), round(14 * k), round(10 * k), round(36 * k)
+    bold, regular, small = font("Bold", round(13 * k)), font("Regular", round(13 * k)), font("Regular", round(12 * k))
+    text_x = pad + side + gap
+    lines = wrap(regular, body, width - text_x - pad)
+    ascent, descent = regular.getmetrics()
+    step = round((ascent + descent) * 1.08)
+    height = pad + step + len(lines) * step + pad
+    card = Image.new("RGBA", (width, height), (238, 239, 243, 255))
+    icon = Image.open(root / "SimplyBar" / "Assets.xcassets" / "AppIcon.appiconset" / "icon_512x512.png")
+    icon = icon.convert("RGBA").resize((side, side), Image.LANCZOS)
+    card.alpha_composite(icon, (pad, (height - side) // 2))
+    write(card, (text_x, pad), title, bold, (20, 20, 22, 255))
+    write(card, (width - pad, pad + round(1 * k)), when, small, (120, 120, 128, 255), anchor_right=True)
+    write(card, (text_x, pad + step), body, regular, (40, 40, 44, 255), width=width - text_x - pad, leading=1.08)
+    edge = ImageDraw.Draw(card)
+    radius = round(18 * k)
+    edge.rounded_rectangle((0, 0, width - 1, height - 1), radius, outline=(255, 255, 255, 140), width=2)
+    card.putalpha(rounded_mask(card.size, radius))
+    return card
+
 
 
 def tile(image: Image.Image, k: float, radius_pt: float, fill) -> Image.Image:
@@ -267,22 +326,16 @@ def page_overview(assets: Assets) -> Image.Image:
 
 
 def page_keep_awake(assets: Assets) -> Image.Image:
-    """03: the views on the left (the cup of the menu bar very large, the popup, the widget), the title on the
-    right."""
+    """03: the views on the left (the cup of the menu bar very large, lit in the accent, the popup, the widget), the
+    title on the right."""
     canvas = dark([(0.25, 0.50, 0.40, (20, 70, 170), 110), (0.05, 0.10, 0.25, (30, 60, 130), 60)])
-    cup = assets.get("menubar-keepAwake-on-large")  # drawn at 24 pixels per point, shown as is
-    lit = Image.new("RGBA", (cup.width + 220, cup.width + 220), (250, 250, 252, 255))
-    glow = Image.new("RGBA", lit.size, (0, 0, 0, 0))
-    ImageDraw.Draw(glow).rounded_rectangle((40, 40, lit.width - 41, lit.height - 41), 90, fill=(0, 0, 0, 22))
-    lit.alpha_composite(glow)
-    lit.alpha_composite(cup, ((lit.width - cup.width) // 2, (lit.height - cup.height) // 2))
-    lit.putalpha(rounded_mask(lit.size, 130))
-    float_on(canvas, lit, (190, 170), angle=-6, depth=50, tint=(0, 0, 0), opacity=160)
+    cup = assets.get("menubar-keepAwake-on-large")  # drawn at 36 pixels per point, shown as is
+    canvas.alpha_composite(glowing(cup), (470 - cup.width // 2 - GLOW_PAD, 430 - cup.height // 2 - GLOW_PAD))
 
     k = 2.6
-    float_on(canvas, tile(assets.get("popup-keepAwake-display"), k, 14, (246, 246, 248)), (560, 560), angle=3,
+    float_on(canvas, tile(assets.get("popup-keepAwake-display"), k, 14, (246, 246, 248)), (700, 720), angle=3,
              depth=70, tint=(0, 0, 0))
-    float_on(canvas, tile(assets.get("widget-keepAwake"), k, 22, (252, 252, 253)), (1180, 1180), angle=-6,
+    float_on(canvas, tile(assets.get("widget-keepAwake"), k, 22, (252, 252, 253)), (1330, 1290), angle=-6,
              depth=90, tint=(0, 0, 0))
 
     x = 1700
@@ -307,17 +360,46 @@ def page_diagnostic(assets: Assets) -> Image.Image:
     return canvas
 
 
+def page_health(assets: Assets, root: Path) -> Image.Image:
+    """05: the title centred on top, the heat alert of the app as macOS shows it under it, then the Health popup
+    and widget floating on each side."""
+    canvas = dark([(0.50, 0.45, 0.45, (20, 70, 170), 110), (0.15, 0.85, 0.30, (30, 60, 130), 60),
+                   (0.85, 0.85, 0.30, (30, 60, 130), 60)])
+    first, second = "Il chauffe\u00a0?", "Vous le saurez."
+    face = min((fit_lines(text, "Heavy", 2200, 190, 1) for text in (first, second)), key=lambda f: f.size)
+    step = round(face.size * 1.08)
+    y = 110
+    for text, color in [(first, WHITE), (second, ACCENT_ON_DARK)]:
+        write(canvas, ((W - text_width(face, text)) / 2, y), text, face, color + (255,))
+        y += step
+    grey = "Chauffe, batterie et alertes."
+    small = font("Bold", 72)
+    write(canvas, ((W - text_width(small, grey)) / 2, y + 30), grey, small, GREY + (255,))
+
+    float_on(canvas, tile(assets.get("popup-health"), 2.2, 14, (246, 246, 248)), (300, 800), angle=-4, depth=80,
+             tint=(0, 0, 0))
+    float_on(canvas, tile(assets.get("widget-health-medium"), 2.6, 22, (252, 252, 253)), (1580, 1160), angle=4,
+             depth=70, tint=(0, 0, 0))
+    banner = notification(root, catalog_fr(root, "Your Mac is hot"),
+                          catalog_fr(root, "macOS slows the Mac down to cool it. Quit heavy apps and keep the vents "
+                                           "clear."), "maintenant", 2.9)
+    float_on(canvas, banner, (1310, 760), depth=60, tint=(0, 0, 0), opacity=150)
+    return canvas
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--root", required=True)
     parser.add_argument("--assets", required=True, help="folder of a `Renderer --store` run")
-    parser.add_argument("--only", nargs="+", choices=["01", "02", "03", "04"], help="write only these pages")
+    parser.add_argument("--only", nargs="+", choices=["01", "02", "03", "04", "05"], help="write only these pages")
     args = parser.parse_args()
     for title in TITLES:
         check_text(title)
     assets = Assets(Path(args.assets))
     out = Path(args.root) / "interne" / "appstore-screenshots-1.1" / "fr"
-    pages = [("01", page_promise), ("02", page_overview), ("03", page_keep_awake), ("04", page_diagnostic)]
+    root = Path(args.root)
+    pages = [("01", page_promise), ("02", page_overview), ("03", page_keep_awake), ("04", page_diagnostic),
+             ("05", lambda assets: page_health(assets, root))]
     for name, page in pages:
         if args.only and name not in args.only:
             continue
