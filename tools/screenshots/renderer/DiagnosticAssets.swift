@@ -15,11 +15,20 @@ struct DiagnosticAssetRenderer {
 
     static let longSide: CGFloat = 2_000
 
-    /// A laptop at work: memory nearly full and the processor busy, both worth watching; nothing else.
+    /// A laptop at work: memory nearly full and the processor busy, both worth watching; nothing else. (With the
+    /// processor calm, the model wrote "16 GB" in French: see `--cpu`, `--memory`, `--swap` to try other numbers.)
+    /// A demo number, `fallback` unless the command line gives `<flag> <value>` (to try what the model writes).
+    static func demo(_ flag: String, _ fallback: Double) -> Double {
+        let arguments = CommandLine.arguments
+        return arguments.firstIndex(of: flag).flatMap { $0 + 1 < arguments.count ? Double(arguments[$0 + 1]) : nil }
+            ?? fallback
+    }
+
     var snapshot: MacSnapshot {
         let names = renderer.demo.names
         return MacSnapshot(
-            date: DemoData.date, cpu: 88, memoryUsed: 92, memoryPressure: 41, memoryTotalGB: 16, swapGB: 3.2,
+            date: DemoData.date, cpu: Int(Self.demo("--cpu", 88)), memoryUsed: Int(Self.demo("--memory", 92)),
+            memoryPressure: 41, memoryTotalGB: 16, swapGB: Self.demo("--swap", 3.2),
             disks: [
                 .init(name: names.system, isStartup: true, freeGB: 182, totalGB: 494, freePercent: 37),
                 .init(name: names.backup, isStartup: false, freeGB: 610, totalGB: 1_000, freePercent: 61),
@@ -126,7 +135,10 @@ struct DiagnosticAssetRenderer {
     /// The first suggested question and the model's answer, with the buttons the app would keep.
     @available(macOS 26, *)
     static func question(snapshot: MacSnapshot, language: DiagnosticLanguage) async -> [DiagnosticMessage] {
-        let question = String(localized: DiagnosticController.suggestedQuestions[0])
+        // The first suggested question, or the one typed after --question (what a user may type in the field).
+        let arguments = CommandLine.arguments
+        let typed = arguments.firstIndex(of: "--question").flatMap { $0 + 1 < arguments.count ? arguments[$0 + 1] : nil }
+        let question = typed ?? String(localized: DiagnosticController.suggestedQuestions[0])
         let conversation = DiagnosticConversation(language: language, snapshot: { snapshot })
         do {
             let answer = try await conversation.ask(question) { _ in }

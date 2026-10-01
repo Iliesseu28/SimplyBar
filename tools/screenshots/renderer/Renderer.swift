@@ -194,6 +194,10 @@ final class AssetRenderer {
             ScreenshotRenderer.fail("nothing drawn for the Keep Awake popup")
         }
         write(image, name: "popup-keepAwake-display")
+        // Its menu bar item, cup filled, drawn sharp at 24 pixels per point to be shown very large.
+        let large = AssetRenderer(output: output, scale: 24, rtl: rtl, demo: demo)
+        large.save(StatusItemView(model: StatusItemModels.model(for: .keepAwake, settings: settings, monitor: monitor)),
+                   name: "menubar-keepAwake-on-large", mirrored: false)
     }
 
     private func renderPopup(_ module: Module) {
