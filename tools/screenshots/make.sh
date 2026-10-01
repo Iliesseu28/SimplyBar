@@ -6,6 +6,8 @@
 #   zsh tools/screenshots/make.sh all          # every language of Shared/Localizable.xcstrings
 #   zsh tools/screenshots/make.sh --video <folder>  # English assets of the promo video (tools/promo-video),
 #                                                   # add --settings-only to redraw the settings window alone
+#   zsh tools/screenshots/make.sh --store           # the 1.1 Mac App Store set, French only (compose_store.py):
+#                                                   # interne/appstore-screenshots-1.1/fr/01.png ... 04.png
 #
 # Output:
 #   docs/images/{overview,menubar,popups,widgets}.png   English, for the README and the site (no title)
@@ -26,7 +28,11 @@ LOG="$ROOT/build/screenshots-renderer.log"
 mkdir -p "$ROOT/build"
 
 VIDEO_OUT=""
-if [[ "${1:-}" == "--video" ]]; then
+STORE=""
+if [[ "${1:-}" == "--store" ]]; then
+  STORE=1
+  set -- fr
+elif [[ "${1:-}" == "--video" ]]; then
   [[ -n "${2:-}" ]] || { echo "usage: make.sh --video <output folder>" >&2; exit 2; }
   mkdir -p "$2"
   VIDEO_OUT="$(cd "$2" && pwd)"
@@ -124,6 +130,31 @@ if [[ -n "$VIDEO_OUT" ]]; then
   fi
   cp "$STAGE"/*.png "$STAGE/video-assets.json" "$VIDEO_OUT/"
   grep -E "^Renderer:|^rendered " "$STAGE/render.log"
+  exit 0
+fi
+
+if [[ -n "$STORE" ]]; then
+  # As for the video: launched by `open` so the switches take their colour, writing on the internal disk. Apple's
+  # model writes the Diagnostic, so this run takes up to a few minutes.
+  plutil -replace LSUIElement -bool NO "$APP/Info.plist"
+  STAGE="$WORK/store/fr"
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE"
+  python3 -c 'import json, sys; print(json.dumps(json.load(open(sys.argv[1]))["fr"]["demo"], ensure_ascii=False))' \
+    "$TOOL/titles.json" > "$STAGE/demo.json"
+  ( sleep 400; pkill -f "$WORK/Renderer.app/Contents/MacOS/" ) &
+  WATCHDOG=$!
+  open -W -n "$WORK/Renderer.app" \
+    --args "$STAGE" "$STAGE/demo.json" 4 ltr --store -AppleLanguages "(fr)" -AppleLocale fr_FR
+  kill $WATCHDOG 2>/dev/null || true
+  cp "$STAGE/render.log" "$ROOT/build/screenshots-store-render.log" 2>/dev/null || true
+  if ! grep -q "^rendered " "$STAGE/render.log" 2>/dev/null; then
+    tail -20 "$STAGE/render.log" >&2 || true
+    echo "Store assets failed, full log: $STAGE/render.log" >&2
+    exit 1
+  fi
+  grep -E "^status:|^card |^question:|^answer:|^model |^rendered " "$STAGE/render.log"
+  python3 "$TOOL/compose_store.py" --root "$ROOT" --assets "$STAGE"
   exit 0
 fi
 
