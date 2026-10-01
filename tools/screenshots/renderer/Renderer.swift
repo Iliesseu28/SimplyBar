@@ -7,11 +7,12 @@ import WidgetKit
 // It draws the real views (menu bar items, popups, widgets) with demo numbers into transparent PNGs; `compose.py`
 // then lays them out on a desktop.
 //
-// Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl> [--video | --front]
+// Usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl> [--video | --front | --store | --diagnostic]
 // With --video it draws the assets of the promo video instead (VideoAssets.swift). With --front, launched by `open`
 // as for --video, it draws the same images from the active app, so the Keep Awake switches take their colour (an
 // inactive app draws them grey), plus the Keep Awake and Alerts settings tabs. With --diagnostic it draws the
 // previews of the Diagnostic module, written by Apple's on-device model where it runs (DiagnosticAssets.swift).
+// With --store, launched by `open` as for --front, it draws what the 1.1 Mac App Store set needs (make.sh --store).
 
 /// Stands in for the one of `SimplyBarApp.swift`, which this build leaves out (it holds the app's `@main`).
 @MainActor
@@ -37,7 +38,8 @@ struct ScreenshotRenderer {
             fail("usage: Renderer <output folder> <demo names JSON> <scale> <ltr|rtl>")
         }
         let output = URL(fileURLWithPath: arguments[1], isDirectory: true)
-        let front = arguments.contains("--front")
+        let store = arguments.contains("--store")
+        let front = arguments.contains("--front") || store
         if arguments.contains("--video") || front {
             // Launched by `open`, which leaves no terminal: messages go to a file of the output folder.
             try? FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
@@ -64,6 +66,13 @@ struct ScreenshotRenderer {
             VideoAssetRenderer(renderer: renderer).renderAll(settingsOnly: arguments.contains("--settings-only"))
         } else if arguments.contains("--diagnostic") {
             DiagnosticAssetRenderer(renderer: renderer).renderAll()
+        } else if store {
+            // The Mac App Store set of version 1.1: every image of the default run, Keep Awake with the display
+            // kept on too, and the Diagnostic written by Apple's model, all from the active app.
+            SettingsCapture(renderer: renderer, settings: AppServices.settings, recordSize: { _, _ in }).bringToFront()
+            renderer.renderAll()
+            renderer.renderKeepAwakeDisplayOn()
+            DiagnosticAssetRenderer(renderer: renderer).renderStore()
         } else if front {
             let settings = SettingsCapture(renderer: renderer, settings: AppServices.settings, recordSize: { _, _ in })
             settings.bringToFront()
@@ -171,6 +180,20 @@ final class AssetRenderer {
         save(WidgetFrame(size: .large) {
             StorageListView(volumes: Array(all.volumes.prefix(5)), date: DemoData.date, detailed: true)
         }, name: "widget-storage-large")
+    }
+
+    /// The Keep Awake popup and its menu bar item with the display kept on too (the 1.1 store set).
+    func renderKeepAwakeDisplayOn() {
+        let monitor = SystemMonitor(settings: settings)
+        demo.apply(to: monitor)
+        demo.startKeepAwake(on: monitor)
+        monitor.keepAwake.keepsDisplayOn = true
+        defer { monitor.keepAwake.isActive = false; monitor.keepAwake.keepsDisplayOn = false }
+        guard let image = capture(AnyView(KeepAwakePopup(monitor: monitor, keepAwake: monitor.keepAwake)),
+                                  prepare: { demo.apply(to: monitor) }) else {
+            ScreenshotRenderer.fail("nothing drawn for the Keep Awake popup")
+        }
+        write(image, name: "popup-keepAwake-display")
     }
 
     private func renderPopup(_ module: Module) {

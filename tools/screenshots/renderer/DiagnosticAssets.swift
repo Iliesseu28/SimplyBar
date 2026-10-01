@@ -32,7 +32,15 @@ struct DiagnosticAssetRenderer {
         )
     }
 
-    func renderAll() {
+    /// What the module shows for the demo Mac: the model's card and answer where it runs, the rules' card elsewhere.
+    struct Content {
+        let status: AIStatus
+        let rules: DiagnosticReport
+        let report: DiagnosticReport
+        let messages: [DiagnosticMessage]
+    }
+
+    func content() -> Content {
         let language = DiagnosticLanguage.app
         let snapshot = snapshot
         let findings = DiagnosticRules.findings(snapshot)
@@ -49,6 +57,29 @@ struct DiagnosticAssetRenderer {
         print("status: \(status)")
         print("card (\(report.source.rawValue)): \(report.title) | \(report.explanation) | \(report.actions.map(\.rawValue))")
         for message in messages { print("\(message.role): \(message.text) \(message.actions.map(\.rawValue))") }
+        return Content(status: status, rules: rules, report: report, messages: messages)
+    }
+
+    /// The Mac App Store set (`--store`): the popup and both widgets at the renderer's scale, on a transparent
+    /// background like the other renderer images, so `compose_store.py` lays them out on its desktop.
+    func renderStore() {
+        let content = content()
+        let monitor = SystemMonitor(settings: AppServices.settings)
+        let popup = DiagnosticController(keepAwake: monitor.keepAwake)
+        popup.status = content.status
+        popup.card = DiagnosticCardState(report: content.report)
+        popup.messages = content.messages
+        renderer.save(DiagnosticPopup(monitor: monitor, diagnostic: popup), name: "popup-diagnostic")
+        let state = DiagnosticWidgetState(report: content.report, isPending: false, date: DemoData.date)
+        renderer.save(WidgetFrame(size: .small) { DiagnosticWidgetContent(state: state, isMedium: false) },
+                      name: "widget-diagnostic-small")
+        renderer.save(WidgetFrame(size: .medium) { DiagnosticWidgetContent(state: state, isMedium: true) },
+                      name: "widget-diagnostic-medium")
+    }
+
+    func renderAll() {
+        let content = content()
+        let (status, rules, report, messages) = (content.status, content.rules, content.report, content.messages)
 
         let monitor = SystemMonitor(settings: AppServices.settings)
         let popup = DiagnosticController(keepAwake: monitor.keepAwake)
