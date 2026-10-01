@@ -15,8 +15,6 @@ struct DiagnosticAssetRenderer {
 
     static let longSide: CGFloat = 2_000
 
-    /// A laptop at work: memory nearly full and the processor busy, both worth watching; nothing else. (With the
-    /// processor calm, the model wrote "16 GB" in French: see `--cpu`, `--memory`, `--swap` to try other numbers.)
     /// A demo number, `fallback` unless the command line gives `<flag> <value>` (to try what the model writes).
     static func demo(_ flag: String, _ fallback: Double) -> Double {
         let arguments = CommandLine.arguments
@@ -24,11 +22,15 @@ struct DiagnosticAssetRenderer {
             ?? fallback
     }
 
+    /// A laptop at work: memory nearly full, the processor calm, so the card and the answer speak of memory only.
+    /// Tried with Apple's model in French (`--cpu`, `--memory`, `--pressure`, `--swap` try other numbers): any
+    /// processor load opened a "why is it slow" answer; a pressure above 0 came out as "câblées" or "filées"; a swap
+    /// with decimals as "3.2 Go"; and some sets wrote "16 GB" on the card.
     var snapshot: MacSnapshot {
         let names = renderer.demo.names
         return MacSnapshot(
-            date: DemoData.date, cpu: Int(Self.demo("--cpu", 88)), memoryUsed: Int(Self.demo("--memory", 92)),
-            memoryPressure: 41, memoryTotalGB: 16, swapGB: Self.demo("--swap", 3.2),
+            date: DemoData.date, cpu: Int(Self.demo("--cpu", 25)), memoryUsed: Int(Self.demo("--memory", 92)),
+            memoryPressure: Int(Self.demo("--pressure", 0)), memoryTotalGB: 16, swapGB: Self.demo("--swap", 3),
             disks: [
                 .init(name: names.system, isStartup: true, freeGB: 182, totalGB: 494, freePercent: 37),
                 .init(name: names.backup, isStartup: false, freeGB: 610, totalGB: 1_000, freePercent: 61),
