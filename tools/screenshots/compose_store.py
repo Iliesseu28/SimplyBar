@@ -3,15 +3,16 @@
 
 Called by `make.sh --store` (read it first): the renderer, launched with --store, draws the real views of the app
 (menu bar items, popups, widgets, the Diagnostic written by Apple's model) into a folder, then this script lays
-out four different pages of 2880 x 1800 into interne/appstore-screenshots-1.1/fr/:
+out four pages of 2880 x 1800 into interne/appstore-screenshots-1.1/fr/. One series: a soft black with a faint blue
+halo, one blue accent, a title in two beats (white, then blue), at most three short grey lines, the app's real views
+floating at different depths. Each page has its own composition:
 
-  01  no view of the app: the headline and what SimplyBar offers, set in type
-  02  the version 1.0 overview: the whole menu bar, the CPU popup, the original widgets, full bleed
-  03  Keep Awake: a zoomed corner of the desktop (item, popup, widget) on the right, the text on the left
-  04  the Diagnostic: the title on top, the popup, both widgets and what stays on the Mac
+  01  the menu bar as a band on top, the title on the left, widgets on the right
+  02  the title on top, the menu bar and the CPU popup on the right, the 1.0 widgets on the left
+  03  Keep Awake: the cup, the popup and the widget on the left, the title on the right
+  04  the Diagnostic: widgets top left, the popup on the right, the title at the bottom left
 
-The drawing helpers (desktop wallpaper, frosted panels, shadows, fonts) come from compose.py, which is not changed.
-Run alone on a folder of an earlier run: python3 compose_store.py --root <repo> --assets <folder>
+Run alone on a folder of an earlier run: python3 compose_store.py --root <repo> --assets <folder> [--only 02 03]
 """
 
 from __future__ import annotations
@@ -23,9 +24,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import compose  # noqa: E402
-from compose import (APPSTORE_SIZE, FORBIDDEN_DASHES, GRID_GAP_X, GRID_GAP_Y, LARGE, MENUBAR_HEIGHT, SMALL,  # noqa: E402
-                     Assets, Desktop, drop_shadow, frosted, lerp, load_font, rounded_mask, save_png, scaled)
+from compose import (APPSTORE_SIZE, FORBIDDEN_DASHES, MENUBAR_HEIGHT, Assets, lerp, load_font,  # noqa: E402
+                     rounded_mask, save_png, scaled)
 
 W, H = APPSTORE_SIZE
 SF = "/System/Library/Fonts/SFNS.ttf"
@@ -35,11 +35,11 @@ NBSP = " "
 # by default and stays out.
 BAR_ORDER = ["keepAwake", "diagnostic", "bluetooth", "gpu", "disk", "network", "memory", "cpu"]
 
-TITLES = [
+TITLES = [  # in two beats, white then blue
     "Votre Mac. En direct.",
-    "Votre Mac en direct dans la barre des menus",
-    f"Anti-veille{NBSP}: votre Mac reste éveillé",
-    "Un diagnostic rédigé par l’IA d’Apple",
+    "Tout votre Mac. D’un coup d’œil.",
+    "Pas de veille. Pas de pause.",
+    "Votre Mac, expliqué. Par l’IA d’Apple.",
 ]
 
 
@@ -136,69 +136,7 @@ def backdrop(top, bottom, blobs, size=APPSTORE_SIZE) -> Image.Image:
     return image.filter(ImageFilter.GaussianBlur(1.2)).resize((width, height), Image.BICUBIC).convert("RGBA")
 
 
-def glass(canvas: Image.Image, box, radius: int, tint, border, blur: float = 30, shadow: int = 0) -> None:
-    if shadow:
-        drop_shadow(canvas, box, radius, blur=shadow, offset=shadow // 2, opacity=90)
-    frosted(canvas, box, radius, tint, blur, border=border)
-
-
-# MARK: - Desktop pieces
-
-def draw_bar(desk: Desktop, order: list[str], start: float | None = None, tray: bool = True,
-             names: dict[str, str] | None = None) -> None:
-    """The menu bar: right aligned next to the system tray as macOS lays it, or from `start` to the right (a
-    zoomed corner of the screen). `names` swaps an item for another drawing (Keep Awake on)."""
-    names = names or {}
-    frosted(desk.image, (0, 0, desk.image.width, desk.px(MENUBAR_HEIGHT)), 0, (250, 250, 255, 105),
-            9 * desk.k, border=None)
-    if start is None:
-        tray_w, tray_h = desk.assets.points("menubar-system")
-        x = desk.width - 12 - tray_w
-        if tray:
-            desk.paste_template("menubar-system", x, (MENUBAR_HEIGHT - tray_h) / 2)
-        x -= 10
-        for module in reversed(order):
-            w, h = desk.assets.points(names.get(module, f"menubar-{module}"))
-            x -= w + 14
-            desk.slots[module] = (x, w + 14)
-            desk.paste_template(names.get(module, f"menubar-{module}"), x + 7, (MENUBAR_HEIGHT - h) / 2)
-    else:
-        x = start
-        for module in order:
-            w, h = desk.assets.points(names.get(module, f"menubar-{module}"))
-            desk.slots[module] = (x, w + 14)
-            desk.paste_template(names.get(module, f"menubar-{module}"), x + 7, (MENUBAR_HEIGHT - h) / 2)
-            x += w + 14
-
-
-def popup(desk: Desktop, name: str, x: float, y: float = MENUBAR_HEIGHT + 5) -> tuple[float, float]:
-    """A popup window drawn as compose.Desktop.popup draws it, from any renderer image."""
-    w, h = desk.assets.points(name)
-    box = desk.box(x, y, w, h)
-    radius = desk.px(14)
-    drop_shadow(desk.image, box, radius, blur=desk.px(16), offset=desk.px(8), opacity=110)
-    frosted(desk.image, box, radius, (246, 246, 248, 222), desk.px(20), border=(0, 0, 0, 28))
-    desk.image.alpha_composite(scaled(desk.assets.get(name), desk.k), box[:2])
-    return w, h
-
-
-def card(canvas: Image.Image, image: Image.Image, xy, k: float, radius_pt: float, tint, border, shadow=True):
-    """A renderer image at `k` pixels per point on a frosted card of the canvas (popups and widgets)."""
-    picture = scaled(image, k)
-    box = (round(xy[0]), round(xy[1]), picture.width, picture.height)
-    radius = round(radius_pt * k)
-    if shadow:
-        drop_shadow(canvas, box, radius, blur=round(14 * k), offset=round(6 * k), opacity=95)
-    frosted(canvas, box, radius, tint, 18 * k, border=border)
-    canvas.alpha_composite(picture, box[:2])
-    return picture.width, picture.height
-
-
-# MARK: - The four pages
-
-ACCENT = (0, 102, 230)          # the blue of the app icon, the one accent of page 01
-ACCENT_ON_DARK = (72, 150, 255)
-ICON = "SimplyBar/Assets.xcassets/AppIcon.appiconset/icon_512x512@2x.png"
+ACCENT_ON_DARK = (72, 150, 255)  # the blue of the app icon, lightened for the dark pages: the one accent
 
 
 def tile(image: Image.Image, k: float, radius_pt: float, fill) -> Image.Image:
@@ -229,9 +167,9 @@ def float_on(canvas: Image.Image, card: Image.Image, xy, angle: float = 0, depth
     canvas.alpha_composite(turned, (x, y))
 
 
-def menubar_pill(assets: Assets, k: float, lit: str = "keepAwake") -> Image.Image:
+def menubar_pill(assets: Assets, k: float, lit: str = "keepAwake", cup_on: bool = True) -> Image.Image:
     """The app's menu bar items alone, as a light pill at `k` pixels per point, one item lit as when it is open."""
-    names = {"keepAwake": "menubar-keepAwake-on"}
+    names = {"keepAwake": "menubar-keepAwake-on"} if cup_on else {}
     widths = [assets.points(names.get(module, f"menubar-{module}"))[0] + 14 for module in BAR_ORDER]
     pad = 12
     width, height = round((sum(widths) + 2 * pad) * k), round(MENUBAR_HEIGHT * 1.5 * k)
@@ -283,129 +221,89 @@ def page_promise(assets: Assets) -> Image.Image:
     return canvas
 
 
-def page_promise_b(assets: Assets, root: Path) -> Image.Image:
-    """01-b, light: the page is the top of a Mac screen. The real menu bar runs across it, the icon and one
-    headline on the left; on the right the CPU popup hangs from its item, Keep Awake and the Diagnostic widget
-    float in front of it."""
-    canvas = backdrop((244, 245, 248), (226, 231, 241), [
-        (0.80, 0.55, 0.34, (196, 214, 250), 170), (0.10, 0.95, 0.30, (232, 236, 246), 120),
-    ])
-    k = 3.3
-    desk = Desktop(assets, W / k, MENUBAR_HEIGHT, k, False, menubar=False)
-    desk.image = canvas.crop((0, 0, W, round(MENUBAR_HEIGHT * k)))
-    draw_bar(desk, BAR_ORDER, names={"keepAwake": "menubar-keepAwake-on"})
-    desk.highlight("cpu")
-    canvas.alpha_composite(desk.image, (0, 0))
+WHITE, GREY = (246, 247, 250), (196, 200, 212)
 
-    icon = Image.open(root / ICON).convert("RGBA").resize((340, 340), Image.LANCZOS)
-    float_on(canvas, icon, (170, 270), depth=40, tint=(20, 40, 110), opacity=90)
-    big = font("Heavy", 230)
-    write(canvas, (170, 700), "Votre Mac.", big, (20, 22, 28, 255))
-    write(canvas, (170, 950), "En direct.", big, ACCENT + (255,))
-    write(canvas, (176, 1310), "Gratuit et libre.", font("Bold", 92), (92, 96, 108, 255))
 
-    # The CPU popup opens under its item, as on screen; Keep Awake and the Diagnostic widget lie in front of it.
-    item_x = desk.slots["cpu"][0] * k
-    pk = 2.5
-    popup_fill = (246, 246, 248)
-    cpu = tile(assets.get("popup-cpu"), pk, 14, popup_fill)
-    float_on(canvas, cpu, (item_x, round((MENUBAR_HEIGHT + 5) * k)), depth=50, tint=(30, 40, 80), opacity=90)
-    float_on(canvas, tile(assets.get("popup-keepAwake-display"), pk, 14, popup_fill), (2010, 700), angle=4,
-             depth=70, tint=(30, 40, 80), opacity=100)
-    float_on(canvas, tile(assets.get("widget-diagnostic-small"), pk, 22, (252, 252, 253)), (1520, 1210), angle=-5,
-             depth=80, tint=(30, 40, 80), opacity=100)
-    return canvas
+def dark(halos) -> Image.Image:
+    """The background of the series: a soft black with a faint blue halo where the app's views float."""
+    return backdrop((13, 14, 18), (18, 20, 28), halos)
+
+
+def headline(canvas: Image.Image, x: float, y: float, first: str, second: str, width: float, size: int,
+             greys: tuple[str, ...] = (), grey_size: int = 80) -> float:
+    """The title in two beats, white then blue, each on one line, then up to three short grey lines."""
+    face = min((fit_lines(text, "Heavy", width, size, 1) for text in (first, second)), key=lambda f: f.size)
+    step = round(face.size * 1.08)
+    write(canvas, (x, y), first, face, WHITE + (255,))
+    y = write(canvas, (x, y + step), second, face, ACCENT_ON_DARK + (255,))
+    if greys:
+        y += round(grey_size * 0.5)
+        small = font("Bold", grey_size)
+        for line in greys:
+            y = write(canvas, (x, y), line, small, GREY + (255,)) + round(grey_size * 0.3)
+    return y
 
 
 def page_overview(assets: Assets) -> Image.Image:
-    """02: the desktop of version 1.0, full bleed: the whole menu bar, the CPU popup, the five original widgets,
-    the title written on the wallpaper."""
-    k = 2.4
-    desk = Desktop(assets, W / k, H / k, k, False, menubar=False)
-    draw_bar(desk, BAR_ORDER)
-    width, height = desk.width, desk.height
-    x_cpu = min(max(8, desk.slots["cpu"][0]), width - 300 - 10)
-    desk.highlight("cpu")
-    group_y = height - LARGE[1] - 44
-    for index, name in enumerate(["cpu", "memory", "network", "disk"]):
-        column, row = index % 2, index // 2
-        desk.widget(name, 44 + column * (SMALL[0] + GRID_GAP_X), group_y + row * (SMALL[1] + GRID_GAP_Y))
-    desk.widget("storage-large", 44 + LARGE[0] + GRID_GAP_X, group_y)
-    popup(desk, "popup-cpu", x_cpu)
-    canvas = desk.image
-    y = write(canvas, (round(44 * k), round(62 * k)), TITLES[1], font("Heavy", 124), (255, 255, 255, 255),
-          width=round((x_cpu - 90) * k), leading=1.05, shadow=16)
-    write(canvas, (round(44 * k), y + 30), "CPU, RAM, GPU, réseau, SSD et Bluetooth. Un clic ouvre la fenêtre "
-          "détaillée de chaque module.", font("Semibold", 54), (255, 255, 255, 235), width=round((x_cpu - 90) * k),
-          leading=1.25, shadow=10)
+    """02: the title on top; under it the app's menu bar enlarged, the CPU popup hanging from its item on the
+    right, the widgets of version 1.0 floating on the left at different depths."""
+    canvas = dark([(0.45, 0.80, 0.42, (20, 70, 170), 105), (0.90, 0.75, 0.25, (30, 60, 130), 70)])
+    headline(canvas, 170, 100, "Tout votre Mac.", "D’un coup d’œil.", 2000, 200)
+
+    pill = menubar_pill(assets, 4.0, lit="cpu", cup_on=False)
+    pill_x, pill_y = W - 120 - pill.width, 640
+    float_on(canvas, pill, (pill_x, pill_y), depth=40, tint=(0, 0, 0), opacity=160)
+    cpu = tile(assets.get("popup-cpu"), 1.9, 14, (246, 246, 248))
+    float_on(canvas, cpu, (W - 150 - cpu.width, pill_y + pill.height + 34), depth=60, tint=(0, 0, 0))
+
+    k, white = 2.3, (252, 252, 253)
+    for name, xy, angle, depth in [
+        ("widget-storage-medium", (190, 880), -3, 50), ("widget-cpu", (1110, 860), 4, 60),
+        ("widget-memory", (1560, 1050), -5, 80), ("widget-network", (380, 1290), 5, 70),
+        ("widget-disk", (880, 1300), -3, 90),
+    ]:
+        float_on(canvas, tile(assets.get(name), k, 22, white), xy, angle=angle, depth=depth, tint=(0, 0, 0))
     return canvas
 
 
 def page_keep_awake(assets: Assets) -> Image.Image:
-    """03: Keep Awake. The text on the left; on the right a zoomed corner of the desktop: the item lit in the
-    menu bar, its popup open with the display kept on, the Keep Awake widget."""
-    canvas = backdrop((14, 18, 46), (46, 30, 78), [
-        (0.80, 0.55, 0.38, (255, 170, 80), 120), (0.15, 0.10, 0.30, (60, 80, 200), 130),
-        (0.40, 0.95, 0.30, (150, 70, 170), 110),
-    ])
-    left = 150
-    y = write(canvas, (left, 330), TITLES[2], font("Heavy", 128), (255, 255, 255, 255), width=1050,
-              leading=1.06, shadow=12)
-    points = [
-        f"Indéfiniment, 30{NBSP}min, 1{NBSP}h, 2{NBSP}h ou 4{NBSP}h",
-        "L’écran peut rester allumé lui aussi",
-        "Le temps restant toujours affiché",
-        "Un widget pour l’allumer d’un clic",
-    ]
-    face = font("Semibold", 58)
-    y += 70
-    for point in points:
-        dot = Image.new("RGBA", (26, 26), (255, 196, 110, 255))
-        canvas.paste(dot, (left, y + 26), rounded_mask(dot.size, 13))
-        y = write(canvas, (left + 60, y), point, face, (232, 234, 248, 255), width=980) + 30
+    """03: the views on the left (the cup of the menu bar very large, the popup, the widget), the title on the
+    right."""
+    canvas = dark([(0.25, 0.50, 0.40, (20, 70, 170), 110), (0.05, 0.10, 0.25, (30, 60, 130), 60)])
+    cup = assets.get("menubar-keepAwake-on-large")  # drawn at 24 pixels per point, shown as is
+    lit = Image.new("RGBA", (cup.width + 220, cup.width + 220), (250, 250, 252, 255))
+    glow = Image.new("RGBA", lit.size, (0, 0, 0, 0))
+    ImageDraw.Draw(glow).rounded_rectangle((40, 40, lit.width - 41, lit.height - 41), 90, fill=(0, 0, 0, 22))
+    lit.alpha_composite(glow)
+    lit.alpha_composite(cup, ((lit.width - cup.width) // 2, (lit.height - cup.height) // 2))
+    lit.putalpha(rounded_mask(lit.size, 130))
+    float_on(canvas, lit, (190, 170), angle=-6, depth=50, tint=(0, 0, 0), opacity=160)
 
-    # The zoomed corner: a desktop of its own, framed like a window onto the screen.
-    k = 2.9
-    frame = (1290, 180, 1440, 1440)
-    desk = Desktop(assets, frame[2] / k, frame[3] / k, k, False, menubar=False)
-    draw_bar(desk, BAR_ORDER, start=18, names={"keepAwake": "menubar-keepAwake-on"})
-    desk.highlight("keepAwake")
-    pop_w, pop_h = popup(desk, "popup-keepAwake-display", 14)
-    desk.widget("keepAwake", desk.width - SMALL[0] - 24, MENUBAR_HEIGHT + 5 + pop_h + 28)
-    drop_shadow(canvas, frame, 60, blur=40, offset=16, opacity=150)
-    canvas.paste(desk.image, frame[:2], rounded_mask(desk.image.size, 60))
-    edge = Image.new("RGBA", desk.image.size, (0, 0, 0, 0))
-    ImageDraw.Draw(edge).rounded_rectangle((0, 0, edge.width - 1, edge.height - 1), 60, outline=(255, 255, 255, 70),
-                                           width=3)
-    canvas.alpha_composite(edge, frame[:2])
+    k = 2.6
+    float_on(canvas, tile(assets.get("popup-keepAwake-display"), k, 14, (246, 246, 248)), (560, 560), angle=3,
+             depth=70, tint=(0, 0, 0))
+    float_on(canvas, tile(assets.get("widget-keepAwake"), k, 22, (252, 252, 253)), (1180, 1180), angle=-6,
+             depth=90, tint=(0, 0, 0))
+
+    x = 1700
+    headline(canvas, x, 560, "Pas de veille.", "Pas de pause.", W - 130 - x, 190,
+             greys=(f"De 30{NBSP}min à 4{NBSP}h, ou sans fin.", "L’écran aussi, si vous voulez."), grey_size=72)
     return canvas
 
 
 def page_diagnostic(assets: Assets) -> Image.Image:
-    """04: the Diagnostic. A light page: the title on top, the popup (card, question and answer by Apple's model),
-    both widgets and what the module promises."""
-    canvas = backdrop((214, 226, 250), (238, 226, 248), [
-        (0.15, 0.80, 0.35, (180, 200, 255), 160), (0.85, 0.20, 0.30, (255, 214, 190), 150),
-        (0.70, 0.90, 0.30, (210, 190, 255), 140),
-    ])
-    left = 150
-    ink = (22, 26, 48, 255)
-    write(canvas, (left, 120), TITLES[3], fit_lines(TITLES[3], "Heavy", W - 2 * left, 124, 1), ink)
-    k = 2.7
-    tint, border = (255, 255, 255, 215), (255, 255, 255, 200)
-    _, pop_h = card(canvas, assets.get("popup-diagnostic"), (left, 330), k, 14, (246, 246, 248, 235), (0, 0, 0, 30))
-    right = left + round(340 * k) + 110
-    med_w, med_h = card(canvas, assets.get("widget-diagnostic-medium"), (right, 380), k, 22, tint, border)
-    small_y = 380 + med_h + 80
-    small_w, _ = card(canvas, assets.get("widget-diagnostic-small"), (right, small_y), k, 22, tint, border)
-    tx = right + small_w + 90
-    face_head, face = font("Heavy", 60), font("Medium", 46)
-    y = small_y + 10
-    for head, line in [("Sur l’appareil", "Rien ne quitte votre Mac."),
-                       ("Un verdict clair", "Un titre, deux phrases, le bon bouton."),
-                       ("Vos questions", "Posez-les, il répond avec vos chiffres.")]:
-        y = write(canvas, (tx, y), head, face_head, (88, 70, 200, 255))
-        y = write(canvas, (tx, y + 6), line, face, (60, 64, 86, 255), width=W - tx - 120, leading=1.18) + 34
+    """04: the Diagnostic widgets on the top left, the popup (card, question and answer by Apple's model) large on
+    the right, the title at the bottom left."""
+    canvas = dark([(0.80, 0.45, 0.40, (20, 70, 170), 110), (0.20, 0.20, 0.30, (30, 60, 130), 70)])
+    float_on(canvas, tile(assets.get("popup-diagnostic"), 2.3, 14, (246, 246, 248)), (1880, 300), angle=3,
+             depth=80, tint=(0, 0, 0))
+    k, white = 2.5, (252, 252, 253)
+    float_on(canvas, tile(assets.get("widget-diagnostic-medium"), k, 22, white), (170, 150), angle=-4, depth=50,
+             tint=(0, 0, 0))
+    float_on(canvas, tile(assets.get("widget-diagnostic-small"), k, 22, white), (1250, 380), angle=6, depth=70,
+             tint=(0, 0, 0))
+    headline(canvas, 170, 980, "Votre Mac, expliqué.", "Par l’IA d’Apple.", 1620, 190,
+             greys=("Rien ne quitte votre Mac.",), grey_size=76)
     return canvas
 
 
@@ -413,17 +311,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--root", required=True)
     parser.add_argument("--assets", required=True, help="folder of a `Renderer --store` run")
-    parser.add_argument("--only", choices=["01"], help="write only the first page and its variant 01-b")
+    parser.add_argument("--only", nargs="+", choices=["01", "02", "03", "04"], help="write only these pages")
     args = parser.parse_args()
     for title in TITLES:
         check_text(title)
     assets = Assets(Path(args.assets))
     out = Path(args.root) / "interne" / "appstore-screenshots-1.1" / "fr"
-    root = Path(args.root)
-    pages = [("01", page_promise), ("01-b", lambda a: page_promise_b(a, root)), ("02", page_overview),
-             ("03", page_keep_awake), ("04", page_diagnostic)]
+    pages = [("01", page_promise), ("02", page_overview), ("03", page_keep_awake), ("04", page_diagnostic)]
     for name, page in pages:
-        if args.only and not name.startswith(args.only):
+        if args.only and name not in args.only:
             continue
         image = page(assets)
         if image.size != APPSTORE_SIZE:

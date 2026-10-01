@@ -135,7 +135,8 @@ fi
 
 if [[ -n "$STORE" ]]; then
   # As for the video: launched by `open` so the switches take their colour, writing on the internal disk. Apple's
-  # model writes the Diagnostic, so this run takes up to a few minutes.
+  # model writes the Diagnostic, so this run takes up to a few minutes. The typed question makes the model answer
+  # about memory, as the card does (the first suggestion, "Why is my Mac slow?", only read the processor).
   plutil -replace LSUIElement -bool NO "$APP/Info.plist"
   STAGE="$WORK/store/fr"
   rm -rf "$STAGE"
@@ -145,7 +146,8 @@ if [[ -n "$STORE" ]]; then
   ( sleep 400; pkill -f "$WORK/Renderer.app/Contents/MacOS/" ) &
   WATCHDOG=$!
   open -W -n "$WORK/Renderer.app" \
-    --args "$STAGE" "$STAGE/demo.json" 4 ltr --store -AppleLanguages "(fr)" -AppleLocale fr_FR
+    --args "$STAGE" "$STAGE/demo.json" 4 ltr --store \
+    --question "Pourquoi tout est lent quand j’ouvre plusieurs apps ?" -AppleLanguages "(fr)" -AppleLocale fr_FR
   kill $WATCHDOG 2>/dev/null || true
   cp "$STAGE/render.log" "$ROOT/build/screenshots-store-render.log" 2>/dev/null || true
   if ! grep -q "^rendered " "$STAGE/render.log" 2>/dev/null; then
