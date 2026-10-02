@@ -61,8 +61,15 @@ struct DiagnosticAssetRenderer {
         let status = DiagnosticAIStatus.current(language: language)
         #if canImport(FoundationModels)
         if status == .available, #available(macOS 26, *) {
-            report = wait { await Self.write(snapshot: snapshot, findings: findings, rules: rules, language: language) }
-            messages = wait { await Self.question(snapshot: snapshot, language: language) }
+            // --rules-card keeps the rules' card, as the app does when the model's card fails its checks: in some
+            // languages the model writes the card in English or half in English, while its answers are right.
+            if !CommandLine.arguments.contains("--rules-card") {
+                report = wait { await Self.write(snapshot: snapshot, findings: findings, rules: rules, language: language) }
+            }
+            // --no-question leaves the question out, where every answer the model gives mistranslates a fact.
+            if !CommandLine.arguments.contains("--no-question") {
+                messages = wait { await Self.question(snapshot: snapshot, language: language) }
+            }
         }
         #endif
         print("status: \(status)")
