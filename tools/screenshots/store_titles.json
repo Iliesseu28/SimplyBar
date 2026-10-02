@@ -1,0 +1,1992 @@
+{
+  "_readme": "Texts of the 1.1 Mac App Store set (compose_store.py), by app language: p1 to p5 the titles in two beats (white, then blue), l1 to l5 the grey lines, *_noai where Apple's model does not take the language, now the time of the notification, q the question typed in the Diagnostic (languages the model takes), chosen by reading what the model answers so that it speaks of memory alone; demo the renderer flags of that language (numbers of the demo Mac, rules-card where the model writes its card half in English, no-question where each answer mistranslates a fact).",
+  "en": {
+    "p1": [
+      "Your Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Keep it awake.",
+      "Apple’s AI, on your Mac.",
+      "Free and open source."
+    ],
+    "l1_noai": "A checkup in one click.",
+    "p2": [
+      "Your whole Mac.",
+      "At a glance."
+    ],
+    "p3": [
+      "No sleep.",
+      "No breaks."
+    ],
+    "l3": [
+      "30 min to 4 h, or no limit.",
+      "The display too, if you like."
+    ],
+    "p4": [
+      "Your Mac, explained.",
+      "By Apple’s AI."
+    ],
+    "p4_noai": [
+      "Your Mac, explained.",
+      "In one click."
+    ],
+    "l4": "Nothing leaves your Mac.",
+    "p5": [
+      "Running hot?",
+      "You’ll know."
+    ],
+    "l5": "Heat, battery and alerts.",
+    "now": "now",
+    "q": "Do I have enough memory for more apps?"
+  },
+  "en-AU": {
+    "p1": [
+      "Your Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Keep it awake.",
+      "Apple’s AI, on your Mac.",
+      "Free and open source."
+    ],
+    "l1_noai": "A checkup in one click.",
+    "p2": [
+      "Your whole Mac.",
+      "At a glance."
+    ],
+    "p3": [
+      "No sleep.",
+      "No breaks."
+    ],
+    "l3": [
+      "30 min to 4 h, or no limit.",
+      "The display too, if you like."
+    ],
+    "p4": [
+      "Your Mac, explained.",
+      "By Apple’s AI."
+    ],
+    "p4_noai": [
+      "Your Mac, explained.",
+      "In one click."
+    ],
+    "l4": "Nothing leaves your Mac.",
+    "p5": [
+      "Running hot?",
+      "You’ll know."
+    ],
+    "l5": "Heat, battery and alerts.",
+    "now": "now",
+    "q": "Do I have enough memory for more apps?"
+  },
+  "en-CA": {
+    "p1": [
+      "Your Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Keep it awake.",
+      "Apple’s AI, on your Mac.",
+      "Free and open source."
+    ],
+    "l1_noai": "A checkup in one click.",
+    "p2": [
+      "Your whole Mac.",
+      "At a glance."
+    ],
+    "p3": [
+      "No sleep.",
+      "No breaks."
+    ],
+    "l3": [
+      "30 min to 4 h, or no limit.",
+      "The display too, if you like."
+    ],
+    "p4": [
+      "Your Mac, explained.",
+      "By Apple’s AI."
+    ],
+    "p4_noai": [
+      "Your Mac, explained.",
+      "In one click."
+    ],
+    "l4": "Nothing leaves your Mac.",
+    "p5": [
+      "Running hot?",
+      "You’ll know."
+    ],
+    "l5": "Heat, battery and alerts.",
+    "now": "now",
+    "q": "Is my memory enough for several apps?"
+  },
+  "en-GB": {
+    "p1": [
+      "Your Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Keep it awake.",
+      "Apple’s AI, on your Mac.",
+      "Free and open source."
+    ],
+    "l1_noai": "A checkup in one click.",
+    "p2": [
+      "Your whole Mac.",
+      "At a glance."
+    ],
+    "p3": [
+      "No sleep.",
+      "No breaks."
+    ],
+    "l3": [
+      "30 min to 4 h, or no limit.",
+      "The display too, if you like."
+    ],
+    "p4": [
+      "Your Mac, explained.",
+      "By Apple’s AI."
+    ],
+    "p4_noai": [
+      "Your Mac, explained.",
+      "In one click."
+    ],
+    "l4": "Nothing leaves your Mac.",
+    "p5": [
+      "Running hot?",
+      "You’ll know."
+    ],
+    "l5": "Heat, battery and alerts.",
+    "now": "now",
+    "q": "Do I have enough memory for more apps?"
+  },
+  "ar": {
+    "p1": [
+      "جهاز Mac.",
+      "مباشرةً."
+    ],
+    "l1": [
+      "أبقِه مستيقظًا.",
+      "ذكاء Apple الاصطناعي على جهازك.",
+      "مجاني ومفتوح المصدر."
+    ],
+    "l1_noai": "تشخيص بنقرة واحدة.",
+    "p2": [
+      "جهاز Mac بالكامل.",
+      "في لمحة واحدة."
+    ],
+    "p3": [
+      "بلا سكون.",
+      "بلا توقف."
+    ],
+    "l3": [
+      "من 30 دقيقة إلى 4 ساعات أو بلا حد.",
+      "والشاشة أيضًا إن أردت."
+    ],
+    "p4": [
+      "جهاز Mac، بوضوح.",
+      "بذكاء Apple الاصطناعي."
+    ],
+    "p4_noai": [
+      "جهاز Mac، بوضوح.",
+      "بنقرة واحدة."
+    ],
+    "l4": "لا شيء يغادر جهاز Mac.",
+    "p5": [
+      "هل يسخن؟",
+      "ستعرف فورًا."
+    ],
+    "l5": "الحرارة والبطارية والتنبيهات.",
+    "now": "الآن"
+  },
+  "bn": {
+    "p1": [
+      "আপনার Mac।",
+      "লাইভ।"
+    ],
+    "l1": [
+      "জাগিয়ে রাখুন।",
+      "Apple-এর AI, আপনার Mac-এ।",
+      "বিনামূল্যে ও ওপেন সোর্স।"
+    ],
+    "l1_noai": "এক ক্লিকে পরীক্ষা।",
+    "p2": [
+      "আপনার পুরো Mac।",
+      "এক নজরে।"
+    ],
+    "p3": [
+      "ঘুম নয়।",
+      "বিরতি নয়।"
+    ],
+    "l3": [
+      "৩০ মিনিট থেকে ৪ ঘণ্টা, বা অবিরাম।",
+      "চাইলে স্ক্রিনও।"
+    ],
+    "p4": [
+      "Mac, সহজ ভাষায়।",
+      "Apple-এর AI দিয়ে।"
+    ],
+    "p4_noai": [
+      "Mac, সহজ ভাষায়।",
+      "এক ক্লিকে।"
+    ],
+    "l4": "কিছুই Mac-এর বাইরে যায় না।",
+    "p5": [
+      "গরম হচ্ছে?",
+      "আপনি জানবেন।"
+    ],
+    "l5": "তাপ, ব্যাটারি ও সতর্কতা।",
+    "now": "এখন"
+  },
+  "ca": {
+    "p1": [
+      "El teu Mac.",
+      "En directe."
+    ],
+    "l1": [
+      "Mantén-lo despert.",
+      "La IA d’Apple, al teu Mac.",
+      "Gratuït i de codi obert."
+    ],
+    "l1_noai": "Diagnòstic amb un clic.",
+    "p2": [
+      "Tot el teu Mac.",
+      "D’un cop d’ull."
+    ],
+    "p3": [
+      "Sense repòs.",
+      "Sense pauses."
+    ],
+    "l3": [
+      "De 30 min a 4 h, o sense límit.",
+      "També la pantalla, si vols."
+    ],
+    "p4": [
+      "El teu Mac, explicat.",
+      "Per la IA d’Apple."
+    ],
+    "p4_noai": [
+      "El teu Mac, explicat.",
+      "Amb un clic."
+    ],
+    "l4": "Res no surt del teu Mac.",
+    "p5": [
+      "S’escalfa?",
+      "Ho sabràs."
+    ],
+    "l5": "Calor, bateria i alertes.",
+    "now": "ara"
+  },
+  "cs": {
+    "p1": [
+      "Váš Mac.",
+      "Živě."
+    ],
+    "l1": [
+      "Nenechá ho usnout.",
+      "AI od Applu ve vašem Macu.",
+      "Zdarma a open source."
+    ],
+    "l1_noai": "Diagnóza na jedno kliknutí.",
+    "p2": [
+      "Celý váš Mac.",
+      "Na první pohled."
+    ],
+    "p3": [
+      "Bez spánku.",
+      "Bez pauzy."
+    ],
+    "l3": [
+      "Od 30 min do 4 h, nebo stále.",
+      "I obrazovku, pokud chcete."
+    ],
+    "p4": [
+      "Váš Mac, vysvětlený.",
+      "Pomocí AI od Applu."
+    ],
+    "p4_noai": [
+      "Váš Mac, vysvětlený.",
+      "Jedním kliknutím."
+    ],
+    "l4": "Nic neopustí váš Mac.",
+    "p5": [
+      "Hřeje se?",
+      "Budete to vědět."
+    ],
+    "l5": "Teplota, baterie a upozornění.",
+    "now": "nyní"
+  },
+  "da": {
+    "p1": [
+      "Din Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Hold den vågen.",
+      "Apples AI, på din Mac.",
+      "Gratis og open source."
+    ],
+    "l1_noai": "Diagnose med ét klik.",
+    "p2": [
+      "Hele din Mac.",
+      "Med ét blik."
+    ],
+    "p3": [
+      "Ingen dvale.",
+      "Ingen pause."
+    ],
+    "l3": [
+      "30 min til 4 t, eller uden stop.",
+      "Også skærmen, hvis du vil."
+    ],
+    "p4": [
+      "Din Mac, forklaret.",
+      "Af Apples AI."
+    ],
+    "p4_noai": [
+      "Din Mac, forklaret.",
+      "Med ét klik."
+    ],
+    "l4": "Intet forlader din Mac.",
+    "p5": [
+      "Bliver den varm?",
+      "Du får det at vide."
+    ],
+    "l5": "Varme, batteri og advarsler.",
+    "now": "nu",
+    "q": "Har jeg nok hukommelse til flere apps?"
+  },
+  "de": {
+    "p1": [
+      "Dein Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Hält ihn wach.",
+      "Apples KI, auf deinem Mac.",
+      "Kostenlos und Open Source."
+    ],
+    "l1_noai": "Diagnose per Klick.",
+    "p2": [
+      "Dein ganzer Mac.",
+      "Auf einen Blick."
+    ],
+    "p3": [
+      "Kein Schlaf.",
+      "Keine Pause."
+    ],
+    "l3": [
+      "30 Min. bis 4 Std. oder endlos.",
+      "Auf Wunsch auch der Bildschirm."
+    ],
+    "p4": [
+      "Dein Mac, erklärt.",
+      "Von Apples KI."
+    ],
+    "p4_noai": [
+      "Dein Mac, erklärt.",
+      "Mit einem Klick."
+    ],
+    "l4": "Nichts verlässt deinen Mac.",
+    "p5": [
+      "Zu heiß?",
+      "Du erfährst es."
+    ],
+    "l5": "Wärme, Batterie und Warnungen.",
+    "now": "Jetzt",
+    "q": "Ist mein Arbeitsspeicher zu voll?"
+  },
+  "el": {
+    "p1": [
+      "Το Mac σας.",
+      "Ζωντανά."
+    ],
+    "l1": [
+      "Κρατήστε το ξύπνιο.",
+      "Η AI της Apple στο Mac σας.",
+      "Δωρεάν, ανοιχτού κώδικα."
+    ],
+    "l1_noai": "Διάγνωση με ένα κλικ.",
+    "p2": [
+      "Όλο το Mac σας.",
+      "Με μια ματιά."
+    ],
+    "p3": [
+      "Χωρίς ύπνο.",
+      "Χωρίς παύση."
+    ],
+    "l3": [
+      "Από 30 λεπτά έως 4 ώρες.",
+      "Και η οθόνη, αν θέλετε."
+    ],
+    "p4": [
+      "Το Mac σας, απλά.",
+      "Από την AI της Apple."
+    ],
+    "p4_noai": [
+      "Το Mac σας, απλά.",
+      "Με ένα κλικ."
+    ],
+    "l4": "Τίποτα δεν φεύγει από το Mac.",
+    "p5": [
+      "Ζεσταίνεται;",
+      "Θα το μάθετε."
+    ],
+    "l5": "Θερμότητα, μπαταρία, ειδοποιήσεις.",
+    "now": "τώρα"
+  },
+  "es": {
+    "p1": [
+      "Tu Mac.",
+      "En directo."
+    ],
+    "l1": [
+      "Mantenlo despierto.",
+      "La IA de Apple, en tu Mac.",
+      "Gratis y de código abierto."
+    ],
+    "l1_noai": "Diagnóstico en un clic.",
+    "p2": [
+      "Todo tu Mac.",
+      "De un vistazo."
+    ],
+    "p3": [
+      "Sin reposo.",
+      "Sin pausas."
+    ],
+    "l3": [
+      "De 30 min a 4 h, o sin límite.",
+      "También la pantalla, si quieres."
+    ],
+    "p4": [
+      "Tu Mac, explicado.",
+      "Por la IA de Apple."
+    ],
+    "p4_noai": [
+      "Tu Mac, explicado.",
+      "En un clic."
+    ],
+    "l4": "Nada sale de tu Mac.",
+    "p5": [
+      "¿Se calienta?",
+      "Lo sabrás."
+    ],
+    "l5": "Calor, batería y alertas.",
+    "now": "ahora",
+    "q": "¿Me alcanza la memoria para más apps?"
+  },
+  "es-419": {
+    "p1": [
+      "Tu Mac.",
+      "En vivo."
+    ],
+    "l1": [
+      "Mantenla despierta.",
+      "La IA de Apple, en tu Mac.",
+      "Gratis y de código abierto."
+    ],
+    "l1_noai": "Diagnóstico en un clic.",
+    "p2": [
+      "Toda tu Mac.",
+      "De un vistazo."
+    ],
+    "p3": [
+      "Sin reposo.",
+      "Sin pausas."
+    ],
+    "l3": [
+      "De 30 min a 4 h, o sin límite.",
+      "También la pantalla, si quieres."
+    ],
+    "p4": [
+      "Tu Mac, explicada.",
+      "Por la IA de Apple."
+    ],
+    "p4_noai": [
+      "Tu Mac, explicada.",
+      "En un clic."
+    ],
+    "l4": "Nada sale de tu Mac.",
+    "p5": [
+      "¿Se calienta?",
+      "Lo sabrás."
+    ],
+    "l5": "Calor, batería y alertas.",
+    "now": "ahora",
+    "q": "¿Tengo suficiente memoria para más apps?",
+    "demo": {
+      "memory": 90
+    }
+  },
+  "fi": {
+    "p1": [
+      "Macisi.",
+      "Suorana."
+    ],
+    "l1": [
+      "Pidä se hereillä.",
+      "Applen tekoäly Macissasi.",
+      "Ilmainen ja avoin."
+    ],
+    "l1_noai": "Diagnoosi yhdellä klikillä.",
+    "p2": [
+      "Koko Macisi.",
+      "Yhdellä katseella."
+    ],
+    "p3": [
+      "Ei lepoa.",
+      "Ei taukoja."
+    ],
+    "l3": [
+      "30 minuutista 4 tuntiin.",
+      "Myös näyttö, jos haluat."
+    ],
+    "p4": [
+      "Macisi, selitettynä.",
+      "Applen tekoälyltä."
+    ],
+    "p4_noai": [
+      "Macisi, selitettynä.",
+      "Yhdellä klikillä."
+    ],
+    "l4": "Mikään ei poistu Macistasi.",
+    "p5": [
+      "Kuumeneeko?",
+      "Saat tietää."
+    ],
+    "l5": "Lämpö, akku ja hälytykset.",
+    "now": "nyt"
+  },
+  "fr": {
+    "p1": [
+      "Votre Mac.",
+      "En direct."
+    ],
+    "l1": [
+      "Gardez-le éveillé.",
+      "L’IA d’Apple, sur votre Mac.",
+      "Gratuit et libre."
+    ],
+    "l1_noai": "Un diagnostic en un clic.",
+    "p2": [
+      "Tout votre Mac.",
+      "D’un coup d’œil."
+    ],
+    "p3": [
+      "Pas de veille.",
+      "Pas de pause."
+    ],
+    "l3": [
+      "De 30 min à 4 h, ou sans fin.",
+      "L’écran aussi, si vous voulez."
+    ],
+    "p4": [
+      "Votre Mac, expliqué.",
+      "Par l’IA d’Apple."
+    ],
+    "p4_noai": [
+      "Votre Mac, expliqué.",
+      "En un clic."
+    ],
+    "l4": "Rien ne quitte votre Mac.",
+    "p5": [
+      "Il chauffe ?",
+      "Vous le saurez."
+    ],
+    "l5": "Chauffe, batterie et alertes.",
+    "now": "maintenant",
+    "q": "Ma mémoire suffit-elle pour plusieurs apps ?"
+  },
+  "fr-CA": {
+    "p1": [
+      "Votre Mac.",
+      "En direct."
+    ],
+    "l1": [
+      "Gardez-le éveillé.",
+      "L’IA d’Apple, sur votre Mac.",
+      "Gratuit et libre."
+    ],
+    "l1_noai": "Un diagnostic en un clic.",
+    "p2": [
+      "Tout votre Mac.",
+      "D’un coup d’œil."
+    ],
+    "p3": [
+      "Pas de veille.",
+      "Pas de pause."
+    ],
+    "l3": [
+      "De 30 min à 4 h, ou sans fin.",
+      "L’écran aussi, si vous voulez."
+    ],
+    "p4": [
+      "Votre Mac, expliqué.",
+      "Par l’IA d’Apple."
+    ],
+    "p4_noai": [
+      "Votre Mac, expliqué.",
+      "En un clic."
+    ],
+    "l4": "Rien ne quitte votre Mac.",
+    "p5": [
+      "Il chauffe?",
+      "Vous le saurez."
+    ],
+    "l5": "Chauffe, batterie et alertes.",
+    "now": "maintenant",
+    "q": "Ai-je assez de mémoire pour plusieurs apps?"
+  },
+  "gu": {
+    "p1": [
+      "તમારું Mac.",
+      "લાઇવ."
+    ],
+    "l1": [
+      "તેને જાગતું રાખો.",
+      "Appleનું AI, તમારા Mac પર.",
+      "મફત અને ઓપન સોર્સ."
+    ],
+    "l1_noai": "એક ક્લિકમાં તપાસ.",
+    "p2": [
+      "તમારું આખું Mac.",
+      "એક નજરે."
+    ],
+    "p3": [
+      "ઊંઘ નહીં.",
+      "વિરામ નહીં."
+    ],
+    "l3": [
+      "30 મિનિટથી 4 કલાક, અથવા સતત.",
+      "ઇચ્છો તો સ્ક્રીન પણ."
+    ],
+    "p4": [
+      "તમારું Mac, સમજાવેલું.",
+      "Appleના AI દ્વારા."
+    ],
+    "p4_noai": [
+      "તમારું Mac, સમજાવેલું.",
+      "એક ક્લિકમાં."
+    ],
+    "l4": "કંઈ પણ Macની બહાર જતું નથી.",
+    "p5": [
+      "ગરમ થાય છે?",
+      "તમને ખબર પડશે."
+    ],
+    "l5": "ગરમી, બેટરી અને ચેતવણીઓ.",
+    "now": "હમણાં"
+  },
+  "he": {
+    "p1": [
+      "ה-Mac שלכם.",
+      "בזמן אמת."
+    ],
+    "l1": [
+      "השאירו אותו ער.",
+      "ה-AI של Apple ב-Mac שלכם.",
+      "חינמי וקוד פתוח."
+    ],
+    "l1_noai": "אבחון בלחיצה אחת.",
+    "p2": [
+      "כל ה-Mac שלכם.",
+      "במבט אחד."
+    ],
+    "p3": [
+      "בלי שינה.",
+      "בלי הפסקות."
+    ],
+    "l3": [
+      "מ-30 דקות עד 4 שעות, או ללא הגבלה.",
+      "גם המסך, אם תרצו."
+    ],
+    "p4": [
+      "ה-Mac שלכם, מוסבר.",
+      "בעזרת ה-AI של Apple."
+    ],
+    "p4_noai": [
+      "ה-Mac שלכם, מוסבר.",
+      "בלחיצה אחת."
+    ],
+    "l4": "שום דבר לא יוצא מה-Mac.",
+    "p5": [
+      "הוא מתחמם?",
+      "אתם תדעו."
+    ],
+    "l5": "חום, סוללה והתראות.",
+    "now": "עכשיו"
+  },
+  "hi": {
+    "p1": [
+      "आपका Mac।",
+      "लाइव।"
+    ],
+    "l1": [
+      "इसे जगाए रखें।",
+      "Apple का AI, आपके Mac पर।",
+      "मुफ़्त और ओपन सोर्स।"
+    ],
+    "l1_noai": "एक क्लिक में जाँच।",
+    "p2": [
+      "आपका पूरा Mac।",
+      "एक नज़र में।"
+    ],
+    "p3": [
+      "न स्लीप।",
+      "न ब्रेक।"
+    ],
+    "l3": [
+      "30 मिनट से 4 घंटे, या लगातार।",
+      "चाहें तो स्क्रीन भी।"
+    ],
+    "p4": [
+      "Mac, आसान भाषा में।",
+      "Apple के AI से।"
+    ],
+    "p4_noai": [
+      "Mac, आसान भाषा में।",
+      "एक क्लिक में।"
+    ],
+    "l4": "कुछ भी Mac से बाहर नहीं जाता।",
+    "p5": [
+      "गर्म हो रहा है?",
+      "आपको पता चलेगा।"
+    ],
+    "l5": "गर्मी, बैटरी और अलर्ट।",
+    "now": "अभी"
+  },
+  "hr": {
+    "p1": [
+      "Vaš Mac.",
+      "Uživo."
+    ],
+    "l1": [
+      "Neka ostane budan.",
+      "Appleova UI na vašem Macu.",
+      "Besplatno i otvorenog koda."
+    ],
+    "l1_noai": "Dijagnoza jednim klikom.",
+    "p2": [
+      "Cijeli vaš Mac.",
+      "Na prvi pogled."
+    ],
+    "p3": [
+      "Bez spavanja.",
+      "Bez pauze."
+    ],
+    "l3": [
+      "Od 30 min do 4 h ili bez kraja.",
+      "I zaslon, ako želite."
+    ],
+    "p4": [
+      "Vaš Mac, objašnjen.",
+      "Uz Appleovu UI."
+    ],
+    "p4_noai": [
+      "Vaš Mac, objašnjen.",
+      "Jednim klikom."
+    ],
+    "l4": "Ništa ne napušta vaš Mac.",
+    "p5": [
+      "Grije se?",
+      "Saznat ćete."
+    ],
+    "l5": "Toplina, baterija i upozorenja.",
+    "now": "sada"
+  },
+  "hu": {
+    "p1": [
+      "A Maced.",
+      "Élőben."
+    ],
+    "l1": [
+      "Ébren tartja.",
+      "Az Apple MI-je a Maceden.",
+      "Ingyenes és nyílt forrású."
+    ],
+    "l1_noai": "Diagnózis egy kattintással.",
+    "p2": [
+      "Az egész Maced.",
+      "Egy pillantással."
+    ],
+    "p3": [
+      "Nincs alvás.",
+      "Nincs szünet."
+    ],
+    "l3": [
+      "30 perctől 4 óráig, vagy végig.",
+      "A kijelző is, ha szeretnéd."
+    ],
+    "p4": [
+      "A Maced, érthetően.",
+      "Az Apple MI-jével."
+    ],
+    "p4_noai": [
+      "A Maced, érthetően.",
+      "Egy kattintással."
+    ],
+    "l4": "Semmi sem hagyja el a Maced.",
+    "p5": [
+      "Melegszik?",
+      "Tudni fogod."
+    ],
+    "l5": "Hő, akkumulátor és riasztások.",
+    "now": "most"
+  },
+  "id": {
+    "p1": [
+      "Mac Anda.",
+      "Langsung."
+    ],
+    "l1": [
+      "Tetap terjaga.",
+      "AI Apple, di Mac Anda.",
+      "Gratis dan open source."
+    ],
+    "l1_noai": "Diagnosis sekali klik.",
+    "p2": [
+      "Seluruh Mac Anda.",
+      "Sekilas pandang."
+    ],
+    "p3": [
+      "Tanpa tidur.",
+      "Tanpa jeda."
+    ],
+    "l3": [
+      "30 mnt hingga 4 jam, atau terus.",
+      "Layar juga, jika Anda mau."
+    ],
+    "p4": [
+      "Mac Anda, dijelaskan.",
+      "Oleh AI Apple."
+    ],
+    "p4_noai": [
+      "Mac Anda, dijelaskan.",
+      "Sekali klik."
+    ],
+    "l4": "Tak ada yang keluar dari Mac.",
+    "p5": [
+      "Mulai panas?",
+      "Anda akan tahu."
+    ],
+    "l5": "Panas, baterai, dan peringatan.",
+    "now": "sekarang"
+  },
+  "it": {
+    "p1": [
+      "Il tuo Mac.",
+      "In diretta."
+    ],
+    "l1": [
+      "Tienilo sveglio.",
+      "L’IA di Apple, sul tuo Mac.",
+      "Gratis e open source."
+    ],
+    "l1_noai": "Diagnosi in un clic.",
+    "p2": [
+      "Tutto il tuo Mac.",
+      "A colpo d’occhio."
+    ],
+    "p3": [
+      "Niente sonno.",
+      "Niente pause."
+    ],
+    "l3": [
+      "Da 30 min a 4 h, o senza limiti.",
+      "Anche lo schermo, se vuoi."
+    ],
+    "p4": [
+      "Il tuo Mac, spiegato.",
+      "Dall’IA di Apple."
+    ],
+    "p4_noai": [
+      "Il tuo Mac, spiegato.",
+      "In un clic."
+    ],
+    "l4": "Nulla esce dal tuo Mac.",
+    "p5": [
+      "Scotta?",
+      "Lo saprai."
+    ],
+    "l5": "Calore, batteria e avvisi.",
+    "now": "ora",
+    "q": "La mia memoria basta per più app?"
+  },
+  "ja": {
+    "p1": [
+      "Macの今を。",
+      "ライブで。"
+    ],
+    "l1": [
+      "スリープさせない。",
+      "AppleのAIを、Macで。",
+      "無料でオープンソース。"
+    ],
+    "l1_noai": "ワンクリックで診断。",
+    "p2": [
+      "Macのすべてを、",
+      "ひと目で。"
+    ],
+    "p3": [
+      "眠らない。",
+      "止まらない。"
+    ],
+    "l3": [
+      "30分から4時間、または無制限。",
+      "ディスプレイも、お好みで。"
+    ],
+    "p4": [
+      "Macを、明快に。",
+      "AppleのAIが解説。"
+    ],
+    "p4_noai": [
+      "Macを、明快に。",
+      "ワンクリックで。"
+    ],
+    "l4": "データはMacの外に出ません。",
+    "p5": [
+      "熱くなってる？",
+      "すぐにわかります。"
+    ],
+    "l5": "温度、バッテリー、通知。",
+    "now": "今",
+    "q": "メモリはなぜこんなにいっぱいなのですか？",
+    "demo": {
+      "cpu": 12
+    }
+  },
+  "kn": {
+    "p1": [
+      "ನಿಮ್ಮ Mac.",
+      "ಲೈವ್."
+    ],
+    "l1": [
+      "ಎಚ್ಚರವಾಗಿಡುತ್ತದೆ.",
+      "Apple AI, ನಿಮ್ಮ Mac ನಲ್ಲಿ.",
+      "ಉಚಿತ, ಓಪನ್ ಸೋರ್ಸ್."
+    ],
+    "l1_noai": "ಒಂದೇ ಕ್ಲಿಕ್‌ನಲ್ಲಿ ಪರಿಶೀಲನೆ.",
+    "p2": [
+      "ನಿಮ್ಮ ಸಂಪೂರ್ಣ Mac.",
+      "ಒಂದೇ ನೋಟದಲ್ಲಿ."
+    ],
+    "p3": [
+      "ನಿದ್ರೆ ಇಲ್ಲ.",
+      "ವಿರಾಮ ಇಲ್ಲ."
+    ],
+    "l3": [
+      "30 ನಿಮಿಷದಿಂದ 4 ಗಂಟೆ.",
+      "ಬೇಕಿದ್ದರೆ ಪರದೆಯೂ."
+    ],
+    "p4": [
+      "ನಿಮ್ಮ Mac, ಸುಲಭವಾಗಿ.",
+      "Apple AI ಮೂಲಕ."
+    ],
+    "p4_noai": [
+      "ನಿಮ್ಮ Mac, ಸುಲಭವಾಗಿ.",
+      "ಒಂದೇ ಕ್ಲಿಕ್‌ನಲ್ಲಿ."
+    ],
+    "l4": "ಏನೂ Mac ನಿಂದ ಹೊರಹೋಗುವುದಿಲ್ಲ.",
+    "p5": [
+      "ಬಿಸಿಯಾಗುತ್ತಿದೆಯೇ?",
+      "ನಿಮಗೆ ತಿಳಿಯುತ್ತದೆ."
+    ],
+    "l5": "ಶಾಖ, ಬ್ಯಾಟರಿ, ಎಚ್ಚರಿಕೆಗಳು.",
+    "now": "ಈಗ"
+  },
+  "ko": {
+    "p1": [
+      "나의 Mac.",
+      "실시간으로."
+    ],
+    "l1": [
+      "잠들지 않게.",
+      "Apple의 AI를 Mac에서.",
+      "무료 오픈 소스."
+    ],
+    "l1_noai": "클릭 한 번으로 진단.",
+    "p2": [
+      "Mac의 모든 것.",
+      "한눈에."
+    ],
+    "p3": [
+      "잠자기 없이.",
+      "쉬지 않고."
+    ],
+    "l3": [
+      "30분에서 4시간, 또는 무제한.",
+      "원하면 디스플레이도."
+    ],
+    "p4": [
+      "Mac을 쉽게 설명.",
+      "Apple의 AI로."
+    ],
+    "p4_noai": [
+      "Mac을 쉽게 설명.",
+      "클릭 한 번으로."
+    ],
+    "l4": "데이터는 Mac 밖으로 나가지 않습니다.",
+    "p5": [
+      "Mac이 뜨거운가요?",
+      "바로 알려 드려요."
+    ],
+    "l5": "발열, 배터리, 알림.",
+    "now": "지금",
+    "q": "메모리가 부족한가요?",
+    "demo": {
+      "rules-card": true
+    }
+  },
+  "ml": {
+    "p1": [
+      "Mac.",
+      "തത്സമയം."
+    ],
+    "l1": [
+      "ഉറങ്ങാൻ വിടില്ല.",
+      "Apple AI, നിങ്ങളുടെ Mac-ൽ.",
+      "സൗജന്യം, ഓപ്പൺ സോഴ്സ്."
+    ],
+    "l1_noai": "ഒറ്റ ക്ലിക്കിൽ പരിശോധന.",
+    "p2": [
+      "Mac മുഴുവനും.",
+      "ഒറ്റനോട്ടത്തിൽ."
+    ],
+    "p3": [
+      "ഉറക്കമില്ല.",
+      "ഇടവേളയില്ല."
+    ],
+    "l3": [
+      "30 മിനിറ്റ് മുതൽ 4 മണിക്കൂർ.",
+      "വേണമെങ്കിൽ സ്ക്രീനും."
+    ],
+    "p4": [
+      "Mac, ലളിതമായി.",
+      "Apple AI വഴി."
+    ],
+    "p4_noai": [
+      "Mac, ലളിതമായി.",
+      "ഒറ്റ ക്ലിക്കിൽ."
+    ],
+    "l4": "ഒന്നും Mac വിട്ടുപോകില്ല.",
+    "p5": [
+      "ചൂടാകുന്നുണ്ടോ?",
+      "നിങ്ങൾ അറിയും."
+    ],
+    "l5": "ചൂട്, ബാറ്ററി, മുന്നറിയിപ്പുകൾ.",
+    "now": "ഇപ്പോൾ"
+  },
+  "mr": {
+    "p1": [
+      "तुमचा Mac.",
+      "लाइव्ह."
+    ],
+    "l1": [
+      "त्याला जागे ठेवा.",
+      "Apple चे AI, तुमच्या Mac वर.",
+      "मोफत आणि ओपन सोर्स."
+    ],
+    "l1_noai": "एका क्लिकमध्ये तपासणी.",
+    "p2": [
+      "तुमचा संपूर्ण Mac.",
+      "एका नजरेत."
+    ],
+    "p3": [
+      "झोप नाही.",
+      "विश्रांती नाही."
+    ],
+    "l3": [
+      "30 मिनिटे ते 4 तास, किंवा सतत.",
+      "हवे असल्यास स्क्रीनही."
+    ],
+    "p4": [
+      "तुमचा Mac, समजावून.",
+      "Apple च्या AI कडून."
+    ],
+    "p4_noai": [
+      "तुमचा Mac, समजावून.",
+      "एका क्लिकमध्ये."
+    ],
+    "l4": "काहीही Mac बाहेर जात नाही.",
+    "p5": [
+      "गरम होतोय?",
+      "तुम्हाला कळेल."
+    ],
+    "l5": "उष्णता, बॅटरी आणि सूचना.",
+    "now": "आत्ता"
+  },
+  "ms": {
+    "p1": [
+      "Mac anda.",
+      "Langsung."
+    ],
+    "l1": [
+      "Kekal berjaga.",
+      "AI Apple, di Mac anda.",
+      "Percuma dan sumber terbuka."
+    ],
+    "l1_noai": "Diagnosis satu klik.",
+    "p2": [
+      "Seluruh Mac anda.",
+      "Sekali pandang."
+    ],
+    "p3": [
+      "Tanpa tidur.",
+      "Tanpa rehat."
+    ],
+    "l3": [
+      "30 min hingga 4 jam, atau terus.",
+      "Skrin juga, jika anda mahu."
+    ],
+    "p4": [
+      "Mac anda, dijelaskan.",
+      "Oleh AI Apple."
+    ],
+    "p4_noai": [
+      "Mac anda, dijelaskan.",
+      "Satu klik."
+    ],
+    "l4": "Tiada data keluar dari Mac.",
+    "p5": [
+      "Semakin panas?",
+      "Anda akan tahu."
+    ],
+    "l5": "Haba, bateri dan amaran.",
+    "now": "kini"
+  },
+  "nb": {
+    "p1": [
+      "Din Mac.",
+      "Direkte."
+    ],
+    "l1": [
+      "Hold den våken.",
+      "Apples KI, på din Mac.",
+      "Gratis og åpen kildekode."
+    ],
+    "l1_noai": "Diagnose med ett klikk.",
+    "p2": [
+      "Hele Macen.",
+      "Med ett blikk."
+    ],
+    "p3": [
+      "Ingen dvale.",
+      "Ingen pause."
+    ],
+    "l3": [
+      "30 min til 4 t, eller uten stopp.",
+      "Skjermen også, om du vil."
+    ],
+    "p4": [
+      "Din Mac, forklart.",
+      "Av Apples KI."
+    ],
+    "p4_noai": [
+      "Din Mac, forklart.",
+      "Med ett klikk."
+    ],
+    "l4": "Ingenting forlater Macen.",
+    "p5": [
+      "Blir den varm?",
+      "Du får vite det."
+    ],
+    "l5": "Varme, batteri og varsler.",
+    "now": "nå",
+    "q": "Har jeg nok minne til flere apper?"
+  },
+  "nl": {
+    "p1": [
+      "Je Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Houd hem wakker.",
+      "Apples AI, op je Mac.",
+      "Gratis en open source."
+    ],
+    "l1_noai": "Diagnose in één klik.",
+    "p2": [
+      "Je hele Mac.",
+      "In één oogopslag."
+    ],
+    "p3": [
+      "Geen slaap.",
+      "Geen pauze."
+    ],
+    "l3": [
+      "30 min tot 4 uur, of onbeperkt.",
+      "Ook het scherm, als je wilt."
+    ],
+    "p4": [
+      "Je Mac, uitgelegd.",
+      "Door Apples AI."
+    ],
+    "p4_noai": [
+      "Je Mac, uitgelegd.",
+      "In één klik."
+    ],
+    "l4": "Niets verlaat je Mac.",
+    "p5": [
+      "Wordt hij heet?",
+      "Je weet het meteen."
+    ],
+    "l5": "Warmte, batterij en meldingen.",
+    "now": "nu",
+    "q": "Heb ik genoeg geheugen voor meer apps?"
+  },
+  "or": {
+    "p1": [
+      "ଆପଣଙ୍କ Mac।",
+      "ଲାଇଭ।"
+    ],
+    "l1": [
+      "ଏହାକୁ ଜାଗ୍ରତ ରଖନ୍ତୁ।",
+      "Appleର AI, ଆପଣଙ୍କ Macରେ।",
+      "ମାଗଣା ଓ ଓପନ ସୋର୍ସ।"
+    ],
+    "l1_noai": "ଗୋଟିଏ କ୍ଲିକରେ ଯାଞ୍ଚ।",
+    "p2": [
+      "ଆପଣଙ୍କ ପୂରା Mac।",
+      "ଏକ ନଜରରେ।"
+    ],
+    "p3": [
+      "ନିଦ ନାହିଁ।",
+      "ବିରାମ ନାହିଁ।"
+    ],
+    "l3": [
+      "30 ମିନିଟରୁ 4 ଘଣ୍ଟା, କିମ୍ବା ନିରନ୍ତର।",
+      "ଚାହିଁଲେ ସ୍କ୍ରିନ ମଧ୍ୟ।"
+    ],
+    "p4": [
+      "ଆପଣଙ୍କ Mac, ସହଜରେ।",
+      "Appleର AI ଦ୍ୱାରା।"
+    ],
+    "p4_noai": [
+      "ଆପଣଙ୍କ Mac, ସହଜରେ।",
+      "ଗୋଟିଏ କ୍ଲିକରେ।"
+    ],
+    "l4": "କିଛି ବି Macରୁ ବାହାରକୁ ଯାଏ ନାହିଁ।",
+    "p5": [
+      "ଗରମ ହେଉଛି କି?",
+      "ଆପଣ ଜାଣିବେ।"
+    ],
+    "l5": "ତାପ, ବ୍ୟାଟେରୀ ଓ ସତର୍କତା।",
+    "now": "ବର୍ତ୍ତମାନ"
+  },
+  "pa": {
+    "p1": [
+      "ਤੁਹਾਡਾ Mac।",
+      "ਲਾਈਵ।"
+    ],
+    "l1": [
+      "ਇਸਨੂੰ ਜਾਗਦਾ ਰੱਖੋ।",
+      "Apple ਦਾ AI, ਤੁਹਾਡੇ Mac ’ਤੇ।",
+      "ਮੁਫ਼ਤ ਅਤੇ ਓਪਨ ਸੋਰਸ।"
+    ],
+    "l1_noai": "ਇੱਕ ਕਲਿੱਕ ਵਿੱਚ ਜਾਂਚ।",
+    "p2": [
+      "ਤੁਹਾਡਾ ਪੂਰਾ Mac।",
+      "ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ।"
+    ],
+    "p3": [
+      "ਨਾ ਨੀਂਦ।",
+      "ਨਾ ਵਿਰਾਮ।"
+    ],
+    "l3": [
+      "30 ਮਿੰਟ ਤੋਂ 4 ਘੰਟੇ, ਜਾਂ ਲਗਾਤਾਰ।",
+      "ਚਾਹੋ ਤਾਂ ਸਕ੍ਰੀਨ ਵੀ।"
+    ],
+    "p4": [
+      "ਤੁਹਾਡਾ Mac, ਸਮਝਾਇਆ।",
+      "Apple ਦੇ AI ਨਾਲ।"
+    ],
+    "p4_noai": [
+      "ਤੁਹਾਡਾ Mac, ਸਮਝਾਇਆ।",
+      "ਇੱਕ ਕਲਿੱਕ ਵਿੱਚ।"
+    ],
+    "l4": "ਕੁਝ ਵੀ Mac ਤੋਂ ਬਾਹਰ ਨਹੀਂ ਜਾਂਦਾ।",
+    "p5": [
+      "ਗਰਮ ਹੋ ਰਿਹਾ?",
+      "ਤੁਹਾਨੂੰ ਪਤਾ ਲੱਗੇਗਾ।"
+    ],
+    "l5": "ਗਰਮੀ, ਬੈਟਰੀ ਅਤੇ ਅਲਰਟ।",
+    "now": "ਹੁਣੇ"
+  },
+  "pl": {
+    "p1": [
+      "Twój Mac.",
+      "Na żywo."
+    ],
+    "l1": [
+      "Nie da mu zasnąć.",
+      "AI Apple na Twoim Macu.",
+      "Darmowy i otwarty."
+    ],
+    "l1_noai": "Diagnoza jednym kliknięciem.",
+    "p2": [
+      "Cały Twój Mac.",
+      "W mgnieniu oka."
+    ],
+    "p3": [
+      "Bez uśpienia.",
+      "Bez przerw."
+    ],
+    "l3": [
+      "Od 30 min do 4 h lub bez końca.",
+      "Także ekran, jeśli chcesz."
+    ],
+    "p4": [
+      "Twój Mac, wyjaśniony.",
+      "Przez AI Apple."
+    ],
+    "p4_noai": [
+      "Twój Mac, wyjaśniony.",
+      "Jednym kliknięciem."
+    ],
+    "l4": "Nic nie opuszcza Twojego Maca.",
+    "p5": [
+      "Grzeje się?",
+      "Dowiesz się."
+    ],
+    "l5": "Ciepło, bateria i alerty.",
+    "now": "teraz"
+  },
+  "pt-BR": {
+    "p1": [
+      "Seu Mac.",
+      "Ao vivo."
+    ],
+    "l1": [
+      "Mantenha-o acordado.",
+      "A IA da Apple, no seu Mac.",
+      "Grátis e de código aberto."
+    ],
+    "l1_noai": "Diagnóstico em um clique.",
+    "p2": [
+      "Todo o seu Mac.",
+      "De relance."
+    ],
+    "p3": [
+      "Sem repouso.",
+      "Sem pausas."
+    ],
+    "l3": [
+      "De 30 min a 4 h, ou sem limite.",
+      "A tela também, se quiser."
+    ],
+    "p4": [
+      "Seu Mac, explicado.",
+      "Pela IA da Apple."
+    ],
+    "p4_noai": [
+      "Seu Mac, explicado.",
+      "Em um clique."
+    ],
+    "l4": "Nada sai do seu Mac.",
+    "p5": [
+      "Esquentou?",
+      "Você vai saber."
+    ],
+    "l5": "Calor, bateria e alertas.",
+    "now": "agora",
+    "q": "Minha memória está no limite?"
+  },
+  "pt-PT": {
+    "p1": [
+      "O seu Mac.",
+      "Em direto."
+    ],
+    "l1": [
+      "Mantenha-o acordado.",
+      "A IA da Apple, no seu Mac.",
+      "Gratuito e de código aberto."
+    ],
+    "l1_noai": "Diagnóstico num clique.",
+    "p2": [
+      "Todo o seu Mac.",
+      "Num relance."
+    ],
+    "p3": [
+      "Sem repouso.",
+      "Sem pausas."
+    ],
+    "l3": [
+      "De 30 min a 4 h, ou sem limite.",
+      "O ecrã também, se quiser."
+    ],
+    "p4": [
+      "O seu Mac, explicado.",
+      "Pela IA da Apple."
+    ],
+    "p4_noai": [
+      "O seu Mac, explicado.",
+      "Num clique."
+    ],
+    "l4": "Nada sai do seu Mac.",
+    "p5": [
+      "Está a aquecer?",
+      "Vai saber."
+    ],
+    "l5": "Calor, bateria e alertas.",
+    "now": "agora",
+    "demo": {
+      "no-question": true
+    }
+  },
+  "ro": {
+    "p1": [
+      "Mac-ul tău.",
+      "În direct."
+    ],
+    "l1": [
+      "Ține-l treaz.",
+      "AI-ul Apple, pe Mac-ul tău.",
+      "Gratuit și open source."
+    ],
+    "l1_noai": "Diagnostic dintr-un clic.",
+    "p2": [
+      "Tot Mac-ul tău.",
+      "Dintr-o privire."
+    ],
+    "p3": [
+      "Fără somn.",
+      "Fără pauze."
+    ],
+    "l3": [
+      "De la 30 min la 4 h, sau mereu.",
+      "Și ecranul, dacă vrei."
+    ],
+    "p4": [
+      "Mac-ul tău, explicat.",
+      "De AI-ul Apple."
+    ],
+    "p4_noai": [
+      "Mac-ul tău, explicat.",
+      "Dintr-un clic."
+    ],
+    "l4": "Nimic nu părăsește Mac-ul tău.",
+    "p5": [
+      "Se încălzește?",
+      "Vei ști."
+    ],
+    "l5": "Căldură, baterie și alerte.",
+    "now": "acum"
+  },
+  "ru": {
+    "p1": [
+      "Ваш Mac.",
+      "Вживую."
+    ],
+    "l1": [
+      "Не даст ему уснуть.",
+      "ИИ Apple на вашем Mac.",
+      "Бесплатно и открыто."
+    ],
+    "l1_noai": "Диагностика в один клик.",
+    "p2": [
+      "Весь ваш Mac.",
+      "С одного взгляда."
+    ],
+    "p3": [
+      "Без сна.",
+      "Без пауз."
+    ],
+    "l3": [
+      "От 30 мин до 4 ч или без конца.",
+      "И экран тоже, если хотите."
+    ],
+    "p4": [
+      "Всё о вашем Mac.",
+      "От ИИ Apple."
+    ],
+    "p4_noai": [
+      "Всё о вашем Mac.",
+      "В один клик."
+    ],
+    "l4": "Данные не покидают ваш Mac.",
+    "p5": [
+      "Перегрелся?",
+      "Вы узнаете."
+    ],
+    "l5": "Нагрев, батарея и оповещения.",
+    "now": "сейчас"
+  },
+  "sk": {
+    "p1": [
+      "Váš Mac.",
+      "Naživo."
+    ],
+    "l1": [
+      "Nenechá ho zaspať.",
+      "AI od Apple vo vašom Macu.",
+      "Zadarmo a open source."
+    ],
+    "l1_noai": "Diagnostika na jedno kliknutie.",
+    "p2": [
+      "Celý váš Mac.",
+      "Na prvý pohľad."
+    ],
+    "p3": [
+      "Bez spánku.",
+      "Bez pauzy."
+    ],
+    "l3": [
+      "Od 30 min do 4 h, alebo stále.",
+      "Aj obrazovku, ak chcete."
+    ],
+    "p4": [
+      "Váš Mac, vysvetlený.",
+      "Pomocou AI od Apple."
+    ],
+    "p4_noai": [
+      "Váš Mac, vysvetlený.",
+      "Jedným kliknutím."
+    ],
+    "l4": "Nič neopustí váš Mac.",
+    "p5": [
+      "Hreje sa?",
+      "Budete to vedieť."
+    ],
+    "l5": "Teplota, batéria a upozornenia.",
+    "now": "teraz"
+  },
+  "sl": {
+    "p1": [
+      "Vaš Mac.",
+      "V živo."
+    ],
+    "l1": [
+      "Ohranite ga budnega.",
+      "Applova UI na vašem Macu.",
+      "Brezplačno in odprtokodno."
+    ],
+    "l1_noai": "Diagnoza z enim klikom.",
+    "p2": [
+      "Ves vaš Mac.",
+      "Na prvi pogled."
+    ],
+    "p3": [
+      "Brez spanja.",
+      "Brez pavz."
+    ],
+    "l3": [
+      "Od 30 min do 4 h ali brez konca.",
+      "Tudi zaslon, če želite."
+    ],
+    "p4": [
+      "Vaš Mac, pojasnjen.",
+      "Z Applovo UI."
+    ],
+    "p4_noai": [
+      "Vaš Mac, pojasnjen.",
+      "Z enim klikom."
+    ],
+    "l4": "Nič ne zapusti vašega Maca.",
+    "p5": [
+      "Se greje?",
+      "Izvedeli boste."
+    ],
+    "l5": "Toplota, baterija in opozorila.",
+    "now": "zdaj"
+  },
+  "sv": {
+    "p1": [
+      "Din Mac.",
+      "Live."
+    ],
+    "l1": [
+      "Håll den vaken.",
+      "Apples AI, på din Mac.",
+      "Gratis och öppen källkod."
+    ],
+    "l1_noai": "Diagnos med ett klick.",
+    "p2": [
+      "Hela din Mac.",
+      "Med en blick."
+    ],
+    "p3": [
+      "Ingen vila.",
+      "Inga pauser."
+    ],
+    "l3": [
+      "30 min till 4 h, eller utan slut.",
+      "Skärmen också, om du vill."
+    ],
+    "p4": [
+      "Din Mac, förklarad.",
+      "Av Apples AI."
+    ],
+    "p4_noai": [
+      "Din Mac, förklarad.",
+      "Med ett klick."
+    ],
+    "l4": "Inget lämnar din Mac.",
+    "p5": [
+      "Blir den varm?",
+      "Du får veta."
+    ],
+    "l5": "Värme, batteri och varningar.",
+    "now": "nu",
+    "q": "Har jag tillräckligt med minne för flera appar?",
+    "demo": {
+      "cpu": 12
+    }
+  },
+  "ta": {
+    "p1": [
+      "உங்கள் Mac.",
+      "நேரலையில்."
+    ],
+    "l1": [
+      "தூங்க விடாது.",
+      "Apple AI, உங்கள் Mac-இல்.",
+      "இலவசம், ஓப்பன் சோர்ஸ்."
+    ],
+    "l1_noai": "ஒரே கிளிக்கில் சோதனை.",
+    "p2": [
+      "உங்கள் முழு Mac.",
+      "ஒரே பார்வையில்."
+    ],
+    "p3": [
+      "உறக்கமில்லை.",
+      "ஓய்வில்லை."
+    ],
+    "l3": [
+      "30 நிமிடம் முதல் 4 மணிநேரம்.",
+      "விரும்பினால் திரையும்."
+    ],
+    "p4": [
+      "உங்கள் Mac, எளிதாக.",
+      "Apple AI மூலம்."
+    ],
+    "p4_noai": [
+      "உங்கள் Mac, எளிதாக.",
+      "ஒரே கிளிக்கில்."
+    ],
+    "l4": "எதுவும் Mac-ஐ விட்டு வெளியேறாது.",
+    "p5": [
+      "சூடாகிறதா?",
+      "உடனே தெரியும்."
+    ],
+    "l5": "வெப்பம், பேட்டரி, எச்சரிக்கைகள்.",
+    "now": "இப்போது"
+  },
+  "te": {
+    "p1": [
+      "మీ Mac.",
+      "లైవ్‌గా."
+    ],
+    "l1": [
+      "మేల్కొని ఉంచుతుంది.",
+      "Apple AI, మీ Macలో.",
+      "ఉచితం, ఓపెన్ సోర్స్."
+    ],
+    "l1_noai": "ఒక్క క్లిక్‌తో తనిఖీ.",
+    "p2": [
+      "మీ పూర్తి Mac.",
+      "ఒక్క చూపులో."
+    ],
+    "p3": [
+      "నిద్ర లేదు.",
+      "విరామం లేదు."
+    ],
+    "l3": [
+      "30 నిమిషాల నుండి 4 గంటలు.",
+      "కావాలంటే స్క్రీన్ కూడా."
+    ],
+    "p4": [
+      "మీ Mac, సులువుగా.",
+      "Apple AI ద్వారా."
+    ],
+    "p4_noai": [
+      "మీ Mac, సులువుగా.",
+      "ఒక్క క్లిక్‌తో."
+    ],
+    "l4": "ఏదీ Mac నుండి బయటకు వెళ్లదు.",
+    "p5": [
+      "వేడెక్కుతోందా?",
+      "మీకు తెలుస్తుంది."
+    ],
+    "l5": "వేడి, బ్యాటరీ, హెచ్చరికలు.",
+    "now": "ఇప్పుడు"
+  },
+  "th": {
+    "p1": [
+      "Mac ของคุณ",
+      "แบบเรียลไทม์"
+    ],
+    "l1": [
+      "ไม่ให้เครื่องหลับ",
+      "AI ของ Apple บน Mac",
+      "ฟรีและโอเพนซอร์ส"
+    ],
+    "l1_noai": "วินิจฉัยในคลิกเดียว",
+    "p2": [
+      "Mac ทั้งเครื่อง",
+      "ในพริบตาเดียว"
+    ],
+    "p3": [
+      "ไม่หลับ",
+      "ไม่พัก"
+    ],
+    "l3": [
+      "30 นาทีถึง 4 ชั่วโมง หรือไม่จำกัด",
+      "จอภาพด้วย หากต้องการ"
+    ],
+    "p4": [
+      "Mac ของคุณ เข้าใจง่าย",
+      "โดย AI ของ Apple"
+    ],
+    "p4_noai": [
+      "Mac ของคุณ เข้าใจง่าย",
+      "ในคลิกเดียว"
+    ],
+    "l4": "ข้อมูลไม่ออกจาก Mac ของคุณ",
+    "p5": [
+      "เครื่องร้อนไหม",
+      "คุณจะรู้ทันที"
+    ],
+    "l5": "ความร้อน แบตเตอรี่ และการแจ้งเตือน",
+    "now": "ตอนนี้"
+  },
+  "tr": {
+    "p1": [
+      "Mac’iniz.",
+      "Canlı."
+    ],
+    "l1": [
+      "Uyanık tutun.",
+      "Apple’ın yapay zekâsı, Mac’inizde.",
+      "Ücretsiz ve açık kaynak."
+    ],
+    "l1_noai": "Tek tıkla teşhis.",
+    "p2": [
+      "Tüm Mac’iniz.",
+      "Tek bakışta."
+    ],
+    "p3": [
+      "Uyku yok.",
+      "Mola yok."
+    ],
+    "l3": [
+      "30 dk ile 4 sa arası ya da sınırsız.",
+      "İsterseniz ekran da."
+    ],
+    "p4": [
+      "Mac’iniz, açıklandı.",
+      "Apple’ın YZ’siyle."
+    ],
+    "p4_noai": [
+      "Mac’iniz, açıklandı.",
+      "Tek tıkla."
+    ],
+    "l4": "Hiçbir veri Mac’inizden çıkmaz.",
+    "p5": [
+      "Isınıyor mu?",
+      "Hemen bilirsiniz."
+    ],
+    "l5": "Isı, pil ve uyarılar.",
+    "now": "şimdi",
+    "q": "Belleğim birkaç uygulamaya yetiyor mu?"
+  },
+  "uk": {
+    "p1": [
+      "Ваш Mac.",
+      "Наживо."
+    ],
+    "l1": [
+      "Не дасть йому заснути.",
+      "ШІ Apple на вашому Mac.",
+      "Безкоштовно й відкрито."
+    ],
+    "l1_noai": "Діагностика в один клік.",
+    "p2": [
+      "Увесь ваш Mac.",
+      "З одного погляду."
+    ],
+    "p3": [
+      "Без сну.",
+      "Без пауз."
+    ],
+    "l3": [
+      "Від 30 хв до 4 год або без кінця.",
+      "І екран теж, якщо хочете."
+    ],
+    "p4": [
+      "Усе про ваш Mac.",
+      "Від ШІ Apple."
+    ],
+    "p4_noai": [
+      "Усе про ваш Mac.",
+      "В один клік."
+    ],
+    "l4": "Дані не залишають ваш Mac.",
+    "p5": [
+      "Перегрівся?",
+      "Ви дізнаєтеся."
+    ],
+    "l5": "Нагрів, батарея та сповіщення.",
+    "now": "зараз"
+  },
+  "ur": {
+    "p1": [
+      "آپ کا Mac۔",
+      "براہِ راست۔"
+    ],
+    "l1": [
+      "اسے جاگتا رکھیں۔",
+      "Apple کی AI، آپ کے Mac پر۔",
+      "مفت اور اوپن سورس۔"
+    ],
+    "l1_noai": "ایک کلک میں تشخیص۔",
+    "p2": [
+      "آپ کا پورا Mac۔",
+      "ایک نظر میں۔"
+    ],
+    "p3": [
+      "نہ نیند۔",
+      "نہ وقفہ۔"
+    ],
+    "l3": [
+      "30 منٹ سے 4 گھنٹے، یا مسلسل۔",
+      "چاہیں تو اسکرین بھی۔"
+    ],
+    "p4": [
+      "آپ کا Mac، واضح۔",
+      "Apple کی AI سے۔"
+    ],
+    "p4_noai": [
+      "آپ کا Mac، واضح۔",
+      "ایک کلک میں۔"
+    ],
+    "l4": "کچھ بھی Mac سے باہر نہیں جاتا۔",
+    "p5": [
+      "گرم ہو رہا ہے؟",
+      "آپ کو پتا چلے گا۔"
+    ],
+    "l5": "حرارت، بیٹری اور الرٹس۔",
+    "now": "ابھی"
+  },
+  "vi": {
+    "p1": [
+      "Mac của bạn.",
+      "Trực tiếp."
+    ],
+    "l1": [
+      "Giữ máy luôn thức.",
+      "AI của Apple, trên Mac.",
+      "Miễn phí, mã nguồn mở."
+    ],
+    "l1_noai": "Chẩn đoán chỉ một cú nhấp.",
+    "p2": [
+      "Toàn bộ máy Mac.",
+      "Chỉ trong nháy mắt."
+    ],
+    "p3": [
+      "Không ngủ.",
+      "Không nghỉ."
+    ],
+    "l3": [
+      "Từ 30 phút đến 4 giờ, hoặc mãi.",
+      "Cả màn hình, nếu bạn muốn."
+    ],
+    "p4": [
+      "Mac của bạn, rõ ràng.",
+      "Nhờ AI của Apple."
+    ],
+    "p4_noai": [
+      "Mac của bạn, rõ ràng.",
+      "Chỉ một cú nhấp."
+    ],
+    "l4": "Không gì rời khỏi máy Mac.",
+    "p5": [
+      "Máy nóng?",
+      "Bạn sẽ biết."
+    ],
+    "l5": "Nhiệt, pin và cảnh báo.",
+    "now": "bây giờ",
+    "q": "Bộ nhớ có đủ cho nhiều ứng dụng không?"
+  },
+  "zh-Hans": {
+    "p1": [
+      "你的 Mac。",
+      "实时呈现。"
+    ],
+    "l1": [
+      "让它保持唤醒。",
+      "Apple 的 AI，就在 Mac 上。",
+      "免费且开源。"
+    ],
+    "l1_noai": "一键诊断。",
+    "p2": [
+      "整台 Mac，",
+      "一目了然。"
+    ],
+    "p3": [
+      "不睡眠。",
+      "不停歇。"
+    ],
+    "l3": [
+      "30 分钟到 4 小时，或无限期。",
+      "显示器也可以保持开启。"
+    ],
+    "p4": [
+      "你的 Mac，讲明白。",
+      "由 Apple 的 AI 解读。"
+    ],
+    "p4_noai": [
+      "你的 Mac，讲明白。",
+      "一键即知。"
+    ],
+    "l4": "数据不会离开你的 Mac。",
+    "p5": [
+      "发热了？",
+      "你会知道。"
+    ],
+    "l5": "温度、电池与提醒。",
+    "now": "现在",
+    "q": "内存够同时开多个 App 吗？"
+  },
+  "zh-Hant": {
+    "p1": [
+      "你的 Mac。",
+      "即時呈現。"
+    ],
+    "l1": [
+      "讓它保持喚醒。",
+      "Apple 的 AI，就在 Mac 上。",
+      "免費且開源。"
+    ],
+    "l1_noai": "一鍵診斷。",
+    "p2": [
+      "整台 Mac，",
+      "一目瞭然。"
+    ],
+    "p3": [
+      "不睡眠。",
+      "不停歇。"
+    ],
+    "l3": [
+      "30 分鐘到 4 小時，或無限期。",
+      "顯示器也能保持開啟。"
+    ],
+    "p4": [
+      "你的 Mac，說清楚。",
+      "由 Apple 的 AI 解讀。"
+    ],
+    "p4_noai": [
+      "你的 Mac，說清楚。",
+      "一鍵即知。"
+    ],
+    "l4": "資料不會離開你的 Mac。",
+    "p5": [
+      "發熱了？",
+      "你會知道。"
+    ],
+    "l5": "溫度、電池與提醒。",
+    "now": "現在",
+    "q": "記憶體夠用嗎？",
+    "demo": {
+      "rules-card": true
+    }
+  }
+}
