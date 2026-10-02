@@ -6,8 +6,9 @@
 #   zsh tools/screenshots/make.sh all          # every language of Shared/Localizable.xcstrings
 #   zsh tools/screenshots/make.sh --video <folder>  # English assets of the promo video (tools/promo-video),
 #                                                   # add --settings-only to redraw the settings window alone
-#   zsh tools/screenshots/make.sh --store           # the 1.1 Mac App Store set, French only (compose_store.py):
-#                                                   # interne/appstore-screenshots-1.1/fr/01.png ... 04.png
+#   zsh tools/screenshots/make.sh --store [langs]   # the 1.1 Mac App Store set (compose_store.py, store_titles.json):
+#                                                   # interne/appstore-screenshots-1.1/<listing code>/01.png ... 05.png,
+#                                                   # every language but French (validated, kept as it is) if none
 #
 # Output:
 #   docs/images/{overview,menubar,popups,widgets}.png   English, for the README and the site (no title)
@@ -31,7 +32,10 @@ VIDEO_OUT=""
 STORE=""
 if [[ "${1:-}" == "--store" ]]; then
   STORE=1
-  set -- fr
+  shift
+  if [[ $# -eq 0 ]]; then
+    set -- ${(f)"$(python3 -c 'import json, sys; print("\n".join(k for k in json.load(open(sys.argv[1])) if k[0] != "_" and k != "fr"))' "$TOOL/store_titles.json")"}
+  fi
 elif [[ "${1:-}" == "--video" ]]; then
   [[ -n "${2:-}" ]] || { echo "usage: make.sh --video <output folder>" >&2; exit 2; }
   mkdir -p "$2"
@@ -137,26 +141,53 @@ if [[ -n "$STORE" ]]; then
   # As for the video: launched by `open` so the switches take their colour, writing on the internal disk. Apple's
   # model writes the Diagnostic, so this run takes up to a few minutes. The typed question makes the model answer
   # about memory only, as the card does (a "why is it slow" question always opened with the processor).
+  # The question and, if needed, the demo numbers of each language are in store_titles.json ("q", "demo"): chosen
+  # by reading the model's answers, so that it speaks of memory alone. One language at a time: the renderer must be
+  # the app in front, or its switches would be grey.
   plutil -replace LSUIElement -bool NO "$APP/Info.plist"
-  STAGE="$WORK/store/fr"
-  rm -rf "$STAGE"
-  mkdir -p "$STAGE"
-  python3 -c 'import json, sys; print(json.dumps(json.load(open(sys.argv[1]))["fr"]["demo"], ensure_ascii=False))' \
-    "$TOOL/titles.json" > "$STAGE/demo.json"
-  ( sleep 400; pkill -f "$WORK/Renderer.app/Contents/MacOS/" ) &
+  store_one() {
+    local lang="$1" stage="$WORK/store/$1"
+    rm -rf "$stage"
+    mkdir -p "$stage"
+    local -a args
+    args=(${(f)"$(python3 - "$TOOL" "$lang" "$stage" <<'PY'
+import json, sys
+sys.path.insert(0, sys.argv[1])
+import compose
+tool, lang, stage = sys.argv[1:]
+titles = json.load(open(f"{tool}/titles.json"))
+text = json.load(open(f"{tool}/store_titles.json"))[lang]
+json.dump(titles[lang]["demo"], open(f"{stage}/demo.json", "w"), ensure_ascii=False)
+args = [stage, f"{stage}/demo.json", "4", "rtl" if lang.split("-")[0] in compose.RTL_LANGUAGES else "ltr", "--store"]
+if text.get("q"):
+    args += ["--question", text["q"]]
+for flag, value in text.get("demo", {}).items():  # {"cpu": 12} gives --cpu 12, {"rules-card": true} --rules-card
+    args += [f"--{flag}"] if value is True else [f"--{flag}", str(value)]
+args += ["-AppleLanguages", f"({lang})", "-AppleLocale", compose.locale_for(lang, titles[lang])]
+print("\n".join(args))
+PY
+)"})
+    open -W -n "$WORK/Renderer.app" --args "${args[@]}"
+    cp "$stage/render.log" "$ROOT/build/screenshots-store-$lang.log" 2>/dev/null || true
+  }
+  ( sleep $(( 400 * $# )); pkill -f "$WORK/Renderer.app/Contents/MacOS/" ) &
   WATCHDOG=$!
-  open -W -n "$WORK/Renderer.app" \
-    --args "$STAGE" "$STAGE/demo.json" 4 ltr --store \
-    --question "Ma mémoire suffit-elle pour plusieurs apps ?" -AppleLanguages "(fr)" -AppleLocale fr_FR
+  for lang in "$@"; do
+    store_one "$lang"
+  done
   kill $WATCHDOG 2>/dev/null || true
-  cp "$STAGE/render.log" "$ROOT/build/screenshots-store-render.log" 2>/dev/null || true
-  if ! grep -q "^rendered " "$STAGE/render.log" 2>/dev/null; then
-    tail -20 "$STAGE/render.log" >&2 || true
-    echo "Store assets failed, full log: $STAGE/render.log" >&2
+  failed=()
+  for lang in "$@"; do
+    grep -q "^rendered " "$WORK/store/$lang/render.log" 2>/dev/null || failed+=("$lang")
+  done
+  if (( ${#failed} )); then
+    echo "Store assets failed for: ${failed[*]} (logs: build/screenshots-store-<lang>.log)" >&2
     exit 1
   fi
-  grep -E "^status:|^card |^question:|^answer:|^model |^rendered " "$STAGE/render.log"
-  python3 "$TOOL/compose_store.py" --root "$ROOT" --assets "$STAGE"
+  for lang in "$@"; do
+    grep -E "^status:|^card |^answer:" "$WORK/store/$lang/render.log" | sed "s/^/$lang /"
+  done
+  python3 "$TOOL/compose_store.py" --root "$ROOT" --assets-root "$WORK/store" "$@"
   exit 0
 fi
 
