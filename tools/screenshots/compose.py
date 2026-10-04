@@ -80,7 +80,8 @@ FALLBACK_FONT = ("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", 0)
 NO_SPACE_SCRIPTS = {"ja", "zh-Hans", "zh-Hant"}
 
 # The app's menu bar items, left to right: the first one declared in SimplyBarApp.swift ends up rightmost.
-MENUBAR_ORDER = ["keepAwake", "bluetooth", "gpu", "disk", "network", "memory", "cpu"]
+# Health and Bluetooth are hidden by default in the app, shown here so the strip has every module.
+MENUBAR_ORDER = ["keepAwake", "diagnostic", "health", "bluetooth", "gpu", "disk", "network", "memory", "cpu"]
 MENUBAR_HEIGHT = 24
 SMALL, MEDIUM, LARGE = (170, 170), (364, 170), (364, 382)
 GRID_GAP_X, GRID_GAP_Y = 24, 42  # macOS lays widgets so that 2 x 2 small ones fill one large
@@ -354,6 +355,26 @@ def overview(assets: Assets, rtl: bool, width: float, height: float, k: float, p
     return desk.image
 
 
+def overview_diagnostic(assets: Assets, rtl: bool, width: float, height: float, k: float) -> Image.Image:
+    """The README desktop of 1.1: the Diagnostic popup open under its item, six small widgets on its left and three
+    on its right, so no widget hides under the popup."""
+    desk = Desktop(assets, width, height, k, rtl)
+    popup_w = assets.points("popup-diagnostic")[0]
+    popup_x = min(max(8, desk.slots["diagnostic"][0]), width - popup_w - 8)
+    rows, margin = 3, 32
+    top = MENUBAR_HEIGHT + (height - MENUBAR_HEIGHT - rows * SMALL[1] - (rows - 1) * GRID_GAP_Y) / 2
+    right = width - margin - SMALL[0]
+    if margin + 2 * SMALL[0] + GRID_GAP_X > popup_x - 16 or right < popup_x + popup_w + 16:
+        fail("overview: the widgets do not fit beside the Diagnostic popup")
+    for index, name in enumerate(["cpu", "memory", "gpu", "disk", "network", "storage-small"]):
+        column, row = index % 2, index // 2
+        desk.widget(name, margin + column * (SMALL[0] + GRID_GAP_X), top + row * (SMALL[1] + GRID_GAP_Y))
+    for row, name in enumerate(["health-small", "keepAwake", "bluetooth-small"]):
+        desk.widget(name, right, top + row * (SMALL[1] + GRID_GAP_Y))
+    desk.popup("diagnostic")
+    return desk.image
+
+
 def menubar_strip(assets: Assets, rtl: bool, k: float) -> Image.Image:
     probe = Desktop(assets, 2000, MENUBAR_HEIGHT, 1, False)
     used = probe.width - min(x for x, _ in probe.slots.values()) + 36
@@ -361,25 +382,37 @@ def menubar_strip(assets: Assets, rtl: bool, k: float) -> Image.Image:
 
 
 def popup_grid(assets: Assets, rtl: bool, k: float) -> Image.Image:
-    """The six popups in three columns of two, paired so the columns end at about the same height."""
-    columns = [["cpu", "bluetooth"], ["memory", "gpu"], ["network", "disk"]]
+    """The nine popups in three columns of three, grouped so the columns end at about the same height."""
+    columns = [["cpu", "gpu", "bluetooth"], ["memory", "network", "health"], ["diagnostic", "disk", "keepAwake"]]
     gap = 32
     heights = [sum(assets.points(f"popup-{module}")[1] for module in column) + gap * (len(column) - 1)
                for column in columns]
-    width = len(columns) * 300 + (len(columns) + 1) * gap
-    desk = Desktop(assets, width, max(heights) + 2 * gap, k, rtl, menubar=False)
-    for index, column in enumerate(columns):
+    widths = [max(assets.points(f"popup-{module}")[0] for module in column) for column in columns]
+    desk = Desktop(assets, sum(widths) + (len(columns) + 1) * gap, max(heights) + 2 * gap, k, rtl, menubar=False)
+    x = gap
+    for column, column_width in zip(columns, widths):
         y = gap
         for module in column:
-            _, h = desk.popup(module, x=gap + index * (300 + gap), y=y)
+            _, h = desk.popup(module, x=x, y=y)
             y += h + gap
+        x += column_width + gap
     return desk.image
+
+
+# The ten widgets on a grid of 4 x 4 cells, as macOS lays them (a medium widget takes 2 cells, a large one 4).
+WIDGET_BOARD = [("cpu", 0, 0), ("memory", 1, 0), ("storage-large", 2, 0),
+                ("network", 0, 1), ("disk", 1, 1),
+                ("gpu", 0, 2), ("keepAwake", 1, 2), ("diagnostic-medium", 2, 2),
+                ("bluetooth-medium", 0, 3), ("health-medium", 2, 3)]
 
 
 def widget_board(assets: Assets, rtl: bool, k: float) -> Image.Image:
     margin = 40
-    desk = Desktop(assets, LARGE[0] * 2 + GRID_GAP_X + margin * 2, LARGE[1] + margin * 2, k, rtl, menubar=False)
-    desk.widget_group(margin, margin)
+    width = 4 * SMALL[0] + 3 * GRID_GAP_X
+    height = 4 * SMALL[1] + 3 * GRID_GAP_Y
+    desk = Desktop(assets, width + margin * 2, height + margin * 2, k, rtl, menubar=False)
+    for name, column, row in WIDGET_BOARD:
+        desk.widget(name, margin + column * (SMALL[0] + GRID_GAP_X), margin + row * (SMALL[1] + GRID_GAP_Y))
     return desk.image
 
 
@@ -690,7 +723,7 @@ def compose_language(args, language: str, entry: dict, docs_languages: set[str])
     if language in docs_languages:
         suffix = "" if language == "en" else f"-{language}"
         images = {
-            "overview": overview(assets, rtl, 1200, 750, 1.6, "cpu", centred=True),
+            "overview": overview_diagnostic(assets, rtl, 1280, 800, 1.5),
             "menubar": menubar_strip(assets, rtl, 3.0),
             "popups": popup_grid(assets, rtl, 1.6),
             "widgets": widget_board(assets, rtl, 2.0),
