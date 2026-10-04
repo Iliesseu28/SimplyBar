@@ -80,7 +80,9 @@ struct ScreenshotRenderer {
             settings.captureKeepAwake()
             settings.captureAlerts()
         } else {
+            // The README set: every image, the Diagnostic with the rules' card (no model, the same at every run).
             renderer.renderAll()
+            DiagnosticAssetRenderer(renderer: renderer).renderStore(useModel: false)
         }
         UserDefaults.standard.removePersistentDomain(forName: RenderDefaults.name)
         print("rendered \(renderer.count) images into \(output.path) (\(Bundle.main.preferredLocalizations.first ?? "?"))")

@@ -51,7 +51,9 @@ struct DiagnosticAssetRenderer {
         let messages: [DiagnosticMessage]
     }
 
-    func content() -> Content {
+    /// `useModel: false` keeps the rules' card and leaves the question out, without asking the model anything: the
+    /// README images (default run) stay the same from one run to the next.
+    func content(useModel: Bool = true) -> Content {
         let language = DiagnosticLanguage.app
         let snapshot = snapshot
         let findings = DiagnosticRules.findings(snapshot)
@@ -60,7 +62,7 @@ struct DiagnosticAssetRenderer {
         var messages: [DiagnosticMessage] = []
         let status = DiagnosticAIStatus.current(language: language)
         #if canImport(FoundationModels)
-        if status == .available, #available(macOS 26, *) {
+        if useModel, status == .available, #available(macOS 26, *) {
             // --rules-card keeps the rules' card, as the app does when the model's card fails its checks: in some
             // languages the model writes the card in English or half in English, while its answers are right.
             if !CommandLine.arguments.contains("--rules-card") {
@@ -80,8 +82,8 @@ struct DiagnosticAssetRenderer {
 
     /// The Mac App Store set (`--store`): the popup and both widgets at the renderer's scale, on a transparent
     /// background like the other renderer images, so `compose_store.py` lays them out on its desktop.
-    func renderStore() {
-        let content = content()
+    func renderStore(useModel: Bool = true) {
+        let content = content(useModel: useModel)
         let monitor = SystemMonitor(settings: AppServices.settings)
         let popup = DiagnosticController(keepAwake: monitor.keepAwake)
         popup.status = content.status
