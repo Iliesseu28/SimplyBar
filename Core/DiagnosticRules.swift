@@ -173,7 +173,7 @@ nonisolated enum DiagnosticRules {
         }
         actions = Array(actions.prefix(DiagnosticReport.maximumActions))
         guard let top = concerns.first else {
-            let note = findings.first.flatMap { note($0, snapshot: snapshot, locale: locale) }
+            let note = findings.first.flatMap { Self.note($0, snapshot: snapshot, locale: locale) }
                 ?? String(localized: "Nothing needs your attention right now.")
             return DiagnosticReport(
                 verdict: .ok, title: String(localized: "Your Mac is doing fine"),
