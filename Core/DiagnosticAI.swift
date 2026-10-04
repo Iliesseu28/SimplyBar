@@ -120,10 +120,16 @@ struct SnapshotTool: Tool {
 
 @available(macOS 26, *)
 enum DiagnosticAI {
+    // The macOS 27 SDK renamed the label `sampling:` to `samplingMode:`; Xcode 26 only knows the old one.
+    #if compiler(>=6.4)
     static let diagnosticOptions = GenerationOptions(samplingMode: .greedy, maximumResponseTokens: 220)
     /// Tool calls stay `.allowed`: macOS 27's `.required` asks for a tool at every step, and the model then calls
     /// the eight tools in a loop without ever answering.
     static let answerOptions = GenerationOptions(samplingMode: .greedy, maximumResponseTokens: 260)
+    #else
+    static let diagnosticOptions = GenerationOptions(sampling: .greedy, maximumResponseTokens: 220)
+    static let answerOptions = GenerationOptions(sampling: .greedy, maximumResponseTokens: 260)
+    #endif
 
     static func status(model: SystemLanguageModel = .default, language: DiagnosticLanguage) -> AIStatus {
         switch model.availability {
