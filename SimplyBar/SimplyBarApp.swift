@@ -15,6 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if AppServices.settings.openSettingsAtLaunch {
             SettingsWindowController.shared.show()
         }
+        ReviewPrompt.appDidLaunch()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
