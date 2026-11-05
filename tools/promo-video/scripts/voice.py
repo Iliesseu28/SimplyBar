@@ -2,12 +2,13 @@
 """Records the voice-over of the promo video, one WAV per line of src/narration.json, with Gemini text-to-speech on
 Vertex AI, then writes src/voice.json (duration of each line, in seconds) for the timeline.
 
-  VERTEX_PROJECT=<project> python3 scripts/voice.py                     # records the lines that have no WAV yet
-  VERTEX_PROJECT=<project> python3 scripts/voice.py --force intro drag  # records these lines again
-  python3 scripts/voice.py --durations                                  # only measures the WAVs
+  python3 scripts/voice.py                     # records the lines that have no WAV yet
+  python3 scripts/voice.py --force intro drag  # records these lines again
+  python3 scripts/voice.py --durations         # only measures the WAVs
 
-Needs gcloud logged in (the access token comes from `gcloud auth print-access-token`) and ffmpeg. The recordings are
-kept in git (public/voice): a new take never sounds the same, so the video renders again without this script.
+Calls go through the AI gateway (proxy-ia): needs PROXY_IA_KEY (PROXY_IA_URL optional) and ffmpeg, no Google
+credential. The recordings are kept in git (public/voice): a new take never sounds the same, so the video renders
+again without this script.
 """
 
 from __future__ import annotations
@@ -29,17 +30,20 @@ VOICE_DIR = ROOT / "public" / "voice"
 DURATIONS = ROOT / "src" / "voice.json"
 
 
-def token() -> str:
-    result = subprocess.run(["gcloud", "auth", "print-access-token"], capture_output=True, text=True)
-    if result.returncode != 0 or not result.stdout.strip():
-        sys.exit("voice.py: gcloud gave no access token (run gcloud auth login)")
-    return result.stdout.strip()
+PROXY_URL = os.environ.get("PROXY_IA_URL", "https://ia.simplibot.fr")
 
 
-def synthesize(project: str, access: str, model: str, voice: str, prompt: str) -> bytes:
+def proxy_key() -> str:
+    """Key of the AI gateway: PROXY_IA_KEY, then the per-machine names."""
+    for name in ("PROXY_IA_KEY", "PROXY_IA_KEY_MAC", "PROXY_IA_KEY_PC"):
+        if os.environ.get(name):
+            return os.environ[name]
+    sys.exit("voice.py: export PROXY_IA_KEY (key of the AI gateway https://ia.simplibot.fr)")
+
+
+def synthesize(key: str, model: str, voice: str, prompt: str) -> bytes:
     """Raw PCM, 16 bits, mono, 24 kHz."""
-    url = (f"https://aiplatform.googleapis.com/v1/projects/{project}/locations/global/publishers/google/models/"
-           f"{model}:generateContent")
+    url = f"{PROXY_URL}/vertex/v1/projects/-/locations/global/publishers/google/models/{model}:generateContent"
     body = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -48,7 +52,7 @@ def synthesize(project: str, access: str, model: str, voice: str, prompt: str) -
         },
     }
     request = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST", headers={
-        "Authorization": f"Bearer {access}", "Content-Type": "application/json"})
+        "X-API-Key": key, "X-Caller": "simplybar/promo-voice", "Content-Type": "application/json"})
     for attempt in range(1, 7):
         try:
             with urllib.request.urlopen(request, timeout=120) as response:
@@ -89,18 +93,15 @@ def main() -> None:
     narration = json.loads(NARRATION.read_text(encoding="utf-8"))
     VOICE_DIR.mkdir(parents=True, exist_ok=True)
     forced = set(args.force or [])
-    access = None
+    key = None
     for line in [] if args.durations else narration["lines"]:
         path = VOICE_DIR / f"{line['id']}.wav"
         again = args.force is not None and (not forced or line["id"] in forced)
         if path.exists() and not again:
             continue
-        project = os.environ.get("VERTEX_PROJECT")
-        if not project:
-            sys.exit("voice.py: set VERTEX_PROJECT (the Google Cloud project that runs Vertex AI)")
-        access = access or token()
+        key = key or proxy_key()
         print(f"recording {line['id']}...", flush=True)
-        pcm = synthesize(project, access, narration["model"], narration["voice"], f"{narration['style']} {line['text']}")
+        pcm = synthesize(key, narration["model"], narration["voice"], f"{narration['style']} {line['text']}")
         to_wav(pcm, path)
     durations = {line["id"]: duration(VOICE_DIR / f"{line['id']}.wav") for line in narration["lines"]}
     DURATIONS.write_text(json.dumps(durations, indent=2) + "\n", encoding="utf-8")
