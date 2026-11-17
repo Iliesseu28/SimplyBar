@@ -57,6 +57,7 @@ struct KeepAwakeProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<KeepAwakeEntry>) -> Void) {
         let now = Date.now
         let payload = SharedStore.load()
+        Probe.timeline(kind: SharedStore.keepAwakeWidgetKind, payload: payload, now: now)
         let request = SharedStore.loadKeepAwakeRequest()
         var dates = [now]
         if let end = payload?.keepAwake?.end { dates.append(end) }

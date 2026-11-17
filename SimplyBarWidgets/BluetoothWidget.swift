@@ -3,7 +3,7 @@ import WidgetKit
 
 struct BluetoothWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SharedStore.bluetoothWidgetKind, provider: PayloadProvider()) { entry in
+        StaticConfiguration(kind: SharedStore.bluetoothWidgetKind, provider: PayloadProvider(kind: SharedStore.bluetoothWidgetKind)) { entry in
             BluetoothWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Bluetooth")

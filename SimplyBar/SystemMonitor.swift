@@ -62,6 +62,8 @@ final class SystemMonitor {
     @ObservationIgnored private var thermalObserver: (any NSObjectProtocol)?
     @ObservationIgnored private var volumeObservers: [any NSObjectProtocol] = []
     @ObservationIgnored private var volumeTask: Task<Void, Never>?
+    /// Readings of each module and the time they took since the last full publication (probe line).
+    @ObservationIgnored private var sampleCost: [Module: (count: Int, time: Duration)] = [:]
     /// Keys of the alerts being sent right now.
     @ObservationIgnored private var sendingAlerts: Set<String> = []
 
@@ -99,6 +101,7 @@ final class SystemMonitor {
     // MARK: - Popups
 
     func popupOpened(_ module: Module) {
+        Probe.log.notice("popup module=\(module.rawValue, privacy: .public)")
         if module == .diagnostic { diagnostic.popupOpened() }
         let running = intervals[module] != nil
         openPopups.insert(module)
@@ -183,6 +186,8 @@ final class SystemMonitor {
     // MARK: - Sampling
 
     func sample(_ module: Module) {
+        let start = ContinuousClock.now
+        defer { recordCost(module, since: start) }
         switch module {
         case .cpu:
             guard let value = cpuReader.read() else { return }
@@ -222,6 +227,14 @@ final class SystemMonitor {
     }
 
     /// Throughput, plus the local address only while it is on screen (menu bar metric or open popup).
+    /// The Bluetooth reading runs in a task: only its start is counted.
+    private func recordCost(_ module: Module, since start: ContinuousClock.Instant) {
+        var cost = sampleCost[module] ?? (count: 0, time: .zero)
+        cost.count += 1
+        cost.time += ContinuousClock.now - start
+        sampleCost[module] = cost
+    }
+
     private func sampleNetwork(record: Bool = true) {
         let wantsIP = openPopups.contains(.network) || (settings.network.shown && settings.network.metric == .ipAddress)
         guard let reading = networkReader.read(localIP: wantsIP) else {
@@ -343,12 +356,41 @@ final class SystemMonitor {
                 """)
             return
         }
+        Probe.log.notice("\(self.probeLine(payload, onlyKind: kind), privacy: .public)")
+        if kind == nil { sampleCost = [:] }
         if let kind {
             WidgetCenter.shared.reloadTimelines(ofKind: kind)
         } else {
             lastWidgetReload = .now
             WidgetCenter.shared.reloadAllTimelines()
         }
+    }
+
+    /// One line per publication: what the widgets got (bytes, percents), which widgets are on the desktop and which
+    /// modules the menu bar shows, and the readings since the last full publication (`module:count×total µs`).
+    private func probeLine(_ payload: WidgetPayload, onlyKind kind: String?) -> String {
+        var parts = ["publish only=\(kind.map(Probe.shortKind) ?? "all")"]
+        parts.append("widgets=" + widgetKinds.map(Probe.shortKind).sorted().joined(separator: ","))
+        parts.append("bar=" + Module.allCases.filter { settings.isShown($0) }.map(\.rawValue).joined(separator: ","))
+        if let cpu = payload.cpu { parts.append(String(format: "cpu=%.1f", (1 - cpu.idle) * 100)) }
+        if let memory = payload.memory { parts.append("ram=\(Int64(memory.used)) ramTotal=\(Int64(memory.total))") }
+        if let disk = payload.disk { parts.append("diskFree=\(Int64(disk.free))") }
+        if let network = payload.network { parts.append("up=\(Int64(network.upload)) down=\(Int64(network.download))") }
+        if let gpu = payload.gpu { parts.append(String(format: "gpu=%.1f", gpu.utilization * 100)) }
+        if let volumes = payload.volumes {
+            parts.append("volumes=\(volumes.count) volFree=" + volumes.map { String(Int64($0.free)) }.joined(separator: ","))
+        }
+        if let devices = payload.bluetooth {
+            let levels = devices.flatMap { $0.levels.map(\.percent) }
+            parts.append("bt=\(devices.count) btMin=\(levels.min() ?? -1)")
+        }
+        if let health = payload.health { parts.append("heat=\(health.thermal)") }
+        if let keepAwake = payload.keepAwake { parts.append("awake=\(keepAwake.isActive ? 1 : 0)") }
+        let cost = sampleCost.sorted { $0.key.rawValue < $1.key.rawValue }.map { module, cost in
+            "\(module.rawValue):\(cost.count)x\(Int(cost.time / .microseconds(1)))"
+        }
+        parts.append("cost=" + cost.joined(separator: ","))
+        return parts.joined(separator: " ")
     }
 
     // MARK: - Disks

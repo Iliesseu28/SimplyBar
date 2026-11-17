@@ -40,6 +40,7 @@ struct DiagnosticProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<DiagnosticEntry>) -> Void) {
         let now = Date.now
         let payload = SharedStore.load()
+        Probe.timeline(kind: SharedStore.diagnosticWidgetKind, payload: payload, now: now)
         let request = SharedStore.loadDiagnosticRequest()
         var dates = [now]
         if let request { dates.append(request.date.addingTimeInterval(DiagnosticWidgetState.pendingWindow)) }

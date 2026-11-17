@@ -3,7 +3,7 @@ import WidgetKit
 
 struct HealthWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SharedStore.healthWidgetKind, provider: PayloadProvider()) { entry in
+        StaticConfiguration(kind: SharedStore.healthWidgetKind, provider: PayloadProvider(kind: SharedStore.healthWidgetKind)) { entry in
             HealthWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Mac Health")

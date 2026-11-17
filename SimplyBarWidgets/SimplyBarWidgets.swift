@@ -27,6 +27,8 @@ struct PayloadEntry: TimelineEntry {
 
 /// Every widget reads the file the menu bar app writes; the app reloads the timelines every 30 minutes.
 struct PayloadProvider: TimelineProvider {
+    let kind: String
+
     func placeholder(in context: Context) -> PayloadEntry {
         PayloadEntry(date: .now, payload: .preview)
     }
@@ -37,7 +39,7 @@ struct PayloadProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<PayloadEntry>) -> Void) {
-        let (payload, policy) = PayloadTimeline.current()
+        let (payload, policy) = PayloadTimeline.current(kind: kind)
         completion(Timeline(entries: [PayloadEntry(date: .now, payload: payload)], policy: policy))
     }
 }
@@ -46,8 +48,10 @@ enum PayloadTimeline {
     /// The latest numbers while they are fresh, and when to look again. Fresh numbers are redrawn when the app
     /// reloads the timelines. If the app stops, the widget switches to "not running" once the numbers get too old;
     /// without numbers it waits for the app's next reload.
-    static func current(now: Date = .now) -> (WidgetPayload?, TimelineReloadPolicy) {
-        let payload = SharedStore.load().flatMap { SharedStore.isFresh($0, now: now) ? $0 : nil }
+    static func current(kind: String, now: Date = .now) -> (WidgetPayload?, TimelineReloadPolicy) {
+        let stored = SharedStore.load()
+        Probe.timeline(kind: kind, payload: stored, now: now)
+        let payload = stored.flatMap { SharedStore.isFresh($0, now: now) ? $0 : nil }
         let policy: TimelineReloadPolicy = payload.map { .after($0.date.addingTimeInterval(SharedStore.freshness)) } ?? .never
         return (payload, policy)
     }
@@ -91,7 +95,7 @@ extension WidgetPayload {
 
 struct CPUWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "cpu", provider: PayloadProvider()) { entry in
+        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "cpu", provider: PayloadProvider(kind: SharedStore.widgetKindPrefix + "cpu")) { entry in
             CPUWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("CPU")
@@ -102,7 +106,7 @@ struct CPUWidget: Widget {
 
 struct MemoryWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "memory", provider: PayloadProvider()) { entry in
+        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "memory", provider: PayloadProvider(kind: SharedStore.widgetKindPrefix + "memory")) { entry in
             MemoryWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("RAM")
@@ -113,7 +117,7 @@ struct MemoryWidget: Widget {
 
 struct GPUWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SharedStore.gpuWidgetKind, provider: PayloadProvider()) { entry in
+        StaticConfiguration(kind: SharedStore.gpuWidgetKind, provider: PayloadProvider(kind: SharedStore.gpuWidgetKind)) { entry in
             GPUWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("GPU")
@@ -124,7 +128,7 @@ struct GPUWidget: Widget {
 
 struct NetworkWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "network", provider: PayloadProvider()) { entry in
+        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "network", provider: PayloadProvider(kind: SharedStore.widgetKindPrefix + "network")) { entry in
             NetworkWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Network")
@@ -135,7 +139,7 @@ struct NetworkWidget: Widget {
 
 struct DiskWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "disk", provider: PayloadProvider()) { entry in
+        StaticConfiguration(kind: SharedStore.widgetKindPrefix + "disk", provider: PayloadProvider(kind: SharedStore.widgetKindPrefix + "disk")) { entry in
             DiskWidgetView(payload: entry.payload).containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("SSD")

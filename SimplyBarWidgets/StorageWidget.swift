@@ -67,7 +67,7 @@ struct StorageProvider: AppIntentTimelineProvider {
     }
 
     func timeline(for configuration: SelectDiskIntent, in context: Context) async -> Timeline<StorageEntry> {
-        let (payload, policy) = PayloadTimeline.current()
+        let (payload, policy) = PayloadTimeline.current(kind: SharedStore.storageWidgetKind)
         let entry = StorageEntry(date: .now, payload: payload, diskID: configuration.disk?.id)
         return Timeline(entries: [entry], policy: policy)
     }
