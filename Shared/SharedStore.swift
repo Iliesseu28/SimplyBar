@@ -62,8 +62,8 @@ nonisolated enum SharedStore {
     static let appGroup = "ZNPYGQCK98.fr.simplibot.simplybar"
 
     /// Past this age a widget says the app is not running instead of showing old numbers as current. The app
-    /// rewrites the numbers every 30 minutes, give or take a few minutes of timer slack.
-    static let freshness: TimeInterval = 45 * 60
+    /// rewrites the numbers every 5 minutes: three missed publications.
+    static let freshness: TimeInterval = 15 * 60
 
     /// A widget's kind is this prefix plus what it shows (`cpu`, `memory`, `gpu`, `network`, `disk`, `storage`,
     /// `bluetooth`, `keepAwake`, `health`, `diagnostic`), so the app can tell from the widgets on the desktop which numbers to keep

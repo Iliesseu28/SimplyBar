@@ -9,7 +9,7 @@ import WidgetKit
 /// Cost control: one coalescing timer per module (20 % tolerance). A module is sampled at its own pace while it is
 /// in the menu bar or its popup is open, every minute when only a desktop widget shows it, and not at all
 /// otherwise; the disk needs its fast pace only while its popup is open. An alert that is on keeps the module it
-/// watches sampled every minute too. Widget data is written and reloaded every 30 minutes, and only while widgets are
+/// watches sampled every minute too. Widget data is written and reloaded every 5 minutes, and only while widgets are
 /// on the desktop.
 @MainActor
 @Observable
@@ -17,10 +17,13 @@ final class SystemMonitor {
     static let historyLength = 50
     /// Pace of a module only a desktop widget shows, and of the disk while its popup is closed.
     static let slowInterval: TimeInterval = 60
-    /// WidgetKit grants a widget a few dozen reloads a day: one every 30 minutes stays inside that budget.
-    static let widgetReloadInterval: TimeInterval = 30 * 60
+    /// Reloads the app asks for are exempt from WidgetKit's daily budget (chronod logs "budget exempt reason:
+    /// containerApp"), so every widget check publishes.
+    static let widgetReloadInterval: TimeInterval = 5 * 60
     /// How often the app asks WidgetKit which widgets are on the desktop.
     static let widgetCheckInterval: TimeInterval = 5 * 60
+    /// The check timer may fire up to this late: a check that comes a little early after a late one still publishes.
+    static let widgetCheckTolerance: TimeInterval = 30
 
     private(set) var cpu: CPUSample?
     private(set) var cpuHistory = History(capacity: historyLength)
@@ -62,6 +65,8 @@ final class SystemMonitor {
     @ObservationIgnored private var thermalObserver: (any NSObjectProtocol)?
     @ObservationIgnored private var volumeObservers: [any NSObjectProtocol] = []
     @ObservationIgnored private var volumeTask: Task<Void, Never>?
+    @ObservationIgnored private var wakeObserver: (any NSObjectProtocol)?
+    @ObservationIgnored private var wakeTask: Task<Void, Never>?
     /// Readings of each module and the time they took since the last full publication (probe line).
     @ObservationIgnored private var sampleCost: [Module: (count: Int, time: Duration)] = [:]
     /// Keys of the alerts being sent right now.
@@ -84,6 +89,7 @@ final class SystemMonitor {
         diagnostic.onChange = { [weak self] in self?.diagnosticChanged() }
         observeThermalState()
         observeVolumes()
+        observeWake()
         notifier.onChange = { [weak self] in self?.reschedule() }
         notifier.activate()
         reschedule()
@@ -92,7 +98,7 @@ final class SystemMonitor {
         let timer = Timer(timeInterval: Self.widgetCheckInterval, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.checkWidgets() }
         }
-        timer.tolerance = 30
+        timer.tolerance = Self.widgetCheckTolerance
         RunLoop.main.add(timer, forMode: .common)
         widgetTimer = timer
         checkWidgets()
@@ -307,7 +313,7 @@ final class SystemMonitor {
     }
 
     /// Asks WidgetKit which widgets are on the desktop. The modules they show keep being sampled (every minute when
-    /// nothing else needs them); their numbers are written and reloaded every 30 minutes, or soon after a new widget
+    /// nothing else needs them); their numbers are written and reloaded every 5 minutes, or soon after a new widget
     /// appears. Nothing is written while no widget is on the desktop.
     private func checkWidgets() {
         Task { [weak self] in
@@ -334,13 +340,13 @@ final class SystemMonitor {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
                 MainActor.assumeIsolated { self?.publishToWidgets() }
             }
-        } else if Date.now.timeIntervalSince(lastWidgetReload) >= Self.widgetReloadInterval {
+        } else if Date.now.timeIntervalSince(lastWidgetReload) >= Self.widgetReloadInterval - 2 * Self.widgetCheckTolerance {
             publishToWidgets()
         }
     }
 
     /// Writes the latest numbers for the widgets on the desktop and asks WidgetKit to redraw them all, or only the
-    /// widgets of `kind` (the other ones keep their 30-minute pace).
+    /// widgets of `kind` (the other ones keep their 5-minute pace).
     func publishToWidgets(onlyKind kind: String? = nil) {
         guard !widgetKinds.isEmpty else { return }
         var payload = widgetPayload()
@@ -395,7 +401,7 @@ final class SystemMonitor {
 
     // MARK: - Disks
 
-    /// A disk plugged in, ejected or renamed shows on the Storage widget within seconds, not at the next 30-minute
+    /// A disk plugged in, ejected or renamed shows on the Storage widget within seconds, not at the next 5-minute
     /// reload. A disk with several volumes posts one notification per volume: they are grouped into one reload.
     private func observeVolumes() {
         let center = NSWorkspace.shared.notificationCenter
@@ -417,6 +423,33 @@ final class SystemMonitor {
             guard !Task.isCancelled, let self, self.widgetKinds.contains(SharedStore.storageWidgetKind) else { return }
             Self.log.notice("Disks changed: Storage widget refreshed")
             self.publishToWidgets(onlyKind: SharedStore.storageWidgetKind)
+        }
+    }
+
+    // MARK: - Wake
+
+    /// After a sleep longer than the freshness limit the widgets say the app is not running: they get new numbers a
+    /// few seconds after the wake instead of at the next 5-minute check.
+    private func observeWake() {
+        wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.woke() }
+        }
+    }
+
+    private func woke() {
+        wakeTask?.cancel()
+        wakeTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(5))
+            guard !Task.isCancelled, let self, !self.widgetKinds.isEmpty else { return }
+            // Readings taken before the sleep would be published as current. CPU and network measure between two
+            // readings and Bluetooth reads in a task: their timers bring their next value.
+            for module in self.widgetModules where [.memory, .disk, .gpu, .health].contains(module) {
+                self.sample(module)
+            }
+            Self.log.notice("Woke: widgets refreshed")
+            self.publishToWidgets()
         }
     }
 

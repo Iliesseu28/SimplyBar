@@ -25,7 +25,7 @@ struct PayloadEntry: TimelineEntry {
     let payload: WidgetPayload?
 }
 
-/// Every widget reads the file the menu bar app writes; the app reloads the timelines every 30 minutes.
+/// Every widget reads the file the menu bar app writes; the app reloads the timelines every 5 minutes.
 struct PayloadProvider: TimelineProvider {
     let kind: String
 
@@ -154,7 +154,7 @@ struct WidgetHeader: View {
     let symbol: String
     let title: Text
     var value: String?
-    /// When the numbers were measured: widgets are redrawn every 30 minutes, not live.
+    /// When the numbers were measured: widgets are redrawn every 5 minutes, not live.
     var date: Date?
 
     init(symbol: String, title: LocalizedStringKey, value: String? = nil, date: Date? = nil) {

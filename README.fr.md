@@ -119,8 +119,8 @@ Chaque alerte est envoyée au plus une fois par heure.
 | Anti-veille | Petite | Un bouton pour activer ou couper l'anti-veille |
 
 Les widgets lisent les valeurs que l'app écrit dans son conteneur partagé (App Group) : laissez SimplyBar
-tourner pour qu'ils se mettent à jour. WidgetKit les rafraîchit environ toutes les 30 minutes, et un widget
-qu'on vient de poser peut attendre jusqu'à 5 minutes ses premiers chiffres. Chaque widget affiche l'heure de sa
+tourner pour qu'ils se mettent à jour. L'app les rafraîchit toutes les 5 minutes et quelques secondes après le
+réveil du Mac, et un widget qu'on vient de poser peut attendre jusqu'à 5 minutes ses premiers chiffres. Chaque widget affiche l'heure de sa
 dernière mesure. Les boutons des widgets Diagnostic et Anti-veille demandent à l'app ouverte d'agir, et le widget
 affiche le résultat.
 

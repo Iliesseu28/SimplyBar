@@ -167,7 +167,7 @@ def main():
     out += ["## 4. Fraîcheur des widgets", "",
             f"Publications complètes : {len(full)} ({len(full) / max(1, hours / 24):.0f} par jour), écart médian "
             f"{fmt(median(gaps) / 60 if gaps else None, 0, ' min')}, plus long {fmt(max(gaps) / 60 if gaps else None, 0, ' min')}, "
-            f"{sum(g > 45 * 60 for g in gaps)} trous de plus de 45 min (le widget affichait alors « app arrêtée »).",
+            f"{sum(g > 15 * 60 for g in gaps)} trous de plus de 15 min (le widget affichait alors « app arrêtée »).",
             f"Publications partielles (un seul widget) : {sum(1 for _, f in publishes if f.get('only') != 'all')}.", "",
             "| Widget | Redessins demandés par macOS | Par jour | Âge médian des chiffres | Âge max | Périmés |", "|---|---|---|---|---|---|"]
     for kind, items in sorted(kinds.items()):
@@ -175,7 +175,7 @@ def main():
         stale = sum(1 for f in items if f.get("fresh") == "false")
         out.append(f"| {kind} | {len(items)} | {len(items) / max(1, hours / 24):.0f} | {fmt(median(ages) / 60 if ages else None, 0, ' min')} | "
                    f"{fmt(max(ages) / 60 if ages else None, 0, ' min')} | {stale} |")
-        if ages and median(ages) > 20 * 60:
+        if ages and median(ages) > 7 * 60:
             flags.append(f"Widget {kind} : chiffres vieux de {median(ages) / 60:.0f} min en médiane quand macOS le redessine.")
     budget = Counter()
     for row in logs:

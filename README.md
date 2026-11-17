@@ -114,8 +114,8 @@ Each alert is sent at most once an hour.
 | Keep Awake | Small | One button to turn Keep Awake on or off |
 
 Widgets read the values the app writes to its shared App Group container: keep SimplyBar running for them to
-update. WidgetKit refreshes them about every 30 minutes, and a widget you have just added can wait up to
-5 minutes for its first numbers. Each widget shows the time of its last reading. The Diagnostic and Keep Awake
+update. The app refreshes them every 5 minutes and a few seconds after the Mac wakes up, and a widget you have
+just added can wait up to 5 minutes for its first numbers. Each widget shows the time of its last reading. The Diagnostic and Keep Awake
 buttons ask the running app to act, and the widget shows the result.
 
 ![Desktop widgets](docs/images/widgets.png)
