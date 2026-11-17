@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Observation
 import OSLog
@@ -59,6 +60,8 @@ final class SystemMonitor {
     /// Date of the last diagnostic request from the widget, handled once.
     @ObservationIgnored private var lastDiagnosticRequest: Date?
     @ObservationIgnored private var thermalObserver: (any NSObjectProtocol)?
+    @ObservationIgnored private var volumeObservers: [any NSObjectProtocol] = []
+    @ObservationIgnored private var volumeTask: Task<Void, Never>?
     /// Keys of the alerts being sent right now.
     @ObservationIgnored private var sendingAlerts: Set<String> = []
 
@@ -78,6 +81,7 @@ final class SystemMonitor {
         observeDiagnosticRequests()
         diagnostic.onChange = { [weak self] in self?.diagnosticChanged() }
         observeThermalState()
+        observeVolumes()
         notifier.onChange = { [weak self] in self?.reschedule() }
         notifier.activate()
         reschedule()
@@ -344,6 +348,33 @@ final class SystemMonitor {
         } else {
             lastWidgetReload = .now
             WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    // MARK: - Disks
+
+    /// A disk plugged in, ejected or renamed shows on the Storage widget within seconds, not at the next 30-minute
+    /// reload. A disk with several volumes posts one notification per volume: they are grouped into one reload.
+    private func observeVolumes() {
+        let center = NSWorkspace.shared.notificationCenter
+        let names = [
+            NSWorkspace.didMountNotification, NSWorkspace.didUnmountNotification,
+            NSWorkspace.didRenameVolumeNotification,
+        ]
+        volumeObservers = names.map { name in
+            center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.volumesChanged() }
+            }
+        }
+    }
+
+    private func volumesChanged() {
+        volumeTask?.cancel()
+        volumeTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled, let self, self.widgetKinds.contains(SharedStore.storageWidgetKind) else { return }
+            Self.log.notice("Disks changed: Storage widget refreshed")
+            self.publishToWidgets(onlyKind: SharedStore.storageWidgetKind)
         }
     }
 
